@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("test")
-GET /test/hello
 public class Controller {
     @Autowired
     private TextRepository repository;

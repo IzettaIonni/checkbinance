@@ -6,20 +6,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.mockMvc;
+import static io.restassured.RestAssured.*;
+import static io.restassured.matcher.RestAssuredMatchers.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureMockMvc
 @SpringBootTest
 class ClientTest {
-    @Autowired
-    private MockMvc mvc;
+    BinanceClient service;
 
     @BeforeEach
-    void setUp() throws Exception {
-        mockMvc(mvc);
+    void setUp() {
+        service = new BinanceClient();
     }
 
     @Test
@@ -33,5 +31,10 @@ class ClientTest {
                 .log().all()
                 .assertThat()
                 .statusCode(200);
+    }
+
+    @Test
+    void testGetExchangeInfo() {
+        System.out.println(service.getExchangeInfo());
     }
 }

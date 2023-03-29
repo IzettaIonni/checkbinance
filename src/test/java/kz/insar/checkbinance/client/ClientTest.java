@@ -35,6 +35,6 @@ class ClientTest {
 
     @Test
     void testGetExchangeInfo() {
-        System.out.println(service.getExchangeInfo());
+        System.out.println(service.getExchangeInfoBySymbol());
     }
 }

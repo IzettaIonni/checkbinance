@@ -17,4 +17,8 @@ public class BinanceClient {
     public ExchangeInfoResponseDTO getExchangeInfo() {
         return restOperations.getForObject("https://api.binance.com/api/v3/exchangeInfo", ExchangeInfoResponseDTO.class);
     }
+
+    public ExchangeInfoResponseDTO getExchangeInfoBySymbol() {
+        return restOperations.getForObject("https://api.binance.com/api/v3/exchangeInfo?symbol=BNBBTC", ExchangeInfoResponseDTO.class);
+    }
 }

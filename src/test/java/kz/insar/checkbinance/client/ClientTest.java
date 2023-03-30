@@ -35,6 +35,7 @@ class ClientTest {
 
     @Test
     void testGetExchangeInfo() {
-        System.out.println(service.getExchangeInfoBySymbol());
+        String[] request_symbols = {"BNBBTC", "BTCUSDT"};
+        System.out.println(service.getExchangeInfoBySymbols(request_symbols));
     }
 }

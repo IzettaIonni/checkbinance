@@ -1,11 +1,15 @@
 package kz.insar.checkbinance.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+
 import static io.restassured.RestAssured.*;
 import static io.restassured.matcher.RestAssuredMatchers.*;
 
@@ -35,7 +39,14 @@ class ClientTest {
 
     @Test
     void testGetExchangeInfo() {
-        String[] request_symbols = {"BNBBTC", "BTCUSDT"};
+        List<String> request_symbols = List.of("BNBBTC", "BTCUSDT");
         System.out.println(service.getExchangeInfoBySymbols(request_symbols));
+    }
+
+    @Test
+    void testT() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<String> request_symbols = List.of("BNBBTC", "BTCUSDT");
+        System.out.println(objectMapper.writeValueAsString(request_symbols));
     }
 }

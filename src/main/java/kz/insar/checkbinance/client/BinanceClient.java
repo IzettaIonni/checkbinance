@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -45,6 +47,10 @@ public class BinanceClient {
                 .queryParam("symbol", symbol).queryParam("limit", limit)
                 .build()
                 .toUri();
-        return restOperations.getForObject(requestUri, RecentTradesDTO.class);
+        return restOperations.exchange(
+                requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<RecentTradeDTO>>() {}
+                )
+                .getBody();
     }
 }
+

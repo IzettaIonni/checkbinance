@@ -55,6 +55,6 @@ class ClientTest {
     void testA() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         System.out.println(objectMapper.writeValueAsString(
-                service.getRecentTrades("BNBBTC", 10)));
+                service.getRecentTrades("BNBBTC", 2)));
     }
 }

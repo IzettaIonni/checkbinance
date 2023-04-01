@@ -41,6 +41,10 @@ public class BinanceClient {
 
     public List<RecentTradeDTO> getRecentTrades(String symbol, Integer limit) {
         URI requestUri = UriComponentsBuilder.fromHttpUrl("https://api.binance.com")
-                .
+                .path("/api/v3/trades")
+                .queryParam("symbol", symbol).queryParam("limit", limit)
+                .build()
+                .toUri();
+        return restOperations.getForObject(requestUri, RecentTradesDTO.class);
     }
 }

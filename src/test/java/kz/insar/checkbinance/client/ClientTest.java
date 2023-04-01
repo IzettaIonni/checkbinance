@@ -1,5 +1,6 @@
 package kz.insar.checkbinance.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,5 +49,12 @@ class ClientTest {
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> request_symbols = List.of("BNBBTC", "BTCUSDT");
         System.out.println(objectMapper.writeValueAsString(request_symbols));
+    }
+
+    @Test
+    void testA() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        System.out.println(objectMapper.writeValueAsString(
+                service.getRecentTrades("BNBBTC", 10)));
     }
 }

@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -13,11 +15,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+@Service
 @AllArgsConstructor
 public class BinanceClient {
     @NonNull
     private final RestOperations restOperations;
-
+    @Autowired
     public BinanceClient() {
         this(new RestTemplate());
     }
@@ -52,5 +55,7 @@ public class BinanceClient {
                 )
                 .getBody();
     }
+    public List<RecentTradeDTO> getRecentTrades(String symbol) {
+        return getRecentTrades(symbol, 10);
+    }
 }
-

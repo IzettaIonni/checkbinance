@@ -11,4 +11,3 @@ public class CheckbinanceApplication {
 	}
 
 }
-//мяу

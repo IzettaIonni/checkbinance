@@ -1,10 +1,8 @@
 package kz.insar.checkbinance.controllers;
 
-import kz.insar.checkbinance.TextRepository;
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.client.BinanceClient;
-import kz.insar.checkbinance.client.ExchangeInfoResponseDTO;
 import kz.insar.checkbinance.converters.ApiConvertrer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;

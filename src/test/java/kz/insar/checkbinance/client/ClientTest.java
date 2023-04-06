@@ -1,10 +1,9 @@
 package kz.insar.checkbinance.client;
 
-import com.binance.api.client.BinanceApiClientFactory;
-import com.binance.api.client.BinanceApiRestClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.http.ContentType;
+import kz.insar.checkbinance.services.TickerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,5 +57,10 @@ class ClientTest {
         ObjectMapper objectMapper = new ObjectMapper();
         System.out.println(objectMapper.writeValueAsString(
                 service.getRecentTrades("BNBBTC", 2)));
+    }
+
+    @Test
+    void testB () throws NullPointerException {
+
     }
 }

@@ -1,0 +1,150 @@
+body {
+    font-family: 'Oxygen', sans-serif;
+
+    font-size: 15px;
+    color: #333;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    border: 3px solid #000;
+}
+
+header {
+    background: rgb(255, 225, 9);
+    background: linear-gradient(125deg, rgba(255, 225, 9, 1) 0%, rgba(255, 171, 7, 1) 100%);
+    ;
+}
+
+.header_container {
+    display: flex;
+    justify-content: space-between;
+    padding: 30px;
+}
+
+h1 {
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.nav {
+    display: flex;
+}
+
+.nav_link {
+    margin: auto 30px;
+    text-transform: uppercase;
+    font-size: 17px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.nav_link a {
+    display: inline-block;
+    position: relative;
+
+    transition: color .2s linear;
+}
+
+.nav_link a:visited {
+    color: #FFE973;
+}
+
+.nav_link a:after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 3px;
+    opacity: 0;
+
+
+    background-color: #fff;
+
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1;
+
+    transition: opacity .2s linear;
+}
+
+.nav_link a:hover {
+    color: #fff;
+}
+
+.nav_link a:hover:after {
+    opacity: 1;
+}
+
+.tiker_table {
+    max-width: 1400px;
+    width: 100%;
+
+    margin: 50px auto;
+
+    display: flex;
+    flex-direction: column;
+
+    background: rgb(230, 230, 230);
+    background: linear-gradient(125deg, rgba(230, 230, 230, 1) 0%, rgba(245, 245, 245, 1) 100%);
+
+    border-radius: 25px;
+    border: 3px solid #999;
+
+    box-shadow: 1px 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.tiker {
+    display: inline-block;
+
+    height: 65px;
+
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 20px;
+
+    margin: 5px 4px;
+
+    border-radius: 25px;
+
+    transition: background .2s linear;
+}
+
+.tiker:hover {
+    background-color: #ccc;
+}
+
+.tiker_params {
+    margin: auto 30px;
+}
+
+.subscribe_button {
+    color: #222;
+
+    font-weight: bold;
+
+    margin: auto 10px;
+    padding: 10px;
+
+    display: inline-block;
+    border-radius: 10px;
+
+    background: rgb(255, 158, 0);
+    background: linear-gradient(125deg, rgba(255, 158, 0, 1) 0%, rgba(255, 126, 0, 1) 100%);
+
+    box-shadow: 1px 1px 3px 2px #ccc;
+}
+
+.subscribe_button a {
+    color: #FFE973;
+
+    display: inline-block;
+    margin: auto;
+}
+
+.subscribe_button a:visited {
+    color: #FFE973;
+}

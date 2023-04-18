@@ -22,12 +22,18 @@ public class TickerServiceImpl implements TickerService {
 
     @Override
     public List<LastPriceDTO> lastPrices(List<String> symbols) {
+        return lastPrices(symbols, 10);
+    }
+
+    @Override
+    public List<LastPriceDTO> lastPrices(List<String> symbols, int limit) {
         List<LastPriceDTO> prices = new ArrayList<>();
+        if (symbols == null || symbols.size() == 0) return prices;
         for (int i = 0; i < symbols.size(); i++) {
             String symbol = symbols.get(i);
-            var recentTrades = binanceClient.getRecentTrades(symbol);
+            var recentTrades = binanceClient.getRecentTrades(symbol, limit);
             for (int j = 0; j < recentTrades.size(); j++) {
-                prices.add(apiConvertrer.toApi(symbol, recentTrades.get(i)));
+                prices.add(apiConvertrer.toApi(symbol, recentTrades.get(j)));
             }
         }
         return prices;

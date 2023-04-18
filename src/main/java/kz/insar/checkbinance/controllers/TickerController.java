@@ -24,8 +24,9 @@ public class TickerController {
     private TickerService tickerService;
 
     @GetMapping("/lastprice")
-    public List<LastPriceDTO> lastPrices(@Nullable @RequestParam List<String> symbols) {
-        return tickerService.lastPrices(symbols);
+    public List<LastPriceDTO> lastPrices(@Nullable @RequestParam List<String> symbols,
+                                         @Nullable @RequestParam(defaultValue = "1") Integer limit) {
+        return tickerService.lastPrices(symbols, limit);
     }
 
     @GetMapping("/exchangeinfo")

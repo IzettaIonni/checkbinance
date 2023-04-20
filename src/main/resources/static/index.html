@@ -16,9 +16,12 @@
     <script>
         $(document).ready(function() {
             const formHandler = function (form) {
-                $.getJSON('/lastprice', function(response) {
-
+                const data = {
+                    symbols : $("#symbols").val()
                 }
+                $.getJSON('/ticker/lastprice', data, function(response) {
+
+                })
             }
 
             $('#myForm').validate({
@@ -46,6 +49,7 @@
     <main>
         <form id="myForm">
             <button>Refresh</button>
+            <input name="symbols" id="symbols" type="text" size="16" class="symbols"/>
         </form>
 
         <div class="tiker_table">

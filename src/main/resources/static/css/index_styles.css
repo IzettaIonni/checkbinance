@@ -148,3 +148,7 @@ h1 {
 .subscribe_button a:visited {
     color: #FFE973;
 }
+
+.symbols {
+    background-color: #ccc;
+}

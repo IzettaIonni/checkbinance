@@ -50,10 +50,17 @@ public class BinanceClient {
                 .queryParam("symbol", symbol).queryParam("limit", limit)
                 .build()
                 .toUri();
-        return restOperations.exchange(
-                requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<RecentTradeDTO>>() {}
-                )
-                .getBody();
+
+        try {
+            return restOperations.exchange(
+                    requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<RecentTradeDTO>>() {}
+                    )
+                    .getBody();
+        }
+        catch(Exception e) {
+            throw new BinanceClientExeption("Unable to get recent trades", e);
+        }
+
     }
     public List<RecentTradeDTO> getRecentTrades(String symbol) {
         return getRecentTrades(symbol, 10);

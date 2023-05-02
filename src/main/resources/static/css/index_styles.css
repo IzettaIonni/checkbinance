@@ -46,6 +46,8 @@ h1 {
     position: relative;
 
     transition: color .2s linear;
+
+    color: #fff;
 }
 
 .nav_link a:visited {

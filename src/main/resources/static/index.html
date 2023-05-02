@@ -19,9 +19,32 @@
                 const data = {
                     symbols : $("#symbols").val()
                 }
-                $.getJSON('/ticker/lastprice', data, function(response) {
+                $.getJSON('/ticker/lastprice', data)
+                    .done(function(response) {
+                    console.log(response)
+                    const target = $("#table"); target.empty()
+                    for (let i = 0; i < response.length; i++) {
+                        let table_element = $("<div>", { id : response[i].id, "class" : "tiker"})
 
-                })
+                        let tiker_name = $("<div>", {"class" : "tiker_name tiker_params"})
+                        $("<p>" + response[i].symbol + "</p>").appendTo(tiker_name)
+                        table_element.append(tiker_name)
+
+                        let tiker_price = $("<div>", {"class" : "tiker_price tiker_params"})
+                        $("<p>" + "price: " +response[i].price + "</p>").appendTo(tiker_price)
+                        table_element.append(tiker_price)
+
+                        let subscribe_button = $("<div>", {"class" : "subscribe_button tiker_params"})
+                        $("<a href='#'>subscribe</a>").appendTo(subscribe_button)
+                        table_element.append(subscribe_button)
+
+                        target.append(table_element)
+                    }
+                }).fail(function( jqxhr, textStatus, error ) {
+                    var err = textStatus + ", " + error;
+                    console.log( "Request Failed: " + err );
+                    alert("Request Failed: " + err +"try other ticker names")
+                });
             }
 
             $('#myForm').validate({
@@ -52,7 +75,7 @@
             <input name="symbols" id="symbols" type="text" size="16" class="symbols"/>
         </form>
 
-        <div class="tiker_table">
+        <div class="tiker_table" id="table">
 
             <div class="tiker">
                 <div class="tiker_name tiker_params">

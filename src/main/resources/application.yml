@@ -8,3 +8,10 @@ server:
 spring:
   application:
     name: test
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/CheckBinance
+    username: postgres
+    password: 123
+    hikari:
+      maxLifetime: 600000

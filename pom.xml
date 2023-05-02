@@ -16,6 +16,7 @@
 	<properties>
 		<spring-boot-dependencies.version>2.7.8</spring-boot-dependencies.version>
 		<java.version>17</java.version>
+
 	</properties>
 	<dependencies>
 		<dependency>
@@ -59,6 +60,20 @@
 <!--			<groupId>org.springframework.boot</groupId>-->
 <!--			<artifactId>spring-boot-starter-web-services</artifactId>-->
 <!--		</dependency>-->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>8.5.7</version>
+		</dependency>
 	</dependencies>
 
 	<build>

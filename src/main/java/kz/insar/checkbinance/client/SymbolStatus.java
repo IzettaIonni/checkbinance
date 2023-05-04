@@ -1,6 +1,6 @@
 package kz.insar.checkbinance.client;
 
-public enum     SymbolStatus {
+public enum SymbolStatus {
     PRE_TRADING,
     TRADING,
     POST_TRADING,

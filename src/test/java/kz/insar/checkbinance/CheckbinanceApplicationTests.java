@@ -25,7 +25,6 @@ class CheckbinanceApplicationTests {
 		builder.baseAssetPrecision(5);
 		builder.status(SymbolStatus.POST_TRADING);
 		builder.quoteAssetPrecision(6);
-		System.out.println(symbolService.createSymbol(builder.build()).getId());
 	}
 
 

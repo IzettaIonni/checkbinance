@@ -38,4 +38,9 @@ public class TickerController {
     public ExchangeInfoBySymbolsDTO exchangeInfo() {
         return tickerService.exchangeInfo();
     }
+
+    @GetMapping("/update")
+    public List<String> testUpdate() {
+        return tickerService.updateSymbols();
+    }
 }

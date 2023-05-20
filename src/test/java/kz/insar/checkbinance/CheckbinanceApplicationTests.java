@@ -5,6 +5,7 @@ import kz.insar.checkbinance.domain.SymbolCreate;
 import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.repositories.entities.SymbolEntity;
 import kz.insar.checkbinance.services.SymbolService;
+import kz.insar.checkbinance.services.TickerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,8 @@ class CheckbinanceApplicationTests {
 
 	@Autowired
 	private SymbolService symbolService;
+	@Autowired
+	private TickerService tickerService;
 
 	@Test
 	void contextLoads() {
@@ -29,9 +32,6 @@ class CheckbinanceApplicationTests {
 
 
 	@Test void Asd() {
-		var s = SymbolId.of(1);
-		s.getId();
-		SymbolId.of(2).getId();
-		System.out.println(s);
+		System.out.println(tickerService.updateSymbols());
 	}
 }

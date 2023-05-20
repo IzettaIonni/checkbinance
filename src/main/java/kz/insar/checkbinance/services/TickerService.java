@@ -13,4 +13,6 @@ public interface TickerService {
     ExchangeInfoBySymbolsDTO exchangeInfo(List<String> symbols);
 
     ExchangeInfoBySymbolsDTO exchangeInfo();
+
+    List<String> updateSymbols();
 }

@@ -6,6 +6,9 @@ import kz.insar.checkbinance.api.SymbolParamsDTO;
 import kz.insar.checkbinance.client.ExchangeInfoResponseDTO;
 import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolDTO;
+import kz.insar.checkbinance.domain.Symbol;
+import kz.insar.checkbinance.domain.SymbolUpdate;
+import kz.insar.checkbinance.domain.SymbolCreate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -48,5 +51,30 @@ public class ApiConvertrer {
         }
         exchangeInfoBySymbolsDTO.setSymbols(symbolParamsDTOList);
         return exchangeInfoBySymbolsDTO;
+    }
+
+    public SymbolUpdate toDomainUpdate(Symbol symbol, SymbolDTO updateParams) {
+        return SymbolUpdate.builder()
+                .id(symbol.getId())
+                .status(updateParams.getStatus())
+                .baseAsset(updateParams.getBaseAsset())
+                .baseAssetPrecision(updateParams.getBaseAssetPrecision())
+                .quoteAsset(updateParams.getQuoteAsset())
+                .quotePrecision(updateParams.getQuotePrecision())
+                .quoteAssetPrecision(updateParams.getQuoteAssetPrecision())
+                .build();
+    }
+
+    public SymbolCreate toDomainCreate(SymbolDTO createParams) {
+        return SymbolCreate.builder()
+                .name(createParams.getSymbol())
+                .status(createParams.getStatus())
+                .baseAsset(createParams.getBaseAsset())
+                .baseAssetPrecision(createParams.getBaseAssetPrecision())
+                .quoteAsset(createParams.getQuoteAsset())
+                .quotePrecision(createParams.getQuotePrecision())
+                .quoteAssetPrecision(createParams.getQuoteAssetPrecision())
+                .build();
+
     }
 }

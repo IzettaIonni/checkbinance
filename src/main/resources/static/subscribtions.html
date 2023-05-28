@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkbinance</title>
+    <link rel="stylesheet" href="css/zero_style.css">
+    <link rel="stylesheet" href="css/index_styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxygen:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script>
+
+
+
+        $(document).ready(function () {
+
+            $(".ticker_table").on("click", "a.unsubscribe", function (){
+                $.get("/ticker/unsubscribeticker", {id : $(this).data('ticker_id')}, function (){
+                })
+            })
+
+            $(".ticker_table").on("click", "div.unsubscribe_button", function (){
+                $(".ticker_table").trigger("click")
+            })
+
+            const updateTable = function (response) {
+
+                const target = $("#table"); target.empty()
+                for (let i = 0; i < response.length; i++) {
+                    let table_element = $("<div>", { id: response[i].id, "class": "ticker" })
+
+                    let ticker_name = $("<div>", { "class": "ticker_name ticker_params" })
+                    $("<p>" + response[i].name + "</p>").appendTo(ticker_name)
+                    table_element.append(ticker_name)
+                    let subscribe_button = $("<div>", { "class": "unsubscribe_button ticker_params" })
+                    $("<a href='#' class='unsubscribe'>unsubscribe</a>").data('ticker_id', response[i].id).appendTo(subscribe_button)
+
+                    table_element.append(subscribe_button)
+
+                    target.append(table_element)
+                }
+            }
+
+            const formHandler = function () {
+                $.getJSON('/ticker/subscriptions')
+                    .done(updateTable).fail(function (jqxhr, textStatus, error) {
+                        var err = textStatus + ", " + error;
+                        console.log("Request Failed: " + err);
+                        alert("Request Failed: " + err + "try other ticker names")
+                    });
+            }
+
+            $('#myForm').validate({
+                submitHandler: formHandler
+            })
+            formHandler()
+
+        });
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="header_container">
+            <h1>Checkbinance</h1>
+            <div class="nav">
+                <div class="nav_link">
+                    <a href="index.html">home</a>
+                </div>
+                <div class="nav_link">
+                    <a href="subscribtions.html">subscribes</a>
+                </div>
+            </div>
+        </div>
+        <form id="myForm" class="search_bar">
+            <input name="symbols" id="symbols" type="text" size="16" class="symbols"
+                placeholder="Type ticker short names to search" />
+            <button class="button-5">Search</button>
+            <button class="button-5">Show all tickers</button>
+        </form>
+    </header>
+
+    <main>
+
+
+        <div class="ticker_table" id="table">
+
+            <div class="ticker">
+                <div class="ticker_name ticker_params">
+                    <p>Here will display your subscriptions</p>
+                </div>
+
+            </div>
+        </div>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

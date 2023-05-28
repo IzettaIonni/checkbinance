@@ -15,6 +15,7 @@ import javax.persistence.*;
 @Builder(toBuilder = true)
 @Getter
 @Setter
+@EqualsAndHashCode
 @TypeDef(
         name = "symbol_status_type",
         typeClass = PostgreSQLEnumType.class

@@ -11,11 +11,12 @@ import java.time.LocalTime;
 @Configuration
 @EnableScheduling
 public class ScheduledUpdate {
+
     @Autowired
     TickerService tickerService;
 
-    @Scheduled(fixedDelay = 300000)
-    private void shceduledSymbolUpdate() {
-        tickerService.updateSymbols();
-    }
+//    @Scheduled(fixedDelay = 300000)
+//    private void shceduledSymbolUpdate() {
+//        tickerService.updateSymbols();
+//    }
 }

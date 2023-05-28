@@ -2,8 +2,9 @@ package kz.insar.checkbinance.controllers;
 
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
-import kz.insar.checkbinance.client.BinanceClient;
+import kz.insar.checkbinance.api.SymbolShortDTO;
 import kz.insar.checkbinance.converters.ApiConvertrer;
+import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.services.TickerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,6 +22,8 @@ public class TickerController {
 
     @Autowired
     private TickerService tickerService;
+
+    private final ApiConvertrer apiConverter = new ApiConvertrer();
 
     @GetMapping("/lastprice")
     public List<LastPriceDTO> lastPrices(@Nullable @RequestParam List<String> symbols,
@@ -39,8 +41,20 @@ public class TickerController {
         return tickerService.exchangeInfo();
     }
 
-    @GetMapping("/update")
-    public List<String> testUpdate() {
-        return tickerService.updateSymbols();
+    @GetMapping("subscribeticker")
+    public void subscribeTicker(@Nullable @RequestParam Integer id) {
+        if (id != null)
+            tickerService.subscribeOnPrice(SymbolId.of(id));
+    }
+
+    @GetMapping("unsubscribeticker")
+    public void unsubscribeTicker(@Nullable @RequestParam Integer id) {
+        if (id != null)
+            tickerService.unsubscribeOnPrice(SymbolId.of(id));
+    }
+
+    @GetMapping("/subscriptions")
+    public List<SymbolShortDTO> subscriptions() {
+        return apiConverter.fromDomainToShortList(tickerService.listSubscribtionOnPrices());
     }
 }

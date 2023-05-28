@@ -14,41 +14,41 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             const formHandler = function (form) {
                 const data = {
-                    symbols : $("#symbols").val()
+                    symbols: $("#symbols").val()
                 }
                 $.getJSON('/ticker/lastprice', data)
-                    .done(function(response) {
-                    console.log(response)
-                    const target = $("#table"); target.empty()
-                    for (let i = 0; i < response.length; i++) {
-                        let table_element = $("<div>", { id : response[i].id, "class" : "tiker"})
+                    .done(function (response) {
+                        console.log(response)
+                        const target = $("#table"); target.empty()
+                        for (let i = 0; i < response.length; i++) {
+                            let table_element = $("<div>", { id: response[i].id, "class": "ticker" })
 
-                        let tiker_name = $("<div>", {"class" : "tiker_name tiker_params"})
-                        $("<p>" + response[i].symbol + "</p>").appendTo(tiker_name)
-                        table_element.append(tiker_name)
+                            let ticker_name = $("<div>", { "class": "ticker_name ticker_params" })
+                            $("<p>" + response[i].symbol + "</p>").appendTo(ticker_name)
+                            table_element.append(ticker_name)
 
-                        let tiker_price = $("<div>", {"class" : "tiker_price tiker_params"})
-                        $("<p>" + "price: " +response[i].price + "</p>").appendTo(tiker_price)
-                        table_element.append(tiker_price)
+                            let ticker_price = $("<div>", { "class": "ticker_price ticker_params" })
+                            $("<p>" + "price: " + response[i].price + "</p>").appendTo(ticker_price)
+                            table_element.append(ticker_price)
 
-                        let subscribe_button = $("<div>", {"class" : "subscribe_button tiker_params"})
-                        $("<a href='#'>subscribe</a>").appendTo(subscribe_button)
-                        table_element.append(subscribe_button)
+                            let subscribe_button = $("<div>", { "class": "subscribe_button ticker_params" })
+                            $("<a href='#'>subscribe</a>").appendTo(subscribe_button)
+                            table_element.append(subscribe_button)
 
-                        target.append(table_element)
-                    }
-                }).fail(function( jqxhr, textStatus, error ) {
-                    var err = textStatus + ", " + error;
-                    console.log( "Request Failed: " + err );
-                    alert("Request Failed: " + err +"try other ticker names")
-                });
+                            target.append(table_element)
+                        }
+                    }).fail(function (jqxhr, textStatus, error) {
+                        var err = textStatus + ", " + error;
+                        console.log("Request Failed: " + err);
+                        alert("Request Failed: " + err + "try other ticker names")
+                    });
             }
 
             $('#myForm').validate({
-                submitHandler : formHandler
+                submitHandler: formHandler
             })
         });
     </script>
@@ -60,140 +60,46 @@
             <h1>Checkbinance</h1>
             <div class="nav">
                 <div class="nav_link">
-                    <a href="#">home</a>
+                    <a href="index.html">home</a>
                 </div>
                 <div class="nav_link">
-                    <a href="#">subscribes</a>
+                    <a href="subscribtions.html">subscribes</a>
                 </div>
             </div>
         </div>
+        <form id="myForm" class="search_bar">
+            <input name="symbols" id="symbols" type="text" size="16" class="symbols"
+                placeholder="Type ticker short names to search" />
+            <button class="button-5">Search</button>
+            <button class="button-5">Show all tickers</button>
+        </form>
     </header>
 
     <main>
-        <form id="myForm">
-            <button>Refresh</button>
-            <input name="symbols" id="symbols" type="text" size="16" class="symbols"/>
-        </form>
 
-        <div class="tiker_table" id="table">
 
-            <div class="tiker">
-                <div class="tiker_name tiker_params">
-                    <p>BNB</p>
-                </div>
-                <div class="tiker_price tiker_params">
-                    <p>$300</p>
-                </div>
-                <div class="subscribe_button tiker_params">
-                    <a href="#">subscribe</a>
+        <div class="ticker_table" id="table">
+
+            <div class="ticker">
+                <div class="ticker_name ticker_params">
+                    <p>Searched tickers will be here</p>
                 </div>
             </div>
 
-            <div class="tiker">
-                <div class="tiker_name tiker_params">
-                    <p>ETH</p>
+            <div id="57" class="ticker">
+                <div class="ticker_name ticker_params">
+                    <p>MTLBTC</p>
                 </div>
-                <div class="tiker_price tiker_params">
-                    <p>$20</p>
-                </div>
-                <div class="subscribe_button tiker_params">
-                    <a href="#">subscribe</a>
+                <div class="unsubscribe_button ticker_params">
+                    <a href="#">unsubscribe</a>
                 </div>
             </div>
-
-            <div class="tiker">
-                <div class="tiker_name tiker_params">
-                    <p>BTC</p>
+            <div id="102" class="ticker">
+                <div class="ticker_name ticker_params">
+                    <p>STORJETH</p>
                 </div>
-                <div class="tiker_price tiker_params">
-                    <p>$500</p>
-                </div>
-                <div class="subscribe_button tiker_params">
-                    <a href="#">subscribe</a>
-                </div>
-            </div>
-
-            <div class="tiker">
-                <div class="tiker_name tiker_params">
-                    <p>ID</p>
-                </div>
-                <div class="tiker_price tiker_params">
-                    <p>$5</p>
-                </div>
-                <div class="subscribe_button tiker_params">
-                    <a href="#">subscribe</a>
-                </div>
-            </div>
-
-            <div class="tiker">
-                <div class="tiker_name tiker_params">
-                    <p>ARB</p>
-                </div>
-                <div class="tiker_price tiker_params">
-                    <p>$40</p>
-                </div>
-                <div class="subscribe_button tiker_params">
-                    <a href="#">subscribe</a>
-                </div>
-            </div>
-
-            <div class="tiker">
-                <div class="tiker_name tiker_params">
-                    <p>DOGE</p>
-                </div>
-                <div class="tiker_price tiker_params">
-                    <p>$0.5</p>
-                </div>
-                <div class="subscribe_button tiker_params">
-                    <a href="#">subscribe</a>
-                </div>
-            </div>
-
-            <div class="tiker">
-                <div class="tiker_name tiker_params">
-                    <p>SOL</p>
-                </div>
-                <div class="tiker_price tiker_params">
-                    <p>$1</p>
-                </div>
-                <div class="subscribe_button tiker_params">
-                    <a href="#">subscribe</a>
-                </div>
-            </div>
-
-            <div class="tiker">
-                <div class="tiker_name tiker_params">
-                    <p>ADA</p>
-                </div>
-                <div class="tiker_price tiker_params">
-                    <p>$15</p>
-                </div>
-                <div class="subscribe_button tiker_params">
-                    <a href="#">subscribe</a>
-                </div>
-            </div>
-
-            <div class="tiker">
-                <div class="tiker_name tiker_params">
-                    <p>MATIC</p>
-                </div>
-                <div class="tiker_price tiker_params">
-                    <p>$66</p>
-                </div>
-                <div class="subscribe_button tiker_params">
-                    <a href="#">subscribe</a>
-                </div>
-            </div>
-
-            <div class="tiker">
-                <div class="tiker_name tiker_params">
-                    <p>SHIB</p>
-                </div>
-                <div class="tiker_price tiker_params">
-                    <p>$44</p>
-                </div>
-                <div class="subscribe_button tiker_params">
-                    <a href="#">subscribe</a>
+                <div class="unsubscribe_button ticker_params">
+                    <a href="#">unsubscribe</a>
                 </div>
             </div>
 

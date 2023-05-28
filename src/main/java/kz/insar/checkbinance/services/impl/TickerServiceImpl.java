@@ -6,6 +6,7 @@ import kz.insar.checkbinance.client.BinanceClient;
 import kz.insar.checkbinance.client.SymbolDTO;
 import kz.insar.checkbinance.converters.ApiConvertrer;
 import kz.insar.checkbinance.domain.Symbol;
+import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.services.SymbolService;
 import kz.insar.checkbinance.services.TickerService;
 import lombok.extern.slf4j.Slf4j;
@@ -79,4 +80,25 @@ public class TickerServiceImpl implements TickerService {
         log.info("Symbol list is updated!");
         return result;
     }
+
+    @Override
+    public List<Symbol> listSymbols() {
+        return symbolService.getSymbols();
+    }
+
+    @Override
+    public void subscribeOnPrice(SymbolId id) {
+        symbolService.addPriceSubscription(id);
+    }
+
+    @Override
+    public void unsubscribeOnPrice(SymbolId id) {
+        symbolService.removePriceSubscription(id);
+    }
+
+    @Override
+    public List<Symbol> listSubscribtionOnPrices() {
+        return symbolService.getListOfPriceSubscriptions();
+    }
+
 }

@@ -1,9 +1,12 @@
 package kz.insar.checkbinance;
 
 import kz.insar.checkbinance.client.SymbolStatus;
+import kz.insar.checkbinance.converters.ApiConvertrer;
+import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolCreate;
 import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.repositories.entities.SymbolEntity;
+import kz.insar.checkbinance.repositories.entities.SymbolSubscriptionPriceEntity;
 import kz.insar.checkbinance.services.SymbolService;
 import kz.insar.checkbinance.services.TickerService;
 import org.junit.jupiter.api.Test;
@@ -18,6 +21,7 @@ class CheckbinanceApplicationTests {
 	@Autowired
 	private TickerService tickerService;
 
+
 	@Test
 	void contextLoads() {
 		var builder = SymbolCreate.builder();
@@ -31,7 +35,24 @@ class CheckbinanceApplicationTests {
 	}
 
 
-	@Test void Asd() {
-		System.out.println(tickerService.updateSymbols());
+	@Test void A() {
+		System.out.println(tickerService.listSymbols());
+	}
+
+	@Test void B() {
+		tickerService.subscribeOnPrice(SymbolId.of(102));
+	}
+
+	@Test void C() {
+		tickerService.unsubscribeOnPrice(SymbolId.of(57));
+	}
+
+	@Test void D() {
+		System.out.println(tickerService.listSubscribtionOnPrices());
+	}
+
+	@Test
+	void asd() {
+		var converter = new ApiConvertrer();
 	}
 }

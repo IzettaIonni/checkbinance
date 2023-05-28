@@ -3,6 +3,7 @@ package kz.insar.checkbinance.converters;
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.api.SymbolParamsDTO;
+import kz.insar.checkbinance.api.SymbolShortDTO;
 import kz.insar.checkbinance.client.ExchangeInfoResponseDTO;
 import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolDTO;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 @Service
 public class ApiConvertrer {
@@ -76,5 +78,16 @@ public class ApiConvertrer {
                 .quoteAssetPrecision(createParams.getQuoteAssetPrecision())
                 .build();
 
+    }
+
+    public SymbolShortDTO fromDomainToShort(Symbol symbol) {
+        return SymbolShortDTO.builder()
+                .id(symbol.getId().getId())
+                .name(symbol.getName())
+                .build();
+    }
+
+    public List<SymbolShortDTO> fromDomainToShortList(List<Symbol> symbols) {
+        return symbols.stream().map(this::fromDomainToShort).collect(Collectors.toList());
     }
 }

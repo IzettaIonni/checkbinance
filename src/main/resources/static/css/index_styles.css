@@ -50,6 +50,79 @@ h1 {
     color: #fff;
 }
 
+.search_bar {
+    display: flex;
+    justify-content: center;
+}
+
+.symbols {
+    width: 80%;
+    height: 80%;
+    margin: 8px 0px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 1px 3px #ddd;
+    border-radius: .25rem;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.button-5 {
+    align-items: center;
+    background-clip: padding-box;
+    background-color: #fa6400;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    justify-content: center;
+    line-height: 1.25;
+    margin: 8px 0px;
+    margin-left: 8px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    min-height: 3rem;
+    padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+    position: relative;
+    text-decoration: none;
+    transition: all 250ms;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: baseline;
+    width: auto;
+    height: 85%;
+}
+
+.button-5:hover,
+.button-5:focus {
+    background-color: #fb8332;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+
+.button-5:hover {
+    transform: translateY(-1px);
+}
+
+.button-5:active {
+    background-color: #c85000;
+    box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+    transform: translateY(0);
+}
+
 .nav_link a:visited {
     color: #FFE973;
 }
@@ -80,7 +153,11 @@ h1 {
     opacity: 1;
 }
 
-.tiker_table {
+.symbols {
+    background-color: #ccc;
+}
+
+.ticker_table {
     max-width: 1400px;
     width: 100%;
 
@@ -98,7 +175,7 @@ h1 {
     box-shadow: 1px 2px 2px 2px rgba(0, 0, 0, 0.2);
 }
 
-.tiker {
+.ticker {
     display: inline-block;
 
     height: 65px;
@@ -115,17 +192,15 @@ h1 {
     transition: background .2s linear;
 }
 
-.tiker:hover {
+.ticker:hover {
     background-color: #ccc;
 }
 
-.tiker_params {
+.ticker_params {
     margin: auto 30px;
 }
 
 .subscribe_button {
-    color: #222;
-
     font-weight: bold;
 
     margin: auto 10px;
@@ -151,6 +226,27 @@ h1 {
     color: #FFE973;
 }
 
-.symbols {
-    background-color: #ccc;
+.unsubscribe_button {
+    font-weight: bold;
+
+    margin: auto 10px;
+    padding: 10px;
+
+    display: inline-block;
+    border-radius: 10px;
+
+    background: linear-gradient(125deg, rgb(109, 109, 109) 0%, rgb(84, 84, 84) 100%);
+
+    box-shadow: 1px 1px 3px 2px #ccc;
+}
+
+.unsubscribe_button a {
+    color: #dbdbdb;
+
+    display: inline-block;
+    margin: auto;
+}
+
+.unsubscribe_button a:visited {
+    color: #dbdbdb;
 }

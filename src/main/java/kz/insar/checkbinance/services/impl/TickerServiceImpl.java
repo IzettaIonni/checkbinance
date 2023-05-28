@@ -87,13 +87,15 @@ public class TickerServiceImpl implements TickerService {
     }
 
     @Override
-    public void subscribeOnPrice(SymbolId id) {
-        symbolService.addPriceSubscription(id);
+    public void subscribeOnPrice(Integer id) {
+        if (id != null)
+            symbolService.addPriceSubscription(SymbolId.of(id));
     }
 
     @Override
-    public void unsubscribeOnPrice(SymbolId id) {
-        symbolService.removePriceSubscription(id);
+    public void unsubscribeOnPrice(Integer id) {
+        if (id != null)
+            symbolService.removePriceSubscription(SymbolId.of(id));
     }
 
     @Override

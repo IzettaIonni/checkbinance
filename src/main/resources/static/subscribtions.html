@@ -28,6 +28,29 @@
                 $(".ticker_table").trigger("click")
             })
 
+            $(".ticker_table").on("click", "a.subscribe", function (){
+                $.get("/ticker/subscribeticker", {id : $(this).data('ticker_id')}, function (){
+                })
+            })
+
+            $(".ticker_table").on("click", "div.subscribe_button", function (){
+                $(".ticker_table").trigger("click")
+            })
+
+            const subscribeButtonBuilder = function (id) {
+                let subscribe_button = $("<div>", { "class": "unsubscribe_button ticker_params" })
+                $("<a href='#' class='unsubscribe'>unsubscribe</a>")
+                    .data('ticker_id', id).appendTo(subscribe_button)
+                return subscribe_button
+            }
+
+            const unsubscribeButtonBuilder = function (id) {
+                let subscribe_button = $("<div>", { "class": "unsubscribe_button ticker_params" })
+                $("<a href='#' class='unsubscribe'>unsubscribe</a>")
+                    .data('ticker_id', id).appendTo(subscribe_button)
+                return subscribe_button
+            }
+
             const updateTable = function (response) {
 
                 const target = $("#table"); target.empty()
@@ -37,10 +60,8 @@
                     let ticker_name = $("<div>", { "class": "ticker_name ticker_params" })
                     $("<p>" + response[i].name + "</p>").appendTo(ticker_name)
                     table_element.append(ticker_name)
-                    let subscribe_button = $("<div>", { "class": "unsubscribe_button ticker_params" })
-                    $("<a href='#' class='unsubscribe'>unsubscribe</a>").data('ticker_id', response[i].id).appendTo(subscribe_button)
 
-                    table_element.append(subscribe_button)
+                    table_element.append(unsubscribeButtonBuilder)
 
                     target.append(table_element)
                 }

@@ -43,14 +43,12 @@ public class TickerController {
 
     @GetMapping("subscribeticker")
     public void subscribeTicker(@Nullable @RequestParam Integer id) {
-        if (id != null)
-            tickerService.subscribeOnPrice(SymbolId.of(id));
+            tickerService.subscribeOnPrice(id);
     }
 
     @GetMapping("unsubscribeticker")
     public void unsubscribeTicker(@Nullable @RequestParam Integer id) {
-        if (id != null)
-            tickerService.unsubscribeOnPrice(SymbolId.of(id));
+            tickerService.unsubscribeOnPrice(id);
     }
 
     @GetMapping("/subscriptions")

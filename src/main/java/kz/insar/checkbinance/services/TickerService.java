@@ -20,9 +20,9 @@ public interface TickerService {
 
     List<Symbol> listSymbols();
 
-    void subscribeOnPrice(SymbolId id);
+    void subscribeOnPrice(Integer id);
 
-    void unsubscribeOnPrice(SymbolId id);
+    void unsubscribeOnPrice(Integer id);
 
     List<Symbol> listSubscribtionOnPrices();
 }

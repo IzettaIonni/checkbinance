@@ -28,7 +28,7 @@ public class TickerController {
     @GetMapping("/lastprice")
     public List<LastPriceDTO> lastPrices(@Nullable @RequestParam List<String> symbols,
                                          @Nullable @RequestParam(defaultValue = "1") Integer limit) {
-        return tickerService.lastPrices(symbols, limit);
+        return tickerService.lastPrices(limit);
     }
 
     @GetMapping("/exchangeinfo")
@@ -42,13 +42,13 @@ public class TickerController {
     }
 
     @GetMapping("subscribeticker")
-    public void subscribeTicker(@Nullable @RequestParam Integer id) {
-            tickerService.subscribeOnPrice(id);
+    public void subscribeTicker(@RequestParam Integer id) {
+        tickerService.subscribeOnPrice(SymbolId.of(id));
     }
 
     @GetMapping("unsubscribeticker")
-    public void unsubscribeTicker(@Nullable @RequestParam Integer id) {
-            tickerService.unsubscribeOnPrice(id);
+    public void unsubscribeTicker(@RequestParam Integer id) {
+        tickerService.unsubscribeOnPrice(SymbolId.of(id));
     }
 
     @GetMapping("/subscriptions")

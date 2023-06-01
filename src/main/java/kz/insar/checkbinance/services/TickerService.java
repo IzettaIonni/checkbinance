@@ -8,9 +8,9 @@ import kz.insar.checkbinance.domain.SymbolId;
 import java.util.List;
 
 public interface TickerService {
-    List<LastPriceDTO> lastPrices(List<String> symbols);
+    List<LastPriceDTO> lastPrices();
 
-    List<LastPriceDTO> lastPrices(List<String> symbols, int limit);
+    List<LastPriceDTO> lastPrices(int limit);
 
     ExchangeInfoBySymbolsDTO exchangeInfo(List<String> symbols);
 
@@ -20,9 +20,9 @@ public interface TickerService {
 
     List<Symbol> listSymbols();
 
-    void subscribeOnPrice(Integer id);
+    void subscribeOnPrice(SymbolId id);
 
-    void unsubscribeOnPrice(Integer id);
+    void unsubscribeOnPrice(SymbolId id);
 
     List<Symbol> listSubscribtionOnPrices();
 }

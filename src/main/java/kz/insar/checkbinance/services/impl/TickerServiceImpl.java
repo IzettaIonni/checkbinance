@@ -3,12 +3,14 @@ package kz.insar.checkbinance.services.impl;
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.client.BinanceClient;
+import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolDTO;
 import kz.insar.checkbinance.converters.ApiConvertrer;
 import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.services.SymbolService;
 import kz.insar.checkbinance.services.TickerService;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,19 +33,19 @@ public class TickerServiceImpl implements TickerService {
     private SymbolService symbolService;
 
     @Override
-    public List<LastPriceDTO> lastPrices(List<String> symbols) {
-        return lastPrices(symbols, 10);
+    public List<LastPriceDTO> lastPrices() {
+        return lastPrices(10);
     }
 
     @Override
-    public List<LastPriceDTO> lastPrices(List<String> symbols, int limit) {
+    public List<LastPriceDTO> lastPrices(int limit) {
+        List<Symbol> subscriptions = listSubscribtionOnPrices();
         List<LastPriceDTO> prices = new ArrayList<>();
-        if (symbols == null || symbols.size() == 0) return prices;
-        for (int i = 0; i < symbols.size(); i++) {
-            String symbol = symbols.get(i);
-            var recentTrades = binanceClient.getRecentTrades(symbol, limit);
-            for (int j = 0; j < recentTrades.size(); j++) {
-                prices.add(apiConvertrer.toApi(symbol, recentTrades.get(j)));
+        if (subscriptions == null || subscriptions.size() == 0) return prices;
+        for (Symbol symbol : subscriptions) {
+            var recentTrades = binanceClient.getRecentTrades(symbol.getName(), limit);
+            for (RecentTradeDTO recentTrade : recentTrades) {
+                prices.add(apiConvertrer.toApi(symbol.getName(), recentTrade));
             }
         }
         return prices;
@@ -87,15 +89,13 @@ public class TickerServiceImpl implements TickerService {
     }
 
     @Override
-    public void subscribeOnPrice(Integer id) {
-        if (id != null)
-            symbolService.addPriceSubscription(SymbolId.of(id));
+    public void subscribeOnPrice(@NonNull SymbolId id) {
+        symbolService.addPriceSubscription(id);
     }
 
     @Override
-    public void unsubscribeOnPrice(Integer id) {
-        if (id != null)
-            symbolService.removePriceSubscription(SymbolId.of(id));
+    public void unsubscribeOnPrice(@NonNull SymbolId id) {
+        symbolService.removePriceSubscription(id);
     }
 
     @Override

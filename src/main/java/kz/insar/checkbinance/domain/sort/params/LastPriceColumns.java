@@ -1,4 +1,4 @@
-package kz.insar.checkbinance.domain;
+package kz.insar.checkbinance.domain.sort.params;
 
 public enum LastPriceColumns {
     SYMBOL,

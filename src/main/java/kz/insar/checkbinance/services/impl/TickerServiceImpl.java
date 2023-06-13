@@ -6,8 +6,8 @@ import kz.insar.checkbinance.client.BinanceClient;
 import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolDTO;
 import kz.insar.checkbinance.converters.ApiConvertrer;
-import kz.insar.checkbinance.domain.LastPriceColumns;
-import kz.insar.checkbinance.domain.SortParams;
+import kz.insar.checkbinance.domain.sort.params.LastPriceColumns;
+import kz.insar.checkbinance.domain.sort.params.SortParams;
 import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.domain.exeptions.ObjectNotFoundException;
@@ -19,7 +19,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import javax.transaction.Transactional;
 import java.util.*;

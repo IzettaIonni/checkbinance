@@ -2,8 +2,8 @@ package kz.insar.checkbinance.services;
 
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
-import kz.insar.checkbinance.domain.LastPriceColumns;
-import kz.insar.checkbinance.domain.SortParams;
+import kz.insar.checkbinance.domain.sort.params.LastPriceColumns;
+import kz.insar.checkbinance.domain.sort.params.SortParams;
 import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolId;
 

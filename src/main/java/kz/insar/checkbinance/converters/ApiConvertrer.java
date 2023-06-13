@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
 @Service
 public class ApiConvertrer {
 
-    public LastPriceDTO toApi(String symbol, RecentTradeDTO recentTrade) {
+    public LastPriceDTO toApi(String symbol, Integer id, RecentTradeDTO recentTrade) {
         LastPriceDTO lastPriceDTO = new LastPriceDTO();
         lastPriceDTO.setSymbol(symbol);
-        lastPriceDTO.setId(recentTrade.getId());
+        lastPriceDTO.setId(id);
         lastPriceDTO.setPrice(recentTrade.getPrice());
         lastPriceDTO.setTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(recentTrade.getTime()), TimeZone.getDefault().toZoneId()));
         return lastPriceDTO;

@@ -14,9 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script>
-
-
-
+        //todo make it works
         $(document).ready(function () {
 
             const subscribeButtonBuilder = function (symbol_id) {
@@ -24,7 +22,7 @@
                 $("<a href='#' class='subscribe'>subscribe</a>")
                     .data('ticker_id', symbol_id).appendTo(subscribe_button)
                 subscribe_button.on("click", function (){
-                    $.get("/ticker/subscribeticker", {id : symbol_id}, formHandler)
+                    $.get("/ticker/subscribeticker", {id : symbol_id}, SubUpdate)
                 })
                 return subscribe_button
             }
@@ -34,7 +32,7 @@
                 $("<a href='#' class='unsubscribe'>unsubscribe</a>")
                     .data('ticker_id', symbol_id).appendTo(subscribe_button)
                 subscribe_button.on("click", function (){
-                    $.get("/ticker/unsubscribeticker", {id : symbol_id}, formHandler)
+                    $.get("/ticker/unsubscribeticker", {id : symbol_id}, SubUpdate)
                 })
                 return subscribe_button
             }
@@ -64,42 +62,6 @@
                     });
             }
 
-            const formHandler = function (form) {
-                const data = {
-                    symbols: $("#symbols").val()
-                }
-                $.getJSON('/ticker/lastprice', data)
-                    .done(function (response) {
-                        console.log(response)
-                        const target = $("#table"); target.empty()
-                        for (let i = 0; i < response.length; i++) {
-                            let table_element = $("<div>", { id: response[i].id, "class": "ticker" })
-
-                            let ticker_name = $("<div>", { "class": "ticker_name ticker_params" })
-                            $("<p>" + response[i].symbol + "</p>").appendTo(ticker_name)
-                            table_element.append(ticker_name)
-
-                            let ticker_price = $("<div>", { "class": "ticker_price ticker_params" })
-                            $("<p>" + "price: " + response[i].price + "</p>").appendTo(ticker_price)
-                            table_element.append(ticker_price)
-
-                            let subscribe_button = $("<div>", { "class": "subscribe_button ticker_params" })
-                            $("<a href='#'>subscribe</a>").appendTo(subscribe_button)
-                            table_element.append(subscribe_button)
-
-                            target.append(table_element)
-                        }
-                    }).fail(function (jqxhr, textStatus, error) {
-                    var err = textStatus + ", " + error;
-                    console.log("Request Failed: " + err);
-                    alert("Request Failed: " + err + "try other ticker names")
-                });
-            }
-
-            $('#myForm').validate({
-                submitHandler: formHandler
-            })
-
             SubUpdate()
         });
     </script>
@@ -108,7 +70,7 @@
 <body>
     <header>
         <div class="header_container">
-            <h1>Checkbinance</h1>
+            <h1>Checkbinance Subscriptions</h1>
             <div class="nav">
                 <div class="nav_link">
                     <a href="index.html">home</a>

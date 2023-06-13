@@ -14,42 +14,102 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script>
+        //todo front everything you want (maybe dropdown)
         $(document).ready(function () {
-            const formHandler = function (form) {
-                const data = {
-                    symbols: $("#symbols").val()
+
+            $("#symbols").on("click", function (){
+                $("#symbols").attr('placeholder', 'Type ticker name or ticker id to subscribe')
+                $("#symbols").removeClass("symbols_error")
+            })
+
+            const subscribeButtonBuilder = function (symbol_id) {
+                let subscribe_button = $("<div>", { "class": "subscribe_button ticker_params" })
+                $("<a href='#' class='subscribe'>subscribe</a>")
+                    .data('ticker_id', symbol_id).appendTo(subscribe_button)
+                subscribe_button.on("click", function (){
+                    $.get("/ticker/subscribeticker", {id : symbol_id}, lastPricesUpdate)
+                })
+                return subscribe_button
+            }
+
+            const unsubscribeButtonBuilder = function (symbol_id) {
+                let subscribe_button = $("<div>", { "class": "unsubscribe_button ticker_params" })
+                $("<a href='#' class='unsubscribe'>unsubscribe</a>")
+                    .data('ticker_id', symbol_id).appendTo(subscribe_button)
+                subscribe_button.on("click", function (){
+                    $.get("/ticker/unsubscribeticker", {id : symbol_id}, lastPricesUpdate)
+                })
+                return subscribe_button
+            }
+
+            const updateTable = function (response) {
+                const target = $("#table"); target.empty()
+                for (let i = 0; i < response.length; i++) {
+                    let table_element = $("<div>", { id: response[i].id, "class": "ticker" })
+                    let ticker_name = $("<div>", { "class": "ticker_name ticker_params" })
+                    $("<p>" + response[i].symbol + "</p>").appendTo(ticker_name)
+                    table_element.append(ticker_name)
+
+                    let ticker_price = $("<div>", { "class": "ticker_price ticker_params" })
+                    $("<p>" + "price: " + response[i].price + "</p>").appendTo(ticker_price)
+                    table_element.append(ticker_price)
+
+                    table_element.append(unsubscribeButtonBuilder(response[i].id))
+
+                    target.append(table_element)
                 }
-                $.getJSON('/ticker/lastprice', data)
-                    .done(function (response) {
-                        console.log(response)
-                        const target = $("#table"); target.empty()
-                        for (let i = 0; i < response.length; i++) {
-                            let table_element = $("<div>", { id: response[i].id, "class": "ticker" })
+                let now = new Date()
+                $("#timeUpdate").text(now.toLocaleString('ru'))
+            }
 
-                            let ticker_name = $("<div>", { "class": "ticker_name ticker_params" })
-                            $("<p>" + response[i].symbol + "</p>").appendTo(ticker_name)
-                            table_element.append(ticker_name)
-
-                            let ticker_price = $("<div>", { "class": "ticker_price ticker_params" })
-                            $("<p>" + "price: " + response[i].price + "</p>").appendTo(ticker_price)
-                            table_element.append(ticker_price)
-
-                            let subscribe_button = $("<div>", { "class": "subscribe_button ticker_params" })
-                            $("<a href='#'>subscribe</a>").appendTo(subscribe_button)
-                            table_element.append(subscribe_button)
-
-                            target.append(table_element)
-                        }
-                    }).fail(function (jqxhr, textStatus, error) {
+            const lastPricesUpdate = function () {
+                $.getJSON('/ticker/lastprice')
+                    .done(updateTable).fail(function (jqxhr, textStatus, error) {
                         var err = textStatus + ", " + error;
                         console.log("Request Failed: " + err);
                         alert("Request Failed: " + err + "try other ticker names")
                     });
             }
+            const formHandler = function (id, name) {
+                let subscribe = {id: id, name: name}
+                $.get('/ticker/subscribeticker', subscribe)
+                    .done(lastPricesUpdate).fail(function (jqxhr, textStatus, error) {
+                    var err = textStatus + ", " + error;
+                    console.log("Request Failed: " + err);
+                    alert("Request Failed: " + err + ", try other ticker id")
+                });
+            }
+
+            const formValidate = function (){
+                let value = $("#symbols").val()
+                if (value.match(/^\s*(\d{1,8}\s+[a-zA-Z]{2,32}|[a-zA-Z]{2,32}\s+\d{1,8}|\d{1,8}|[a-zA-Z]{2,32})\s*$/)) {
+                    let id = value.match(/\d+/)
+                    let name = value.match(/[A-Za-z]+/)
+                    if (id != null) {
+                        id = parseInt(id[0])
+                    }
+                    if (name != null) {
+                        name = name[0]
+                    }
+                    formHandler(id, name)
+                }
+                else {
+                    $("#symbols").val('')
+                    $("#symbols").attr('placeholder', 'Invalid data!')
+                    $(".symbols").addClass("symbols_error")
+                }
+
+            }
 
             $('#myForm').validate({
-                submitHandler: formHandler
+
+                submitHandler: formValidate
             })
+
+            lastPricesUpdate()
+
+            let timerId = setInterval(lastPricesUpdate, 10000)
+
         });
     </script>
 </head>
@@ -57,7 +117,7 @@
 <body>
     <header>
         <div class="header_container">
-            <h1>Checkbinance</h1>
+            <h1>Checkbinance Prices</h1>
             <div class="nav">
                 <div class="nav_link">
                     <a href="index.html">home</a>
@@ -68,38 +128,21 @@
             </div>
         </div>
         <form id="myForm" class="search_bar">
-            <input name="symbols" id="symbols" type="text" size="16" class="symbols"
-                placeholder="Type ticker short names to search" />
-            <button class="button-5">Search</button>
+            <input id="symbols" type="text" size="16" class="symbols"
+                placeholder="Type ticker name or ticker id to subscribe" />
+            <button class="button-5">Subscribe</button>
             <button class="button-5">Show all tickers</button>
         </form>
     </header>
 
     <main>
 
-
+        <div id="timeUpdate"></div>
         <div class="ticker_table" id="table">
 
             <div class="ticker">
                 <div class="ticker_name ticker_params">
                     <p>Searched tickers will be here</p>
-                </div>
-            </div>
-
-            <div id="57" class="ticker">
-                <div class="ticker_name ticker_params">
-                    <p>MTLBTC</p>
-                </div>
-                <div class="unsubscribe_button ticker_params">
-                    <a href="#">unsubscribe</a>
-                </div>
-            </div>
-            <div id="102" class="ticker">
-                <div class="ticker_name ticker_params">
-                    <p>STORJETH</p>
-                </div>
-                <div class="unsubscribe_button ticker_params">
-                    <a href="#">unsubscribe</a>
                 </div>
             </div>
 

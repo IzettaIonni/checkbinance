@@ -72,6 +72,11 @@ h1 {
     padding-bottom: 12px;
 }
 
+.symbols_error::placeholder {
+    color: red;
+    font-weight: 700;
+}
+
 .button-5 {
     align-items: center;
     background-clip: padding-box;

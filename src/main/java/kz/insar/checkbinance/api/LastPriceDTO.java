@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 public class LastPriceDTO {
     private String symbol;
-    private Long id;
+    private Integer id;
     private BigDecimal price;
     private LocalDateTime time;
 }

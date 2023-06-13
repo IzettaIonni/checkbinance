@@ -4,19 +4,26 @@ import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.api.SymbolShortDTO;
 import kz.insar.checkbinance.converters.ApiConvertrer;
+import kz.insar.checkbinance.domain.LastPriceColumns;
+import kz.insar.checkbinance.domain.SortDirection;
+import kz.insar.checkbinance.domain.SortParams;
 import kz.insar.checkbinance.domain.SymbolId;
+import kz.insar.checkbinance.domain.exeptions.InvalidDataException;
+import kz.insar.checkbinance.domain.exeptions.ObjectNotFoundException;
 import kz.insar.checkbinance.services.TickerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
 @RestController
+@Validated
 @RequestMapping("ticker")
 public class TickerController {
 
@@ -26,13 +33,14 @@ public class TickerController {
     private final ApiConvertrer apiConverter = new ApiConvertrer();
 
     @GetMapping("/lastprice")
-    public List<LastPriceDTO> lastPrices(@Nullable @RequestParam List<String> symbols,
-                                         @Nullable @RequestParam(defaultValue = "1") Integer limit) {
+    public List<LastPriceDTO> lastPrices(@Nullable @RequestParam @Valid List<String> symbols,
+                                         @Nullable @RequestParam(defaultValue = "1") @Valid Integer limit) {
+        var sort = new SortParams<LastPriceColumns>(LastPriceColumns.SYMBOL, SortDirection.ASC);
         return tickerService.lastPrices(limit);
     }
 
     @GetMapping("/exchangeinfo")
-    public ExchangeInfoBySymbolsDTO exchangeInfo(@Nullable @RequestParam List<String> symbols) {
+    public ExchangeInfoBySymbolsDTO exchangeInfo(@Nullable @RequestParam @Valid List<String> symbols) {
         return tickerService.exchangeInfo(symbols);
     }
 
@@ -41,18 +49,46 @@ public class TickerController {
         return tickerService.exchangeInfo();
     }
 
-    @GetMapping("subscribeticker")
-    public void subscribeTicker(@RequestParam Integer id) {
-        tickerService.subscribeOnPrice(SymbolId.of(id));
+    @GetMapping("/subscribeticker")
+    public void subscribeTicker(@RequestParam(required = false) @Valid @Nullable Integer id,
+                                @RequestParam(required = false) @Valid @Nullable String name) {
+        if (id == null && name == null) {
+            throw new InvalidDataException("ticker name and ticker id is null");
+        }
+        if (id != null) {
+            tickerService.subscribeOnPrice(SymbolId.of(id));
+        }
+        else {
+            tickerService.subscribeOnPrice(name);
+        }
     }
 
-    @GetMapping("unsubscribeticker")
-    public void unsubscribeTicker(@RequestParam Integer id) {
-        tickerService.unsubscribeOnPrice(SymbolId.of(id));
+    @GetMapping("/unsubscribeticker")
+    public void unsubscribeTicker(@RequestParam(required = false) @Valid @NotNull Integer id,
+                                  @RequestParam(required = false) @Valid @Nullable String name) {
+        if (id == null && name == null) {
+            throw new InvalidDataException("ticker name and ticker id is not found");
+        }
+        if (id != null) {
+            tickerService.unsubscribeOnPrice(SymbolId.of(id));
+        }
+        else {
+            tickerService.unsubscribeOnPrice(name);
+        }
     }
 
     @GetMapping("/subscriptions")
     public List<SymbolShortDTO> subscriptions() {
         return apiConverter.fromDomainToShortList(tickerService.listSubscribtionOnPrices());
+    }
+
+    @ExceptionHandler({ObjectNotFoundException.class})
+    public ResponseEntity<Void> notFoundException() {
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler({InvalidDataException.class})
+    public ResponseEntity<Void> badRequestException() {
+        return ResponseEntity.badRequest().build();
     }
 }

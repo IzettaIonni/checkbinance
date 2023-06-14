@@ -37,9 +37,8 @@ public class TickerController {
                                          @Nullable @RequestParam(defaultValue = "1") @Valid Integer limit) {
         var sort = new SortParams<LastPriceColumns>(LastPriceColumns.SYMBOL, SortDirection.ASC);
         return tickerService.lastPrices(limit);
-        System.out.println("asd");
-        int a = 32;
-
+        String a = new String("123");
+        System.out.println(a);
     }
 
     @GetMapping("/exchangeinfo")

@@ -13,4 +13,5 @@ public class SortParams<T> {
 
     @NonNull
     private final SortDirection dir;
+
 }

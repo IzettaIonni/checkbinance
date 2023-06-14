@@ -95,6 +95,7 @@ public class TickerServiceImpl implements TickerService {
         }
         log.info("Symbol list is updated!");
         return result;
+        System.out.println("asd");
     }
 
     @Override

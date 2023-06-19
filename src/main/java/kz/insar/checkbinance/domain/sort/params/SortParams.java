@@ -4,7 +4,6 @@ import lombok.*;
 
 @Data
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Builder(toBuilder = true)
 public class SortParams<T> {
 

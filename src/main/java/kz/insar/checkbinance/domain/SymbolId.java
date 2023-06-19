@@ -7,9 +7,9 @@ import lombok.NonNull;
 public class SymbolId {
     private final Integer id;
 
-    private SymbolId(Integer id) {
+    public SymbolId(Integer id) {
         if (id == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("id must not be null");
         }
         this.id = id;
     }

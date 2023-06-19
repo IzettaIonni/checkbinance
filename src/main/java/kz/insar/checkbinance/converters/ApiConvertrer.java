@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class ApiConvertrer {
 
+
     public LastPriceDTO toApi(String symbol, Integer id, RecentTradeDTO recentTrade) {
         LastPriceDTO lastPriceDTO = new LastPriceDTO();
         lastPriceDTO.setSymbol(symbol);

@@ -6,6 +6,7 @@ import kz.insar.checkbinance.client.BinanceClient;
 import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolDTO;
 import kz.insar.checkbinance.converters.ApiConvertrer;
+import kz.insar.checkbinance.domain.sort.comparators.LastPriceDTOComparator;
 import kz.insar.checkbinance.domain.sort.params.LastPriceColumns;
 import kz.insar.checkbinance.domain.sort.params.SortParams;
 import kz.insar.checkbinance.domain.Symbol;
@@ -44,7 +45,7 @@ public class TickerServiceImpl implements TickerService {
 
     @Override
     public List<LastPriceDTO> lastPrices(SortParams<LastPriceColumns> sortParams) {
-        return lastPrices(10, sortParams);
+        return lastPrices(2, sortParams);
     }
 
 
@@ -60,10 +61,11 @@ public class TickerServiceImpl implements TickerService {
                 prices.add(apiConvertrer.toApi(symbol.getName(), symbol.getId().getId(), recentTrade));
             }
         }
-        //todo comparator sort etc
-        Collections.sort();
+        LastPriceDTOComparator sort = new LastPriceDTOComparator(sortParams.getDir(), sortParams.getColumn());
+        prices.sort(sort);
         return prices;
     }
+
 
     @Override
     public ExchangeInfoBySymbolsDTO exchangeInfo(List<String> symbols) {
@@ -93,9 +95,7 @@ public class TickerServiceImpl implements TickerService {
                 result.add(symbolService.createSymbol(request).getName());
             }
         }
-        log.info("Symbol list is updated!");
         return result;
-        System.out.println("asd");
     }
 
     @Override

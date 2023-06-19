@@ -34,9 +34,10 @@ public class TickerController {
 
     @GetMapping("/lastprice")
     public List<LastPriceDTO> lastPrices(@Nullable @RequestParam @Valid List<String> symbols,
-                                         @Nullable @RequestParam(defaultValue = "1") @Valid Integer limit) {
-        var sort = new SortParams<LastPriceColumns>(LastPriceColumns.SYMBOL, SortDirection.ASC);
-        return tickerService.lastPrices(limit);
+                                         @Nullable @RequestParam(defaultValue = "1") @Valid int limit) {
+        var sort = new SortParams<>(LastPriceColumns.SYMBOL, SortDirection.ASC);
+        return tickerService.lastPrices(limit, sort);
+        //todo set sort params as request
     }
 
     @GetMapping("/exchangeinfo")

@@ -11,9 +11,11 @@ import kz.insar.checkbinance.domain.SymbolId;
 import java.util.List;
 
 public interface TickerService {
+    List<LastPriceDTO> legacyLastPrices(SortParams<LastPriceColumns> sortParams);
+
     List<LastPriceDTO> lastPrices(SortParams<LastPriceColumns> sortParams);
 
-    List<LastPriceDTO> lastPrices(int limit, SortParams<LastPriceColumns> sortParams);
+    List<LastPriceDTO> legacyLastPrices(int limit, SortParams<LastPriceColumns> sortParams);
 
     ExchangeInfoBySymbolsDTO exchangeInfo(List<String> symbols);
 

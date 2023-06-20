@@ -7,6 +7,7 @@ import kz.insar.checkbinance.api.SymbolShortDTO;
 import kz.insar.checkbinance.client.ExchangeInfoResponseDTO;
 import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolDTO;
+import kz.insar.checkbinance.client.SymbolPriceDTO;
 import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolUpdate;
 import kz.insar.checkbinance.domain.SymbolCreate;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ApiConvertrer {
@@ -30,6 +32,26 @@ public class ApiConvertrer {
         lastPriceDTO.setPrice(recentTrade.getPrice());
         lastPriceDTO.setTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(recentTrade.getTime()), TimeZone.getDefault().toZoneId()));
         return lastPriceDTO;
+    }
+
+
+    public List<LastPriceDTO> toApi(List<SymbolPriceDTO> symbolPrices, List<Symbol> subscriptions) {
+
+        LocalDateTime now = LocalDateTime.now(TimeZone.getDefault().toZoneId());
+        List<LastPriceDTO> lastPrices = new ArrayList<>();
+        for (SymbolPriceDTO symbolPrice : symbolPrices) {
+            LastPriceDTO lastPriceDTO = new LastPriceDTO();
+            lastPriceDTO.setSymbol(symbolPrice.getSymbol());
+            lastPriceDTO.setId(
+                    subscriptions.stream()
+                            .filter(subscription -> symbolPrice.getSymbol().equals(subscription.getName()))
+                            .findAny().orElseThrow().getId().getId()
+            );
+            lastPriceDTO.setPrice(symbolPrice.getPrice());
+            lastPriceDTO.setTime(now);
+            lastPrices.add(lastPriceDTO);
+        }
+        return lastPrices;
     }
 
     public SymbolParamsDTO toApi(SymbolDTO symbol) {
@@ -90,5 +112,13 @@ public class ApiConvertrer {
 
     public List<SymbolShortDTO> fromDomainToShortList(List<Symbol> symbols) {
         return symbols.stream().map(this::fromDomainToShort).collect(Collectors.toList());
+    }
+
+    public List<String> toDomainRequest(List<Symbol> symbols) {
+        List<String> stringSymbols = new ArrayList<>();
+        for (Symbol symbol : symbols) {
+            stringSymbols.add(symbol.getName());
+        }
+        return stringSymbols;
     }
 }

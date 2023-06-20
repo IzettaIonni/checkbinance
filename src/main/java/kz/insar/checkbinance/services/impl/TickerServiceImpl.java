@@ -44,14 +44,23 @@ public class TickerServiceImpl implements TickerService {
     private SymbolRepository symbolRepository;
 
     @Override
-    public List<LastPriceDTO> lastPrices(SortParams<LastPriceColumns> sortParams) {
-        return lastPrices(2, sortParams);
+    public List<LastPriceDTO> legacyLastPrices(SortParams<LastPriceColumns> sortParams) {
+        return legacyLastPrices(2, sortParams);
     }
 
-
-    //TODO: повысить эффективность за счет понижения количества запросов
     @Override
-    public List<LastPriceDTO> lastPrices(int limit, SortParams<LastPriceColumns> sortParams) {
+    public List<LastPriceDTO> lastPrices(SortParams<LastPriceColumns> sortParams) {
+        List<Symbol> subscriptions = listSubscribtionOnPrices();
+        List<LastPriceDTO> prices = new ArrayList<>();
+        if (subscriptions == null || subscriptions.size() == 0) return prices;
+        prices = apiConvertrer.toApi(binanceClient.getPrices(apiConvertrer.toDomainRequest(subscriptions)), subscriptions);
+        LastPriceDTOComparator sort = new LastPriceDTOComparator(sortParams.getDir(), sortParams.getColumn());
+        prices.sort(sort);
+        return prices;
+    }
+
+    @Override
+    public List<LastPriceDTO> legacyLastPrices(int limit, SortParams<LastPriceColumns> sortParams) {
         List<Symbol> subscriptions = listSubscribtionOnPrices();
         List<LastPriceDTO> prices = new ArrayList<>();
         if (subscriptions == null || subscriptions.size() == 0) return prices;

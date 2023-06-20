@@ -1,5 +1,6 @@
 package kz.insar.checkbinance.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -30,7 +31,8 @@ public class BinanceClient {
     }
 
     public ExchangeInfoResponseDTO getExchangeInfoBySymbol(String symbol) {
-        return restOperations.getForObject("https://api.binance.com/api/v3/exchangeInfo?symbol=" + symbol, ExchangeInfoResponseDTO.class);
+        return restOperations.getForObject(
+                "https://api.binance.com/api/v3/exchangeInfo?symbol=" + symbol, ExchangeInfoResponseDTO.class);
     }
 
     @SneakyThrows
@@ -64,5 +66,66 @@ public class BinanceClient {
     }
     public List<RecentTradeDTO> getRecentTrades(String symbol) {
         return getRecentTrades(symbol, 10);
+    }
+
+    //Get prices of symbols form the list
+    @SneakyThrows
+    public List<SymbolPriceDTO> getPrices(List<String> symbols) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        URI requestUri = UriComponentsBuilder.fromHttpUrl("https://api.binance.com")
+                .path("/api/v3/ticker/price")
+                .queryParam("symbols", objectMapper.writeValueAsString(symbols))
+                .build()
+                .toUri();
+
+        try {
+            return restOperations.exchange(
+                            requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<SymbolPriceDTO>>() {}
+                    )
+                    .getBody();
+        }
+        catch(Exception e) {
+            throw new BinanceClientExeption("Unable to get symbols prices", e);
+        }
+    }
+
+    @SneakyThrows
+    public SymbolPriceDTO getPrice(String symbol) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        URI requestUri = UriComponentsBuilder.fromHttpUrl("https://api.binance.com")
+                .path("/api/v3/ticker/price")
+                .queryParam("symbol", symbol)
+                .build()
+                .toUri();
+
+        try {
+            return restOperations.exchange(
+                            requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<SymbolPriceDTO>() {}
+                    )
+                    .getBody();
+        }
+        catch(Exception e) {
+            throw new BinanceClientExeption("Unable to get symbol price", e);
+        }
+    }
+
+
+    @SneakyThrows
+    public List<SymbolPriceDTO> getPrices() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        URI requestUri = UriComponentsBuilder.fromHttpUrl("https://api.binance.com")
+                .path("/api/v3/ticker/price")
+                .build()
+                .toUri();
+
+        try {
+            return restOperations.exchange(
+                            requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<SymbolPriceDTO>>() {}
+                    )
+                    .getBody();
+        }
+        catch(Exception e) {
+            throw new BinanceClientExeption("Unable to get all symbols prices", e);
+        }
     }
 }

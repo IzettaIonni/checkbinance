@@ -31,7 +31,7 @@ public class LastPriceDTOComparator implements Comparator<LastPriceDTO> {
                 break;
 
             case PRICE:
-                result = o1.getPrice().intValue() - (o2.getPrice().intValue());
+                result = o1.getPrice().compareTo(o2.getPrice());
                 break;
 
             case TIME:

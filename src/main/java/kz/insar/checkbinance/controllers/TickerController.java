@@ -4,6 +4,7 @@ import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.api.SymbolShortDTO;
 import kz.insar.checkbinance.converters.ApiConvertrer;
+import kz.insar.checkbinance.converters.ControllerConverter;
 import kz.insar.checkbinance.domain.sort.params.LastPriceColumns;
 import kz.insar.checkbinance.domain.sort.params.SortDirection;
 import kz.insar.checkbinance.domain.sort.params.SortParams;
@@ -30,14 +31,34 @@ public class TickerController {
     @Autowired
     private TickerService tickerService;
 
+    @Autowired
+    private ControllerConverter controllerConverter;
+
     private final ApiConvertrer apiConverter = new ApiConvertrer();
 
     @GetMapping("/lastprice")
-    public List<LastPriceDTO> lastPrices(@Nullable @RequestParam @Valid List<String> symbols,
-                                         @Nullable @RequestParam(defaultValue = "1") @Valid int limit) {
-        var sort = new SortParams<>(LastPriceColumns.SYMBOL, SortDirection.ASC);
-        return tickerService.lastPrices(limit, sort);
-        //todo set sort params as request
+    public List<LastPriceDTO> lastPrices(@Nullable @RequestParam(defaultValue = "pRiCe") @Valid String sortKey,
+                                         @Nullable @RequestParam(defaultValue = "ASC") @Valid String sortDir) {
+        if (sortKey == null || sortDir == null) {
+            throw new InvalidDataException("Sort parameters must not be null");
+        }
+        else {
+            var sort = controllerConverter.toSort(sortKey, sortDir);
+            return tickerService.lastPrices(sort);
+        }
+    }
+
+    @GetMapping("/legacylastprice")
+    public List<LastPriceDTO> legacyLastPrices(@Nullable @RequestParam(defaultValue = "1") @Valid int limit,
+                                               @Nullable @RequestParam(defaultValue = "SYMBOL") @Valid String sortKey,
+                                               @Nullable @RequestParam(defaultValue = "ASC") @Valid String sortDir) {
+        if (sortKey == null || sortDir == null) {
+            throw new InvalidDataException("Sort parameters must not be null");
+        }
+        else {
+            var sort = controllerConverter.toSort(sortKey, sortDir);
+            return tickerService.legacyLastPrices(limit, sort);
+        }
     }
 
     @GetMapping("/exchangeinfo")

@@ -37,28 +37,18 @@ public class TickerController {
     private final ApiConvertrer apiConverter = new ApiConvertrer();
 
     @GetMapping("/lastprice")
-    public List<LastPriceDTO> lastPrices(@Nullable @RequestParam(defaultValue = "pRiCe") @Valid String sortKey,
-                                         @Nullable @RequestParam(defaultValue = "ASC") @Valid String sortDir) {
-        if (sortKey == null || sortDir == null) {
-            throw new InvalidDataException("Sort parameters must not be null");
-        }
-        else {
-            var sort = controllerConverter.toSort(sortKey, sortDir);
-            return tickerService.lastPrices(sort);
-        }
+    public List<LastPriceDTO> lastPrices(@Nullable @RequestParam(defaultValue = "SYMBOL") @Valid LastPriceColumns sortKey,
+                                         @Nullable @RequestParam(defaultValue = "ASC") @Valid SortDirection sortDir) {
+            return tickerService.lastPrices(controllerConverter.toSort(sortKey, sortDir));
+
     }
 
     @GetMapping("/legacylastprice")
     public List<LastPriceDTO> legacyLastPrices(@Nullable @RequestParam(defaultValue = "1") @Valid int limit,
-                                               @Nullable @RequestParam(defaultValue = "SYMBOL") @Valid String sortKey,
-                                               @Nullable @RequestParam(defaultValue = "ASC") @Valid String sortDir) {
-        if (sortKey == null || sortDir == null) {
-            throw new InvalidDataException("Sort parameters must not be null");
-        }
-        else {
-            var sort = controllerConverter.toSort(sortKey, sortDir);
-            return tickerService.legacyLastPrices(limit, sort);
-        }
+                                               @Nullable @RequestParam(defaultValue = "SYMBOL") @Valid LastPriceColumns sortKey,
+                                               @Nullable @RequestParam(defaultValue = "ASC") @Valid SortDirection sortDir) {
+        return tickerService.legacyLastPrices(limit, controllerConverter.toSort(sortKey, sortDir));
+
     }
 
     @GetMapping("/exchangeinfo")

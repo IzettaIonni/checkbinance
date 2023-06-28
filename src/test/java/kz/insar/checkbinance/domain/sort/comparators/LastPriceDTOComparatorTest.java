@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,27 +19,33 @@ public class LastPriceDTOComparatorTest {
 
     ArrayList<LastPriceDTO> lastPricesArray;
 
+    LastPriceDTO a, b, c;
+
     @BeforeEach
     void setUp() {
         lastPricesArray = new ArrayList<>();
 
-        LastPriceDTO a = new LastPriceDTO();
-            a.setId(1);
-            a.setPrice(BigDecimal.valueOf(20));
-            a.setSymbol("C");
-            a.setTime(LocalDateTime.ofEpochSecond(1687145938, 0, ZoneOffset.UTC));
+        a = LastPriceDTO.builder()
+                .id(1)
+                .price(20L)
+                .symbol("C")
+                .time(1687145938L)
+                .build();
 
-        LastPriceDTO c = new LastPriceDTO();
-            c.setId(3);
-            c.setPrice(BigDecimal.valueOf(30));
-            c.setSymbol("A");
-            c.setTime(LocalDateTime.ofEpochSecond(1687145958, 0, ZoneOffset.UTC));
 
-        LastPriceDTO b = new LastPriceDTO();
-            b.setId(2);
-            b.setPrice(BigDecimal.valueOf(10));
-            b.setSymbol("B");
-            b.setTime(LocalDateTime.ofEpochSecond(1687145948, 0, ZoneOffset.UTC));
+        b = LastPriceDTO.builder()
+                .id(3)
+                .price(30L)
+                .symbol("A")
+                .time(1687145958L)
+                .build();
+
+        c = LastPriceDTO.builder()
+                .id(2)
+                .price(10L)
+                .symbol("B")
+                .time(1687145948L)
+                .build();
 
         lastPricesArray.add(a);
         lastPricesArray.add(b);
@@ -47,80 +54,85 @@ public class LastPriceDTOComparatorTest {
 
     @Test
     void testSortBySymbolASC() {
+        //given
         LastPriceDTOComparator comparator = new LastPriceDTOComparator(SortDirection.ASC, LastPriceColumns.SYMBOL);
+
+        //when
         lastPricesArray.sort(comparator);
-        assertEquals("A", lastPricesArray.get(0).getSymbol());
-        assertEquals("B", lastPricesArray.get(1).getSymbol());
-        assertEquals("C", lastPricesArray.get(2).getSymbol());
-    }
+
+        //then
+        var expected = List.of(b,c,a);
+        assertEquals(expected, lastPricesArray);
+    };
 
     @Test
     void testSortBySymbolDESC() {
         LastPriceDTOComparator comparator = new LastPriceDTOComparator(SortDirection.DESC, LastPriceColumns.SYMBOL);
+
         lastPricesArray.sort(comparator);
-        assertEquals("C", lastPricesArray.get(0).getSymbol());
-        assertEquals("B", lastPricesArray.get(1).getSymbol());
-        assertEquals("A", lastPricesArray.get(2).getSymbol());
+
+        var expected = List.of(a,c,b);
+        assertEquals(expected, lastPricesArray);
     }
 
     @Test
     void testSortByIdASC() {
         LastPriceDTOComparator comparator = new LastPriceDTOComparator(SortDirection.ASC, LastPriceColumns.ID);
+
         lastPricesArray.sort(comparator);
-        assertEquals(1, lastPricesArray.get(0).getId());
-        assertEquals(2, lastPricesArray.get(1).getId());
-        assertEquals(3, lastPricesArray.get(2).getId());
+
+        var expected = List.of(a,c,b);
+        assertEquals(expected, lastPricesArray);
     }
 
     @Test
     void testSortByIdDESC() {
         LastPriceDTOComparator comparator = new LastPriceDTOComparator(SortDirection.DESC, LastPriceColumns.ID);
-        lastPricesArray.sort(comparator);
-        assertEquals(3, lastPricesArray.get(0).getId());
-        assertEquals(2, lastPricesArray.get(1).getId());
-        assertEquals(1, lastPricesArray.get(2).getId());
+
+        lastPricesArray.sort(comparator)
+        ;
+        var expected = List.of(b,c,a);
+        assertEquals(expected, lastPricesArray);
     }
 
     @Test
     void testSortByPriceASC() {
         LastPriceDTOComparator comparator = new LastPriceDTOComparator(SortDirection.ASC, LastPriceColumns.PRICE);
+
         lastPricesArray.sort(comparator);
-        assertEquals(BigDecimal.valueOf(10), lastPricesArray.get(0).getPrice());
-        assertEquals(BigDecimal.valueOf(20), lastPricesArray.get(1).getPrice());
-        assertEquals(BigDecimal.valueOf(30), lastPricesArray.get(2).getPrice());
+
+        var expected = List.of(c,a,b);
+        assertEquals(expected, lastPricesArray);
     }
 
     @Test
     void testSortByPriceDESC() {
         LastPriceDTOComparator comparator = new LastPriceDTOComparator(SortDirection.DESC, LastPriceColumns.PRICE);
+
         lastPricesArray.sort(comparator);
-        assertEquals(BigDecimal.valueOf(30), lastPricesArray.get(0).getPrice());
-        assertEquals(BigDecimal.valueOf(20), lastPricesArray.get(1).getPrice());
-        assertEquals(BigDecimal.valueOf(10), lastPricesArray.get(2).getPrice());
+
+        var expected = List.of(b,a,c);
+        assertEquals(expected, lastPricesArray);
     }
 
     @Test
     void testSortByLocalDateTimeASC() {
         LastPriceDTOComparator comparator = new LastPriceDTOComparator(SortDirection.ASC, LastPriceColumns.TIME);
+
         lastPricesArray.sort(comparator);
-        assertEquals(LocalDateTime.ofEpochSecond(1687145938, 0, ZoneOffset.UTC),
-                lastPricesArray.get(0).getTime());
-        assertEquals(LocalDateTime.ofEpochSecond(1687145948, 0, ZoneOffset.UTC),
-                lastPricesArray.get(1).getTime());
-        assertEquals(LocalDateTime.ofEpochSecond(1687145958, 0, ZoneOffset.UTC),
-                lastPricesArray.get(2).getTime());
+
+        var expected = List.of(a,c,b);
+        assertEquals(expected, lastPricesArray);
     }
 
     @Test
     void testSortByLocalDateTimeDESC() {
         LastPriceDTOComparator comparator = new LastPriceDTOComparator(SortDirection.DESC, LastPriceColumns.TIME);
+
         lastPricesArray.sort(comparator);
-        assertEquals(LocalDateTime.ofEpochSecond(1687145958, 0, ZoneOffset.UTC),
-                lastPricesArray.get(0).getTime());
-        assertEquals(LocalDateTime.ofEpochSecond(1687145948, 0, ZoneOffset.UTC),
-                lastPricesArray.get(1).getTime());
-        assertEquals(LocalDateTime.ofEpochSecond(1687145938, 0, ZoneOffset.UTC),
-                lastPricesArray.get(2).getTime());
+
+        var expected = List.of(b,c,a);
+        assertEquals(expected, lastPricesArray);
     }
 
 }

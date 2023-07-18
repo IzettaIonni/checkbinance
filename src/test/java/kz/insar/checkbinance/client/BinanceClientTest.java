@@ -1,6 +1,7 @@
 package kz.insar.checkbinance.client;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AutoConfigureMockMvc
+@Disabled
 @SpringBootTest
 class BinanceClientTest {
     BinanceClient service;

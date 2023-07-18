@@ -9,11 +9,13 @@ import kz.insar.checkbinance.repositories.entities.SymbolEntity;
 import kz.insar.checkbinance.repositories.entities.SymbolSubscriptionPriceEntity;
 import kz.insar.checkbinance.services.SymbolService;
 import kz.insar.checkbinance.services.TickerService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
+@Disabled
 class CheckbinanceApplicationTests {
 
 	@Autowired

@@ -3,9 +3,11 @@ package kz.insar.checkbinance.domain.sort.comparators;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.domain.sort.params.LastPriceColumns;
 import kz.insar.checkbinance.domain.sort.params.SortDirection;
+import lombok.Data;
 
 import java.util.Comparator;
 
+@Data
 public class LastPriceDTOComparator implements Comparator<LastPriceDTO> {
 
     private final SortDirection dir;

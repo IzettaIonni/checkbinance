@@ -63,7 +63,7 @@ public class SymbolIdTest {
     @Test
     void testOf_ShouldReturnSymbolIdObject() {
         var actual = SymbolId.of(ID);
-        var expected = new SymbolId(44);
+        var expected = new SymbolId(ID);
         assertEquals(expected, actual, ".of method creates object with wrong id");
     }
 }

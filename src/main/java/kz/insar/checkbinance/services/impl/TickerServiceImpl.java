@@ -16,6 +16,7 @@ import kz.insar.checkbinance.repositories.SymbolRepository;
 import kz.insar.checkbinance.repositories.entities.SymbolEntity;
 import kz.insar.checkbinance.services.SymbolService;
 import kz.insar.checkbinance.services.TickerService;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,19 +30,20 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class TickerServiceImpl implements TickerService {
 
-    @Autowired
-    private BinanceClient binanceClient;
+    @NonNull
+    private final BinanceClient binanceClient;
 
-    @Autowired
-    private ApiConvertrer apiConvertrer;
+    @NonNull
+    private final ApiConvertrer apiConvertrer;
 
-    @Autowired
-    private SymbolService symbolService;
+    @NonNull
+    private final SymbolService symbolService;
 
-    @Autowired
-    private SymbolRepository symbolRepository;
+    @NonNull
+    private final SymbolRepository symbolRepository;
 
     @Override
     public List<LastPriceDTO> legacyLastPrices(SortParams<LastPriceColumns> sortParams) {

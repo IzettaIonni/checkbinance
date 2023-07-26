@@ -26,10 +26,17 @@ public interface TickerService {
     List<Symbol> listSymbols();
 
     void subscribeOnPrice(SymbolId id);
+    default void subscribeOnPrice(Symbol symbol) {
+        subscribeOnPrice(symbol.getId());
+    }
 
     void subscribeOnPrice(String symbolName);
 
     void unsubscribeOnPrice(SymbolId id);
+
+    default void unsubscribeOnPrice(Symbol symbol) {
+        unsubscribeOnPrice(symbol.getId());
+    }
 
     void unsubscribeOnPrice(String symbolName);
 

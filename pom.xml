@@ -36,7 +36,8 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>1.17.5</version>
+			<version>1.18.3</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -69,6 +70,7 @@
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>spring-mock-mvc</artifactId>
+			<version>4.4.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -110,12 +112,6 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.testcontainers</groupId>-->
-<!--			<artifactId>postgresql</artifactId>-->
-<!--			<version>1.18.3</version>-->
-<!--			<scope>test</scope>-->
-<!--		</dependency>-->
     </dependencies>
 
 <!--	<dependencyManagement>-->
@@ -148,6 +144,28 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>3.1.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.9</version>
+				<executions>
+					<execution>
+						<id>start-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>generate-report</id>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<title>Coverage with JaCoCo and Maven</title>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

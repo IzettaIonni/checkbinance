@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TickerServiceImplTest {
 
@@ -40,6 +41,35 @@ public class TickerServiceImplTest {
         symbolRepositoryMock = control.createMock(SymbolRepository.class);
         service = new TickerServiceImpl(binanceClientMock, apiConvertrerMock,
                 symbolServiceMock, symbolRepositoryMock);
+    }
+
+    @Test
+    void testCtor_ShouldThrowNPEIfIsBinanceClientMissing() {
+        assertThrows(Throwable.class, () -> new TickerServiceImpl(
+                null, apiConvertrerMock, symbolServiceMock, symbolRepositoryMock));
+    }
+
+    @Test
+    void testCtor_ShouldThrowNPEIfIsApiConverterMissing() {
+        assertThrows(Throwable.class, () -> new TickerServiceImpl(
+                binanceClientMock, null, symbolServiceMock, symbolRepositoryMock));
+    }
+
+    @Test
+    void testCtor_ShouldThrowNPEIfIsSymbolServiceMissing() {
+        assertThrows(Throwable.class, () -> new TickerServiceImpl(
+                binanceClientMock, apiConvertrerMock, null, symbolRepositoryMock));
+    }
+
+    @Test
+    void testCtor_ShouldThrowNPEIfIsSymbolRepositoryMissing() {
+        assertThrows(Throwable.class, () -> new TickerServiceImpl(
+                binanceClientMock, apiConvertrerMock, symbolServiceMock, null));
+    }
+
+    @Test
+    void testSubscribeOnPrice_ShouldThrowNPEIfParamIsNull() {
+        assertThrows(Throwable.class, () -> service.subscribeOnPrice((SymbolId) null));
     }
 
     @Test
@@ -97,16 +127,6 @@ public class TickerServiceImplTest {
         var expected = List.of();
         assertEquals(expected, actual);
     }
-
-    //    public List<LastPriceDTO> lastPrices(SortParams<LastPriceColumns> sortParams) {
-//        List<Symbol> subscriptions = listSubscribtionOnPrices();
-//        List<LastPriceDTO> prices = new ArrayList<>();
-//        if (subscriptions == null || subscriptions.size() == 0) return prices;
-//        prices = apiConvertrer.toApi(binanceClient.getPrices(apiConvertrer.toDomainRequest(subscriptions)), subscriptions);
-//        LastPriceDTOComparator sort = new LastPriceDTOComparator(sortParams.getDir(), sortParams.getColumn());
-//        prices.sort(sort);
-//        return prices;
-//    }
 
     @Test
     void testLastPrices_withSubscriptions() {

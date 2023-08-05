@@ -11,4 +11,4 @@ ENV DATASOURCE_USERNAME=postgres
 ENV DATASOURCE_PASSWORD=123
 COPY --from=builder /usr/app/target/checkbinance-0.0.1-SNAPSHOT.jar checkbinance-0.0.1-SNAPSHOT.jar
 EXPOSE 8080
-ENTRYPOINT java -jar checkbinance-0.0.1-SNAPSHOT.jar $DATASOURCE_URL $DATASOURCE_USERNAME $DATASOURCE_PASSWORD
+ENTRYPOINT java -Dspring.datasource.url=$DATASOURCE_URL -Dspring.datasource.username=$DATASOURCE_USERNAME -Dspring.datasource.password=$DATASOURCE_PASSWORD -jar checkbinance-0.0.1-SNAPSHOT.jar 

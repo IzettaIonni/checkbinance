@@ -7,7 +7,6 @@ import kz.insar.checkbinance.converters.ApiConvertrer;
 import kz.insar.checkbinance.converters.ControllerConverter;
 import kz.insar.checkbinance.domain.sort.params.LastPriceColumns;
 import kz.insar.checkbinance.domain.sort.params.SortDirection;
-import kz.insar.checkbinance.domain.sort.params.SortParams;
 import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.domain.exeptions.InvalidDataException;
 import kz.insar.checkbinance.domain.exeptions.ObjectNotFoundException;
@@ -40,7 +39,6 @@ public class TickerController {
     public List<LastPriceDTO> lastPrices(@Nullable @RequestParam(defaultValue = "SYMBOL") @Valid LastPriceColumns sortKey,
                                          @Nullable @RequestParam(defaultValue = "ASC") @Valid SortDirection sortDir) {
             return tickerService.lastPrices(controllerConverter.toSort(sortKey, sortDir));
-
     }
 
     @GetMapping("/legacylastprice")
@@ -76,7 +74,7 @@ public class TickerController {
     }
 
     @GetMapping("/unsubscribeticker")
-    public void unsubscribeTicker(@RequestParam(required = false) @Valid @NotNull Integer id,
+    public void unsubscribeTicker(@RequestParam(required = false) @Valid @Nullable Integer id,
                                   @RequestParam(required = false) @Valid @Nullable String name) {
         if (id == null && name == null) {
             throw new InvalidDataException("ticker name and ticker id is not found");
@@ -91,7 +89,7 @@ public class TickerController {
 
     @GetMapping("/subscriptions")
     public List<SymbolShortDTO> subscriptions() {
-        return apiConverter.fromDomainToShortList(tickerService.listSubscribtionOnPrices());
+        return apiConverter.fromDomainToShortList(tickerService.listSubscriptionOnPrices());
     }
 
     @ExceptionHandler({ObjectNotFoundException.class})

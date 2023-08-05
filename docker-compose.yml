@@ -1,0 +1,32 @@
+version: "3.3"
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgreDB
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: CheckBinance
+    ports:
+      - 5432:5432
+      
+  checkbinance:
+    image: checkbinance
+    container_name: checkbinance
+    environment:
+      DATASOURCE_URL: jdbc:postgresql://postgreDB:5432/CheckBinance
+      DATASOURCE_USERNAME: postgres
+      DATASOURCE_PASSWORD: 123
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    
+  gp-db-web:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8086:8080
+    depends_on:
+    - postgres

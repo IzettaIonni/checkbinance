@@ -7,6 +7,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @Configuration
 public class TestBeans {
 
-//    private final PostgreSQLContainer<?> postgreSQL = ContainerHolder.getPostgreSQL();
+    //private final PostgreSQLContainer<?> postgreSQL = ContainerHolder.getPostgreSQL();
 
 }

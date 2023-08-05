@@ -14,12 +14,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class CheckbinanceApplication {
 
 	public static void main(String[] args) {
-		if (args.length == 3) {
-			
-		}
-
 		SpringApplication.run(CheckbinanceApplication.class, args);
-
 	}
 
 }

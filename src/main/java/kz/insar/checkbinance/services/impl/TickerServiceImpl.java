@@ -19,7 +19,6 @@ import kz.insar.checkbinance.services.TickerService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -52,7 +51,7 @@ public class TickerServiceImpl implements TickerService {
 
     @Override
     public List<LastPriceDTO> lastPrices(SortParams<LastPriceColumns> sortParams) {
-        List<Symbol> subscriptions = listSubscribtionOnPrices();
+        List<Symbol> subscriptions = listSubscriptionOnPrices();
         List<LastPriceDTO> prices = new ArrayList<>();
         if (subscriptions == null || subscriptions.size() == 0) return prices;
         prices = apiConvertrer.toApi(binanceClient.getPrices(apiConvertrer.toDomainRequest(subscriptions)), subscriptions);
@@ -63,7 +62,7 @@ public class TickerServiceImpl implements TickerService {
 
     @Override
     public List<LastPriceDTO> legacyLastPrices(int limit, SortParams<LastPriceColumns> sortParams) {
-        List<Symbol> subscriptions = listSubscribtionOnPrices();
+        List<Symbol> subscriptions = listSubscriptionOnPrices();
         List<LastPriceDTO> prices = new ArrayList<>();
         if (subscriptions == null || subscriptions.size() == 0) return prices;
         for (Symbol symbol : subscriptions) {
@@ -91,13 +90,13 @@ public class TickerServiceImpl implements TickerService {
     @Override
     public  List<String> updateSymbols() {
         var exchangeInfo = binanceClient.getExchangeInfo();
-        Map<String, Symbol> exsistsSymbols = symbolService.getSymbols()
+        Map<String, Symbol> existSymbols = symbolService.getSymbols()
                 .stream().collect(Collectors.toMap(Symbol::getName, Function.identity()));
         List<String> result = new ArrayList<>();
         for (SymbolDTO params : exchangeInfo.getSymbols()) {
-            if (exsistsSymbols.containsKey(params.getSymbol())) {
+            if (existSymbols.containsKey(params.getSymbol())) {
                 //Update
-                var request = apiConvertrer.toDomainUpdate(exsistsSymbols.get(params.getSymbol()), params);
+                var request = apiConvertrer.toDomainUpdate(existSymbols.get(params.getSymbol()), params);
                 result.add(symbolService.updateSymbol(request).getName());
             }
             else {
@@ -150,7 +149,7 @@ public class TickerServiceImpl implements TickerService {
     }
 
     @Override
-    public List<Symbol> listSubscribtionOnPrices() {
+    public List<Symbol> listSubscriptionOnPrices() {
         return symbolService.getListOfPriceSubscriptions();
     }
 

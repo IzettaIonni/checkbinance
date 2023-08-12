@@ -14,4 +14,19 @@ import java.math.BigDecimal;
 public class SymbolPriceDTO {
     private String symbol;
     private BigDecimal price;
+
+    public static class SymbolPriceDTOBuilder {
+        public SymbolPriceDTOBuilder price(BigDecimal price) {
+            this.price = price;
+            return this;
+        }
+
+        public SymbolPriceDTOBuilder price(String price) {
+            return price(new BigDecimal(price));
+        }
+
+        public SymbolPriceDTOBuilder price(long price) {
+            return price(BigDecimal.valueOf(price));
+        }
+    }
 }

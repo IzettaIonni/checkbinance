@@ -1,19 +1,24 @@
 package kz.insar.checkbinance.controllers;
 
-import io.restassured.RestAssured;
-import io.restassured.common.mapper.TypeRef;
 import kz.insar.checkbinance.api.LastPriceDTO;
+import kz.insar.checkbinance.client.SymbolPriceDTO;
 import kz.insar.checkbinance.client.SymbolStatus;
+import kz.insar.checkbinance.containers.BinanceAPIHelper;
+import kz.insar.checkbinance.containers.ContainerHolder;
 import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolCreate;
 import kz.insar.checkbinance.services.SymbolService;
 import kz.insar.checkbinance.services.impl.TickerServiceImpl;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.model.JsonBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,16 +30,27 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.mockMvc;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockserver.model.HttpRequest.*;
+import static org.mockserver.model.HttpResponse.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
 @AutoConfigureMockMvc
-public class TickerControllerITRESTAssured {
+@ExtendWith(ContainerHolder.class)
+public class TickerControllerITRESTAssuredIT {
+
+//    private static PostgreSQLContainer<?> postgreSQL = ContainerHolder.getPostgreSQL();
+//    private static MockServerContainer mockServer = ContainerHolder.getMockServer();
 
     @Autowired
     private SymbolService symbolService;
     @Autowired
     private TickerServiceImpl tickerService;
+    @Autowired
+    private MockMvc mvc;
+
+    private static BinanceAPIHelper binanceAPIHelper;
+
     private Symbol createSymbol(String name) {
         return symbolService.createSymbol(SymbolCreate.builder()
                 .quotePrecision(567)
@@ -47,12 +63,55 @@ public class TickerControllerITRESTAssured {
                 .build());
     }
 
-    @Autowired
-    private MockMvc mvc;
+    @BeforeAll
+    static void beforeClass() {
+        binanceAPIHelper = ContainerHolder.getBinanceAPIHelper();
+    }
 
     @BeforeEach
     void setUp() {
         mockMvc(mvc);
+    }
+
+    @AfterEach
+    void tearDown() {
+        binanceAPIHelper.cleanUp();
+    }
+
+    @Test
+    void testTickerLastPrice_shouldReturnPricesIfOK() {
+        //todo delete
+        binanceAPIHelper.mockRequestTickerPrice(
+                List.of("CHZBNB", "BEAMUSDT"),
+                List.of(SymbolPriceDTO.builder().price(12).symbol("CHZBNB").build(),
+                        SymbolPriceDTO.builder().price(26).symbol("BEAMUSDT").build())
+        );
+
+        var symbolOne = createSymbol("CHZBNB");
+        var symbolTwo = createSymbol("BEAMUSDT");
+        tickerService.subscribeOnPrice(symbolOne);
+        tickerService.subscribeOnPrice(symbolTwo);
+
+        given()
+                .params("sortKey", "ID", "sortDir", "DESC")
+
+                .when()
+                .get("/ticker/lastprice")
+
+                .then()
+                .log().all() //log() works here
+                .assertThat()
+                .status(HttpStatus.OK)
+                .contentType("application/json");
+    }
+
+    @Test
+    void testTickerLastPrice_shouldReturnExceptionIfSymbolNotFound() {
+        binanceAPIHelper.mockRequestTickerPrice(
+                List.of("CHZBNB", "BEAMUSDT"),
+                response()
+                        .withStatusCode(404)
+        );
     }
 
     @Test
@@ -151,8 +210,8 @@ public class TickerControllerITRESTAssured {
     @Test
     void testExchangeAllInfo() {
         given()
-                .params("sortKey", "ID", "sortDir", "DESC")
 //                .log().all()
+                .params("sortKey", "ID", "sortDir", "DESC")
 
         .when()
                 .get("/ticker/exchangeallinfo")

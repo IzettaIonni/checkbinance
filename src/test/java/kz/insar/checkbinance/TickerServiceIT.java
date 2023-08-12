@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.LocalDateTime;
@@ -36,8 +37,6 @@ class TickerServiceIT {
 	private SymbolService symbolService;
 	@Autowired
 	private TickerServiceImpl tickerService;
-
-	//todo
 	//private final PostgreSQLContainer<?> postgreSQL = ContainerHolder.getPostgreSQL();
 	
 	private Symbol createSymbol(String name) {

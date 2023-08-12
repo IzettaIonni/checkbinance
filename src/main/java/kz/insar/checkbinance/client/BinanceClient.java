@@ -16,39 +16,50 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-@Service
 @AllArgsConstructor
 public class BinanceClient {
+    private final String baseUrl;
+
     @NonNull
     private final RestOperations restOperations;
-    @Autowired
-    public BinanceClient() {
-        this(new RestTemplate());
+    public BinanceClient(String baseUrl) {
+        this(baseUrl, new RestTemplate());
+    }
+
+
+    private UriComponentsBuilder getBaseUrl() {
+        return UriComponentsBuilder.fromHttpUrl(baseUrl);
     }
 
     public ExchangeInfoResponseDTO getExchangeInfo() {
-        return restOperations.getForObject("https://api.binance.com/api/v3/exchangeInfo", ExchangeInfoResponseDTO.class);
+        return restOperations.getForObject(getBaseUrl().pathSegment("exchangeInfo").build().toUri(),
+                ExchangeInfoResponseDTO.class);
     }
 
     public ExchangeInfoResponseDTO getExchangeInfoBySymbol(String symbol) {
         return restOperations.getForObject(
-                "https://api.binance.com/api/v3/exchangeInfo?symbol=" + symbol, ExchangeInfoResponseDTO.class);
+                getBaseUrl()
+                        .queryParam("symbol", symbol)
+                        .pathSegment("exchangeInfo")
+                        .build()
+                        .toUri(), ExchangeInfoResponseDTO.class);
     }
 
     @SneakyThrows
     public ExchangeInfoResponseDTO getExchangeInfoBySymbols(List<String> symbols) {
         ObjectMapper objectMapper = new ObjectMapper();
-        URI requestUri = UriComponentsBuilder.fromHttpUrl("https://api.binance.com")
+        URI requestUri = getBaseUrl()
                 .queryParam("symbols", objectMapper.writeValueAsString(symbols))
-                .path("/api/v3/exchangeInfo")
+                .pathSegment("exchangeInfo")
                 .build()
                 .toUri();
         return restOperations.getForObject(requestUri, ExchangeInfoResponseDTO.class);
     }
 
+
     public List<RecentTradeDTO> getRecentTrades(String symbol, Integer limit) {
-        URI requestUri = UriComponentsBuilder.fromHttpUrl("https://api.binance.com")
-                .path("/api/v3/trades")
+        URI requestUri = getBaseUrl()
+                .pathSegment("trades")
                 .queryParam("symbol", symbol).queryParam("limit", limit)
                 .build()
                 .toUri();
@@ -72,11 +83,13 @@ public class BinanceClient {
     @SneakyThrows
     public List<SymbolPriceDTO> getPrices(List<String> symbols) {
         ObjectMapper objectMapper = new ObjectMapper();
-        URI requestUri = UriComponentsBuilder.fromHttpUrl("https://api.binance.com")
-                .path("/api/v3/ticker/price")
+        URI requestUri = getBaseUrl()
+                .pathSegment("ticker", "price")
                 .queryParam("symbols", objectMapper.writeValueAsString(symbols))
                 .build()
                 .toUri();
+        //todo delete
+        System.out.println(requestUri + " request URI");
         try {
             return restOperations.exchange(
                             requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<SymbolPriceDTO>>() {}
@@ -91,8 +104,8 @@ public class BinanceClient {
     @SneakyThrows
     public SymbolPriceDTO getPrice(String symbol) {
         ObjectMapper objectMapper = new ObjectMapper();
-        URI requestUri = UriComponentsBuilder.fromHttpUrl("https://api.binance.com")
-                .path("/api/v3/ticker/price")
+        URI requestUri = getBaseUrl()
+                .pathSegment("price")
                 .queryParam("symbol", symbol)
                 .build()
                 .toUri();
@@ -112,8 +125,8 @@ public class BinanceClient {
     @SneakyThrows
     public List<SymbolPriceDTO> getPrices() {
         ObjectMapper objectMapper = new ObjectMapper();
-        URI requestUri = UriComponentsBuilder.fromHttpUrl("https://api.binance.com")
-                .path("/api/v3/ticker/price")
+        URI requestUri = getBaseUrl()
+                .pathSegment("ticker", "price")
                 .build()
                 .toUri();
 

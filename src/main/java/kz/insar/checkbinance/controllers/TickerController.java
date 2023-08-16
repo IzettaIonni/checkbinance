@@ -3,6 +3,7 @@ package kz.insar.checkbinance.controllers;
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.api.SymbolShortDTO;
+import kz.insar.checkbinance.client.BinanceClientExeption;
 import kz.insar.checkbinance.converters.ApiConvertrer;
 import kz.insar.checkbinance.converters.ControllerConverter;
 import kz.insar.checkbinance.domain.sort.params.LastPriceColumns;
@@ -11,11 +12,13 @@ import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.domain.exeptions.InvalidDataException;
 import kz.insar.checkbinance.domain.exeptions.ObjectNotFoundException;
 import kz.insar.checkbinance.services.TickerService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -25,6 +28,7 @@ import java.util.List;
 @RestController
 @Validated
 @RequestMapping("ticker")
+@Slf4j
 public class TickerController {
 
     @Autowired
@@ -100,5 +104,23 @@ public class TickerController {
     @ExceptionHandler({InvalidDataException.class})
     public ResponseEntity<Void> badRequestException() {
         return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler({BinanceClientExeption.class})
+    public ResponseEntity<Void> binanceClientException(BinanceClientExeption e) {
+        if (e.getCause() != null) {
+            var cause = e.getCause();
+            if (cause instanceof HttpClientErrorException) {
+                HttpClientErrorException ex = (HttpClientErrorException) cause;
+                switch (ex.getRawStatusCode()) {
+                case 404:
+                    log.warn("Binance resources Not Found", e);
+                    return ResponseEntity.notFound().build();
+                }
+            }
+        }
+
+        log.error("Binance Client Error: ", e);
+        return ResponseEntity.internalServerError().build();
     }
 }

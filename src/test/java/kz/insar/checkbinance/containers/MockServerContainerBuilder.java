@@ -18,9 +18,6 @@ public class MockServerContainerBuilder {
         container.start();
 
         System.setProperty("binance-client.base-url", container.getEndpoint());
-        //todo delete
-        System.out.println(System.getProperty("binance-client.base-url") + " system property//////////");
-        System.out.println(container.getEndpoint());
         return container;
     }
 }

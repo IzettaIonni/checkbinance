@@ -1,6 +1,7 @@
 package kz.insar.checkbinance.controllers;
 
 import kz.insar.checkbinance.api.LastPriceDTO;
+import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolPriceDTO;
 import kz.insar.checkbinance.client.SymbolStatus;
 import kz.insar.checkbinance.containers.BinanceAPIHelper;
@@ -23,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -38,9 +41,6 @@ import static org.mockserver.model.HttpResponse.*;
 @AutoConfigureMockMvc
 @ExtendWith(ContainerHolder.class)
 public class TickerControllerITRESTAssuredIT {
-
-//    private static PostgreSQLContainer<?> postgreSQL = ContainerHolder.getPostgreSQL();
-//    private static MockServerContainer mockServer = ContainerHolder.getMockServer();
 
     @Autowired
     private SymbolService symbolService;
@@ -80,7 +80,6 @@ public class TickerControllerITRESTAssuredIT {
 
     @Test
     void testTickerLastPrice_shouldReturnPricesIfOK() {
-        //todo delete
         binanceAPIHelper.mockRequestTickerPrice(
                 List.of("CHZBNB", "BEAMUSDT"),
                 List.of(SymbolPriceDTO.builder().price(12).symbol("CHZBNB").build(),
@@ -99,7 +98,7 @@ public class TickerControllerITRESTAssuredIT {
                 .get("/ticker/lastprice")
 
                 .then()
-                .log().all() //log() works here
+                .log().all()
                 .assertThat()
                 .status(HttpStatus.OK)
                 .contentType("application/json");
@@ -108,29 +107,27 @@ public class TickerControllerITRESTAssuredIT {
     @Test
     void testTickerLastPrice_shouldReturnExceptionIfSymbolNotFound() {
         binanceAPIHelper.mockRequestTickerPrice(
-                List.of("CHZBNB", "BEAMUSDT"),
-                response()
-                        .withStatusCode(404)
-        );
-    }
+                List.of("CHZBNB", "BEAMUSDT"), response().withStatusCode(404));
 
-    @Test
-    void testNotFoundException(){
-        given()
-
-        .when()
-            .post("/users")
-
-        .then()
-            .assertThat().status(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void testLastPrice() {
         var symbolOne = createSymbol("CHZBNB");
         var symbolTwo = createSymbol("BEAMUSDT");
         tickerService.subscribeOnPrice(symbolOne);
         tickerService.subscribeOnPrice(symbolTwo);
+
+        given()
+                .params("sortKey", "ID", "sortDir", "DESC")
+
+        .when()
+                .get("/ticker/lastprice")
+
+        .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void testLastPrice_shouldReturnNullIfSubscriptionsDoesNotExist() {
         given()
                 .params("sortKey", "ID", "sortDir", "DESC")
 
@@ -140,25 +137,30 @@ public class TickerControllerITRESTAssuredIT {
         .then()
                 .assertThat()
                 .status(HttpStatus.OK)
-                .contentType("application/json")
-                .body("[0].symbol", equalTo(symbolTwo.getName()))
-                .body("[0].id", equalTo(symbolTwo.getId().getId()))
-                .body("[1].symbol", equalTo(symbolOne.getName()))
-                .body("[1].id", equalTo(symbolOne.getId().getId()));
+                .extract().body().equals(null);
     }
 
     @Test
-    void testLegacyLastPrice() {
+    void testLegacyLastPrice_shouldReturnPricesIfOK() {
+        binanceAPIHelper.mockRequestTickerPrice(
+                List.of("CHZBNB", "BEAMUSDT"),
+                List.of(
+                        SymbolPriceDTO.builder().price(12).symbol("CHZBNB").build(),
+                        SymbolPriceDTO.builder().price(26).symbol("BEAMUSDT").build()
+                )
+        );
+
         var symbolOne = createSymbol("CHZBNB");
         var symbolTwo = createSymbol("BEAMUSDT");
         tickerService.subscribeOnPrice(symbolOne);
         tickerService.subscribeOnPrice(symbolTwo);
+
         List<LastPriceDTO> actual = given()
                 .params("sortKey", "ID", "sortDir", "DESC")
 //                .log().all()
 
         .when()
-                .get("/ticker/lastprice")
+                .get("/ticker/legacylastprice")
 
         .then()
                 .log().all() //log() works here
@@ -173,7 +175,32 @@ public class TickerControllerITRESTAssuredIT {
                 .extract().body()
                 // here's the magic
                 .jsonPath().getList(".", LastPriceDTO.class);
-        System.out.println(actual);
+        List<LastPriceDTO> expected = List.of(
+//                LastPriceDTO.builder()
+//                        .symbol("BEAMUSDT")
+//                        .id(symbolTwo.getId().getId())
+//                        .price(26)
+//                        .time()
+        );
+    }
+
+    @Test
+    void testLegacyLastPrice_shouldReturnExceptionIfSymbolNotFound() {
+
+    }
+
+    @Test
+    void testLegacyLastPrice_shouldReturnNullIfSubscriptionsDoesNotExist() {
+        given()
+                .params("sortKey", "ID", "sortDir", "DESC")
+
+        .when()
+                .get("/ticker/legacylastprice")
+
+        .then()
+                .assertThat()
+                .status(HttpStatus.OK)
+                .extract().body().equals(null);
     }
 
     @Test

@@ -88,8 +88,6 @@ public class BinanceClient {
                 .queryParam("symbols", objectMapper.writeValueAsString(symbols))
                 .build()
                 .toUri();
-        //todo delete
-        System.out.println(requestUri + " request URI");
         try {
             return restOperations.exchange(
                             requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<SymbolPriceDTO>>() {}

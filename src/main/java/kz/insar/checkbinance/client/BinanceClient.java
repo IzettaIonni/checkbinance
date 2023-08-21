@@ -60,7 +60,8 @@ public class BinanceClient {
     public List<RecentTradeDTO> getRecentTrades(String symbol, Integer limit) {
         URI requestUri = getBaseUrl()
                 .pathSegment("trades")
-                .queryParam("symbol", symbol).queryParam("limit", limit)
+                .queryParam("symbol", symbol)
+                .queryParam("limit", limit)
                 .build()
                 .toUri();
 

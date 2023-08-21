@@ -12,7 +12,6 @@ public class LastPriceDTOComparator implements Comparator<LastPriceDTO> {
 
     private final SortDirection dir;
     private final LastPriceColumns columns;
-    private int result;
 
     public LastPriceDTOComparator(SortDirection dir, LastPriceColumns columns) {
         this.dir = dir;
@@ -22,6 +21,8 @@ public class LastPriceDTOComparator implements Comparator<LastPriceDTO> {
 
     @Override
     public int compare(LastPriceDTO o1, LastPriceDTO o2) {
+
+        int result = 0;
 
         switch (columns) {
             case SYMBOL:
@@ -39,6 +40,9 @@ public class LastPriceDTOComparator implements Comparator<LastPriceDTO> {
             case TIME:
                 result = o1.getTime().compareTo(o2.getTime());
                 break;
+
+            default:
+                throw new RuntimeException("Unsupported sort paramether: " + columns);
         }
 
         if (dir == SortDirection.DESC) {

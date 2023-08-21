@@ -15,8 +15,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockserver.client.MockServerClient;
-import org.mockserver.model.JsonBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,13 +25,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.LongFunction;
+import java.util.function.Supplier;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.mockMvc;
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockserver.model.HttpRequest.*;
 import static org.mockserver.model.HttpResponse.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -51,6 +51,7 @@ public class TickerControllerITRESTAssuredIT {
 
     private static BinanceAPIHelper binanceAPIHelper;
 
+
     private Symbol createSymbol(String name) {
         return symbolService.createSymbol(SymbolCreate.builder()
                 .quotePrecision(567)
@@ -61,6 +62,10 @@ public class TickerControllerITRESTAssuredIT {
                 .quoteAssetPrecision(77)
                 .status(SymbolStatus.POST_TRADING)
                 .build());
+    }
+
+    private static LocalDateTime T(String time) {
+        return LocalDateTime.parse(time);
     }
 
     @BeforeAll
@@ -80,7 +85,7 @@ public class TickerControllerITRESTAssuredIT {
 
     @Test
     void testTickerLastPrice_shouldReturnPricesIfOK() {
-        binanceAPIHelper.mockRequestTickerPrice(
+        binanceAPIHelper.mockRequestLastPrice(
                 List.of("CHZBNB", "BEAMUSDT"),
                 List.of(SymbolPriceDTO.builder().price(12).symbol("CHZBNB").build(),
                         SymbolPriceDTO.builder().price(26).symbol("BEAMUSDT").build())
@@ -106,7 +111,7 @@ public class TickerControllerITRESTAssuredIT {
 
     @Test
     void testTickerLastPrice_shouldReturnExceptionIfSymbolNotFound() {
-        binanceAPIHelper.mockRequestTickerPrice(
+        binanceAPIHelper.mockRequestLastPrice(
                 List.of("CHZBNB", "BEAMUSDT"), response().withStatusCode(404));
 
         var symbolOne = createSymbol("CHZBNB");
@@ -141,13 +146,53 @@ public class TickerControllerITRESTAssuredIT {
     }
 
     @Test
-    void testLegacyLastPrice_shouldReturnPricesIfOK() {
-        binanceAPIHelper.mockRequestTickerPrice(
-                List.of("CHZBNB", "BEAMUSDT"),
+    void testLegacyLastPrice_shouldReturnPricesIfOKWithLimit() {
+        binanceAPIHelper.mockRequestLegacyLastPrice(
+                "CHZBNB",
+                2,
                 List.of(
-                        SymbolPriceDTO.builder().price(12).symbol("CHZBNB").build(),
-                        SymbolPriceDTO.builder().price(26).symbol("BEAMUSDT").build()
-                )
+                        RecentTradeDTO.builder()
+                                .id(51l)
+                                .price(BigDecimal.valueOf(12))
+                                .qty(BigDecimal.valueOf(44))
+                                .quoteQty(BigDecimal.valueOf(76))
+                                .time(1692271257000l)
+                                .isBuyerMaker(true)
+                                .isBestMatch(false)
+                                .build(),
+                        RecentTradeDTO.builder()
+                                .id(52l)
+                                .price(BigDecimal.valueOf(71))
+                                .qty(BigDecimal.valueOf(47))
+                                .quoteQty(BigDecimal.valueOf(70))
+                                .time(1692277878000l)
+                                .isBuyerMaker(false)
+                                .isBestMatch(false)
+                                .build())
+        );
+        binanceAPIHelper.mockRequestLegacyLastPrice(
+                "BEAMUSDT",
+                2,
+                List.of(
+                        RecentTradeDTO.builder()
+                                .id(47l)
+                                .price(BigDecimal.valueOf(89))
+                                .qty(BigDecimal.valueOf(21))
+                                .quoteQty(BigDecimal.valueOf(66))
+                                .time(1692274412000l)
+                                .isBuyerMaker(false)
+                                .isBestMatch(true)
+                                .build(),
+                        RecentTradeDTO.builder()
+
+                                .id(45l)
+                                .price(BigDecimal.valueOf(33))
+                                .qty(BigDecimal.valueOf(76))
+                                .quoteQty(BigDecimal.valueOf(12))
+                                .time(1692279824000l)
+                                .isBuyerMaker(true)
+                                .isBestMatch(true)
+                                .build())
         );
 
         var symbolOne = createSymbol("CHZBNB");
@@ -156,8 +201,9 @@ public class TickerControllerITRESTAssuredIT {
         tickerService.subscribeOnPrice(symbolTwo);
 
         List<LastPriceDTO> actual = given()
-                .params("sortKey", "ID", "sortDir", "DESC")
-//                .log().all()
+                .param("sortKey", "ID")
+                .param("sortDir", "DESC")
+                .param("limit", "2")
 
         .when()
                 .get("/ticker/legacylastprice")
@@ -167,21 +213,138 @@ public class TickerControllerITRESTAssuredIT {
                 .assertThat()
                 .status(HttpStatus.OK)
                 .contentType("application/json")
-                .body("[0].symbol", equalTo(symbolTwo.getName()))
-                .body("[0].id", equalTo(symbolTwo.getId().getId()))
-                .body("[1].symbol", equalTo(symbolOne.getName()))
-                .body("[1].id", equalTo(symbolOne.getId().getId()))
-                //.extract().as(new TypeRef<List<LastPriceDTO>>(){});
                 .extract().body()
                 // here's the magic
                 .jsonPath().getList(".", LastPriceDTO.class);
+
         List<LastPriceDTO> expected = List.of(
-//                LastPriceDTO.builder()
-//                        .symbol("BEAMUSDT")
-//                        .id(symbolTwo.getId().getId())
-//                        .price(26)
-//                        .time()
+                LastPriceDTO.builder()
+                        .symbol("BEAMUSDT")
+                        .id(symbolTwo.getId().getId())
+                        .price(89)
+                        .time(T("2023-08-17T12:13:32.000"))
+                        .build(),
+                LastPriceDTO.builder()
+                        .symbol("BEAMUSDT")
+                        .id(symbolTwo.getId().getId())
+                        .price(33)
+                        .time(T("2023-08-17T13:43:44.000"))
+                        .build(),
+                LastPriceDTO.builder()
+                        .symbol("CHZBNB")
+                        .id(symbolOne.getId().getId())
+                        .price(12)
+                        .time(T("2023-08-17T11:20:57.000"))
+                        .build(),
+                LastPriceDTO.builder()
+                        .symbol("CHZBNB")
+                        .id(symbolOne.getId().getId())
+                        .price(71)
+                        .time(T("2023-08-17T13:11:18.000"))
+                        .build()
         );
+        assertThat(actual).containsExactlyElementsOf(expected);
+    }
+
+    @Test
+    void testLegacyLastPrice_shouldReturnPricesIfOKWithoutLimit() {
+        binanceAPIHelper.mockRequestLegacyLastPrice(
+                "CHZBNB",
+                1,
+                List.of(
+                        RecentTradeDTO.builder()
+                                .id(51l)
+                                .price(BigDecimal.valueOf(12))
+                                .qty(BigDecimal.valueOf(44))
+                                .quoteQty(BigDecimal.valueOf(76))
+                                .time(1692271257000l)
+                                .isBuyerMaker(true)
+                                .isBestMatch(false)
+                                .build(),
+                        RecentTradeDTO.builder()
+                                .id(52l)
+                                .price(BigDecimal.valueOf(71))
+                                .qty(BigDecimal.valueOf(47))
+                                .quoteQty(BigDecimal.valueOf(70))
+                                .time(1692277878000l)
+                                .isBuyerMaker(false)
+                                .isBestMatch(false)
+                                .build())
+        );
+        binanceAPIHelper.mockRequestLegacyLastPrice(
+                "BEAMUSDT",
+                2,
+                List.of(
+                        RecentTradeDTO.builder()
+                                .id(47l)
+                                .price(BigDecimal.valueOf(89))
+                                .qty(BigDecimal.valueOf(21))
+                                .quoteQty(BigDecimal.valueOf(66))
+                                .time(1692274412000l)
+                                .isBuyerMaker(false)
+                                .isBestMatch(true)
+                                .build(),
+                        RecentTradeDTO.builder()
+
+                                .id(45l)
+                                .price(BigDecimal.valueOf(33))
+                                .qty(BigDecimal.valueOf(76))
+                                .quoteQty(BigDecimal.valueOf(12))
+                                .time(1692279824000l)
+                                .isBuyerMaker(true)
+                                .isBestMatch(true)
+                                .build())
+        );
+
+        var symbolOne = createSymbol("CHZBNB");
+        var symbolTwo = createSymbol("BEAMUSDT");
+        tickerService.subscribeOnPrice(symbolOne);
+        tickerService.subscribeOnPrice(symbolTwo);
+
+        List<LastPriceDTO> actual = given()
+                .param("sortKey", "ID")
+                .param("sortDir", "DESC")
+                .param("limit", "2")
+
+                .when()
+                .get("/ticker/legacylastprice")
+
+                .then()
+                .log().all() //log() works here
+                .assertThat()
+                .status(HttpStatus.OK)
+                .contentType("application/json")
+                .extract().body()
+                // here's the magic
+                .jsonPath().getList(".", LastPriceDTO.class);
+
+        List<LastPriceDTO> expected = List.of(
+                LastPriceDTO.builder()
+                        .symbol("BEAMUSDT")
+                        .id(symbolTwo.getId().getId())
+                        .price(89)
+                        .time(T("2023-08-17T12:13:32.000"))
+                        .build(),
+                LastPriceDTO.builder()
+                        .symbol("BEAMUSDT")
+                        .id(symbolTwo.getId().getId())
+                        .price(33)
+                        .time(T("2023-08-17T13:43:44.000"))
+                        .build(),
+                LastPriceDTO.builder()
+                        .symbol("CHZBNB")
+                        .id(symbolOne.getId().getId())
+                        .price(12)
+                        .time(T("2023-08-17T11:20:57.000"))
+                        .build(),
+                LastPriceDTO.builder()
+                        .symbol("CHZBNB")
+                        .id(symbolOne.getId().getId())
+                        .price(71)
+                        .time(T("2023-08-17T13:11:18.000"))
+                        .build()
+        );
+        assertThat(actual).containsExactlyElementsOf(expected);
     }
 
     @Test

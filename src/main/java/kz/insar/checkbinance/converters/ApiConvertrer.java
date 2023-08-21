@@ -41,13 +41,13 @@ public class ApiConvertrer {
 
     private final LongFunction<LocalDateTime> epochMiliConverter;
 
-   public ApiConvertrer(Supplier<LocalDateTime> currentTime, LongFunction<LocalDateTime> epochMiliConverter) {
+    public ApiConvertrer(Supplier<LocalDateTime> currentTime, LongFunction<LocalDateTime> epochMiliConverter) {
        if (currentTime == null) {
            throw new NullPointerException();
        }
        this.currentTime = currentTime;
        this.epochMiliConverter = epochMiliConverter;
-   }
+    }
 
     public ApiConvertrer(Supplier<LocalDateTime> currentTime) {
         this(currentTime, new EpochMilisToTimeConverter());

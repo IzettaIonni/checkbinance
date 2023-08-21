@@ -45,11 +45,6 @@ public class TickerServiceImpl implements TickerService {
     private final SymbolRepository symbolRepository;
 
     @Override
-    public List<LastPriceDTO> legacyLastPrices(SortParams<LastPriceColumns> sortParams) {
-        return legacyLastPrices(2, sortParams);
-    }
-
-    @Override
     public List<LastPriceDTO> lastPrices(SortParams<LastPriceColumns> sortParams) {
         List<Symbol> subscriptions = listSubscriptionOnPrices();
         List<LastPriceDTO> prices = new ArrayList<>();
@@ -74,6 +69,11 @@ public class TickerServiceImpl implements TickerService {
         LastPriceDTOComparator sort = new LastPriceDTOComparator(sortParams.getDir(), sortParams.getColumn());
         prices.sort(sort);
         return prices;
+    }
+
+    @Override
+    public List<LastPriceDTO> legacyLastPrices(SortParams<LastPriceColumns> sortParams) {
+        return legacyLastPrices(2, sortParams);
     }
 
 

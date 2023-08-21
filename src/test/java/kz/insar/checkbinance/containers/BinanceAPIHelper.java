@@ -1,6 +1,7 @@
 package kz.insar.checkbinance.containers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolPriceDTO;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -42,7 +43,7 @@ public class BinanceAPIHelper {
     }
 
     @SneakyThrows
-    public BinanceAPIHelper mockRequestTickerPrice(List<String> requestSymbols, HttpResponse response) {
+    public BinanceAPIHelper mockRequestLastPrice(List<String> requestSymbols, HttpResponse response) {
         return mockRequest(request()
                 .withMethod("GET")
                 .withPath("/ticker/price")
@@ -50,8 +51,35 @@ public class BinanceAPIHelper {
                 response);
     }
 
-    public BinanceAPIHelper mockRequestTickerPrice(List<String> requestSymbols, List<SymbolPriceDTO> responseDTO) {
-        return mockRequestTickerPrice(requestSymbols, response().withBody(JsonBody.json(responseDTO)).withStatusCode(200));
+    public BinanceAPIHelper mockRequestLastPrice(List<String> requestSymbols, List<SymbolPriceDTO> responseDTOList) {
+
+        return mockRequestLastPrice(requestSymbols,
+                response().withBody(JsonBody.json(responseDTOList)).withStatusCode(200));
+    }
+
+    @SneakyThrows
+    public BinanceAPIHelper mockRequestLegacyLastPrice(
+            String requestSymbol, int requestLimit, HttpResponse response) {
+        return mockRequest(request()
+                        .withMethod("GET")
+                        .withPath("/trades")
+                        .withQueryStringParameter("symbol", requestSymbol)
+                        .withQueryStringParameter("limit", Integer.toString(requestLimit)),
+                response);
+    }
+
+    public BinanceAPIHelper mockRequestLegacyLastPrice(
+            String requestSymbol, int requestLimit, List<RecentTradeDTO> responseDTOList) {
+
+        return mockRequestLegacyLastPrice(requestSymbol, requestLimit,
+                response().withBody(JsonBody.json(responseDTOList)).withStatusCode(200));
+    }
+
+    public BinanceAPIHelper mockRequestLegacyLastPrice(
+            String requestSymbol, int requestLimit, RecentTradeDTO responseDTO) {
+
+        return mockRequestLegacyLastPrice(requestSymbol, requestLimit,
+                response().withBody(JsonBody.json(responseDTO)).withStatusCode(200));
     }
 
 

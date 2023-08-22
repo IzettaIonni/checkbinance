@@ -73,7 +73,7 @@ public class TickerServiceImpl implements TickerService {
 
     @Override
     public List<LastPriceDTO> legacyLastPrices(SortParams<LastPriceColumns> sortParams) {
-        return legacyLastPrices(2, sortParams);
+        return legacyLastPrices(1, sortParams);
     }
 
 

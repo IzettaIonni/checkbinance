@@ -260,20 +260,12 @@ public class TickerControllerITRESTAssuredIT {
                                 .time(1692271257000l)
                                 .isBuyerMaker(true)
                                 .isBestMatch(false)
-                                .build(),
-                        RecentTradeDTO.builder()
-                                .id(52l)
-                                .price(BigDecimal.valueOf(71))
-                                .qty(BigDecimal.valueOf(47))
-                                .quoteQty(BigDecimal.valueOf(70))
-                                .time(1692277878000l)
-                                .isBuyerMaker(false)
-                                .isBestMatch(false)
-                                .build())
+                                .build()
+                )
         );
         binanceAPIHelper.mockRequestLegacyLastPrice(
                 "BEAMUSDT",
-                2,
+                1,
                 List.of(
                         RecentTradeDTO.builder()
                                 .id(47l)
@@ -283,17 +275,8 @@ public class TickerControllerITRESTAssuredIT {
                                 .time(1692274412000l)
                                 .isBuyerMaker(false)
                                 .isBestMatch(true)
-                                .build(),
-                        RecentTradeDTO.builder()
-
-                                .id(45l)
-                                .price(BigDecimal.valueOf(33))
-                                .qty(BigDecimal.valueOf(76))
-                                .quoteQty(BigDecimal.valueOf(12))
-                                .time(1692279824000l)
-                                .isBuyerMaker(true)
-                                .isBestMatch(true)
-                                .build())
+                                .build()
+                )
         );
 
         var symbolOne = createSymbol("CHZBNB");
@@ -304,7 +287,6 @@ public class TickerControllerITRESTAssuredIT {
         List<LastPriceDTO> actual = given()
                 .param("sortKey", "ID")
                 .param("sortDir", "DESC")
-                .param("limit", "2")
 
                 .when()
                 .get("/ticker/legacylastprice")
@@ -326,22 +308,10 @@ public class TickerControllerITRESTAssuredIT {
                         .time(T("2023-08-17T12:13:32.000"))
                         .build(),
                 LastPriceDTO.builder()
-                        .symbol("BEAMUSDT")
-                        .id(symbolTwo.getId().getId())
-                        .price(33)
-                        .time(T("2023-08-17T13:43:44.000"))
-                        .build(),
-                LastPriceDTO.builder()
                         .symbol("CHZBNB")
                         .id(symbolOne.getId().getId())
                         .price(12)
                         .time(T("2023-08-17T11:20:57.000"))
-                        .build(),
-                LastPriceDTO.builder()
-                        .symbol("CHZBNB")
-                        .id(symbolOne.getId().getId())
-                        .price(71)
-                        .time(T("2023-08-17T13:11:18.000"))
                         .build()
         );
         assertThat(actual).containsExactlyElementsOf(expected);

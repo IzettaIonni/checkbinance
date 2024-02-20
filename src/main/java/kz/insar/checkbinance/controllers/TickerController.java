@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
@@ -53,6 +54,7 @@ public class TickerController {
 
     }
 
+
     @GetMapping("/exchangeinfo")
     public ExchangeInfoBySymbolsDTO exchangeInfo(@Nullable @RequestParam @Valid List<String> symbols) {
         return tickerService.exchangeInfo(symbols);
@@ -62,7 +64,7 @@ public class TickerController {
     public ExchangeInfoBySymbolsDTO exchangeInfo() {
         return tickerService.exchangeInfo();
     }
-
+    
     @GetMapping("/subscribeticker")
     public void subscribeTicker(@RequestParam(required = false) @Valid @Nullable Integer id,
                                 @RequestParam(required = false) @Valid @Nullable String name) {

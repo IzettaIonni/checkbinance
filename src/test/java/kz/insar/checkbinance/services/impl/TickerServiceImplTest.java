@@ -27,7 +27,7 @@ public class TickerServiceImplTest {
 
     private IMocksControl control;
     private BinanceClient binanceClientMock;
-    private ApiConvertrer apiConvertrerMock;
+    private ApiConvertrer apiConverterMock;
     private SymbolService symbolServiceMock;
     private SymbolRepository symbolRepositoryMock;
     private TickerServiceImpl service;
@@ -36,17 +36,17 @@ public class TickerServiceImplTest {
     void setUp() {
         control = createStrictControl();
         binanceClientMock = control.createMock(BinanceClient.class);
-        apiConvertrerMock = control.createMock(ApiConvertrer.class);
+        apiConverterMock = control.createMock(ApiConvertrer.class);
         symbolServiceMock = control.createMock(SymbolService.class);
         symbolRepositoryMock = control.createMock(SymbolRepository.class);
-        service = new TickerServiceImpl(binanceClientMock, apiConvertrerMock,
+        service = new TickerServiceImpl(binanceClientMock, apiConverterMock,
                 symbolServiceMock, symbolRepositoryMock);
     }
 
     @Test
     void testCtor_ShouldThrowNPEIfIsBinanceClientMissing() {
         assertThrows(Throwable.class, () -> new TickerServiceImpl(
-                null, apiConvertrerMock, symbolServiceMock, symbolRepositoryMock));
+                null, apiConverterMock, symbolServiceMock, symbolRepositoryMock));
     }
 
     @Test
@@ -58,13 +58,13 @@ public class TickerServiceImplTest {
     @Test
     void testCtor_ShouldThrowNPEIfIsSymbolServiceMissing() {
         assertThrows(Throwable.class, () -> new TickerServiceImpl(
-                binanceClientMock, apiConvertrerMock, null, symbolRepositoryMock));
+                binanceClientMock, apiConverterMock, null, symbolRepositoryMock));
     }
 
     @Test
     void testCtor_ShouldThrowNPEIfIsSymbolRepositoryMissing() {
         assertThrows(Throwable.class, () -> new TickerServiceImpl(
-                binanceClientMock, apiConvertrerMock, symbolServiceMock, null));
+                binanceClientMock, apiConverterMock, symbolServiceMock, null));
     }
 
     @Test
@@ -139,10 +139,10 @@ public class TickerServiceImplTest {
         var subscriptions = List.of(symbolMock1, symbolMock2);
         List<LastPriceDTO> lastPriceDTOListMock = control.createMock(List.class);
         expect(symbolServiceMock.getListOfPriceSubscriptions()).andReturn(subscriptions);
-        expect(apiConvertrerMock.toDomainRequest(eq(subscriptions))).andReturn(List.of("Foo", "Bar"));
+        expect(apiConverterMock.toDomainRequest(eq(subscriptions))).andReturn(List.of("Foo", "Bar"));
         expect(binanceClientMock.getPrices(eq(List.of("Foo", "Bar"))))
                 .andReturn(List.of(symbolPriceDTOMock1, symbolPriceDTOMock2));
-        expect(apiConvertrerMock.toApi(eq(List.of(symbolPriceDTOMock1, symbolPriceDTOMock2)), same(subscriptions)))
+        expect(apiConverterMock.toApi(eq(List.of(symbolPriceDTOMock1, symbolPriceDTOMock2)), same(subscriptions)))
                 .andReturn(lastPriceDTOListMock);
         lastPriceDTOListMock.sort(eq(new LastPriceDTOComparator(SortDirection.ASC, LastPriceColumns.ID)));
         control.replay();

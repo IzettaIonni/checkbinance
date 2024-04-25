@@ -2,7 +2,7 @@ FROM maven:3-openjdk-11 as builder
 ENV HOME=/usr/app
 RUN mkdir -p $HOME
 WORKDIR $HOME
-ADD . $HOME
+ADD .. $HOME
 RUN mvn package
 
 FROM openjdk:11-jdk

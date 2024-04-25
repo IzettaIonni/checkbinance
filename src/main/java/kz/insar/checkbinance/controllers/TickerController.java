@@ -16,14 +16,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -43,68 +44,106 @@ public class TickerController {
     @GetMapping("/lastprice")
     public List<LastPriceDTO> lastPrices(@Nullable @RequestParam(defaultValue = "SYMBOL") @Valid LastPriceColumns sortKey,
                                          @Nullable @RequestParam(defaultValue = "ASC") @Valid SortDirection sortDir) {
-            return tickerService.lastPrices(controllerConverter.toSort(sortKey, sortDir));
+        var requestId = UUID.randomUUID();
+        log.info("request " + requestId + " lastPrice with sortKey = "
+                + sortKey.name() + " and sortDir = " +sortDir.name());
+        var response = tickerService.lastPrices(controllerConverter.toSort(sortKey, sortDir));
+        log.info("request " + requestId + " successfully done");
+        return response;
     }
 
     @GetMapping("/legacylastprice")
     public List<LastPriceDTO> legacyLastPrices(@Nullable @RequestParam(defaultValue = "1") @Valid int limit,
                                                @Nullable @RequestParam(defaultValue = "SYMBOL") @Valid LastPriceColumns sortKey,
                                                @Nullable @RequestParam(defaultValue = "ASC") @Valid SortDirection sortDir) {
-        return tickerService.legacyLastPrices(limit, controllerConverter.toSort(sortKey, sortDir));
-
+        var requestId = UUID.randomUUID();
+        log.info("request " + requestId + " legacyLastPrice with sortKey = "
+                + sortKey.name() + " and sortDir = " +sortDir.name());
+        var response = tickerService.legacyLastPrices(limit, controllerConverter.toSort(sortKey, sortDir));
+        log.info("request " + requestId + " successfully done");
+        return response;
     }
 
 
     @GetMapping("/exchangeinfo")
-    public ExchangeInfoBySymbolsDTO exchangeInfo(@Nullable @RequestParam @Valid List<String> symbols) {
-        return tickerService.exchangeInfo(symbols);
+    public ExchangeInfoBySymbolsDTO exchangeInfo(@Nullable @RequestParam() @Valid List<String> symbols) {
+        if (symbols == null) {
+            log.debug("request exchangeInfo without params");
+            throw new InvalidDataException();
+        }
+        var requestId = UUID.randomUUID();
+        log.info("request " + requestId + " exchangeInfo with symbols: " + symbols);
+        var response = tickerService.exchangeInfo(symbols);
+        log.info("request " + requestId + " successfully done");
+        return response;
     }
 
     @GetMapping("/exchangeallinfo")
     public ExchangeInfoBySymbolsDTO exchangeInfo() {
-        return tickerService.exchangeInfo();
+        var requestId = UUID.randomUUID();
+        log.info("request " + requestId + " exchangeAllInfo");
+        var response = tickerService.exchangeInfo();
+        log.info("request " + requestId + " successfully done");
+        return response;
     }
     
     @GetMapping("/subscribeticker")
     public void subscribeTicker(@RequestParam(required = false) @Valid @Nullable Integer id,
                                 @RequestParam(required = false) @Valid @Nullable String name) {
         if (id == null && name == null) {
+            log.debug("request subscribeTicker without params");
             throw new InvalidDataException("ticker name and ticker id is null");
         }
+        var requestId = UUID.randomUUID();
+        log.info("request " + requestId + " subscribeTicker");
         if (id != null) {
             tickerService.subscribeOnPrice(SymbolId.of(id));
+            log.info("request " + requestId + " is done with tickerId = " + id);
         }
         else {
             tickerService.subscribeOnPrice(name);
+            log.info("request " + requestId + " is done with tickerName = " + name);
         }
+
     }
 
     @GetMapping("/unsubscribeticker")
     public void unsubscribeTicker(@RequestParam(required = false) @Valid @Nullable Integer id,
                                   @RequestParam(required = false) @Valid @Nullable String name) {
         if (id == null && name == null) {
+            log.debug("request unsubscribeTicker without params");
             throw new InvalidDataException("ticker name and ticker id is not found");
         }
+        var requestId = UUID.randomUUID();
+        log.info("request " + requestId + " unsubscribeTicker");
         if (id != null) {
             tickerService.unsubscribeOnPrice(SymbolId.of(id));
+            log.info("request " + requestId + " is done with tickerId = " + id);
         }
         else {
             tickerService.unsubscribeOnPrice(name);
+            log.info("request " + requestId + " is done with tickerName = " + name);
         }
     }
 
     @GetMapping("/subscriptions")
     public List<SymbolShortDTO> subscriptions() {
-        return apiConverter.fromDomainToShortList(tickerService.listSubscriptionOnPrices());
+        var requestId = UUID.randomUUID();
+        log.info("request " + requestId + " subscriptions");
+        var response = apiConverter.fromDomainToShortList(tickerService.listSubscriptionOnPrices());
+        log.info("request " + requestId + " successfully done");
+        return response;
     }
 
     @ExceptionHandler({ObjectNotFoundException.class})
     public ResponseEntity<Void> notFoundException() {
+        log.debug("ObjectNotFoundException caught, return NotFound response");
         return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler({InvalidDataException.class})
     public ResponseEntity<Void> badRequestException() {
+        log.debug("InvalidDataException caught, return BadRequest response");
         return ResponseEntity.badRequest().build();
     }
 

@@ -87,7 +87,7 @@ public class TickerController {
         return response;
     }
     
-    @GetMapping("/subscribeticker")
+    @PostMapping("/subscribeticker")
     public void subscribeTicker(@RequestParam(required = false) @Valid @Nullable Integer id,
                                 @RequestParam(required = false) @Valid @Nullable String name) {
         if (id == null && name == null) {
@@ -107,7 +107,7 @@ public class TickerController {
 
     }
 
-    @GetMapping("/unsubscribeticker")
+    @PostMapping("/unsubscribeticker")
     public void unsubscribeTicker(@RequestParam(required = false) @Valid @Nullable Integer id,
                                   @RequestParam(required = false) @Valid @Nullable String name) {
         if (id == null && name == null) {
@@ -133,6 +133,11 @@ public class TickerController {
         var response = apiConverter.fromDomainToShortList(tickerService.listSubscriptionOnPrices());
         log.info("request " + requestId + " successfully done");
         return response;
+    }
+
+    @GetMapping("/updatesymbols")
+    public void updateSymbols() {
+        tickerService.updateSymbols();
     }
 
     @ExceptionHandler({ObjectNotFoundException.class})

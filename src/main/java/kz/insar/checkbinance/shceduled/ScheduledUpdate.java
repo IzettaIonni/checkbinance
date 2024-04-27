@@ -15,7 +15,7 @@ public class ScheduledUpdate {
     @Autowired
     TickerService tickerService;
 //todo uncomment
-
+//
 //    @Scheduled(fixedDelay = 300000)
 //    private void shceduledSymbolUpdate() {
 //        tickerService.updateSymbols();

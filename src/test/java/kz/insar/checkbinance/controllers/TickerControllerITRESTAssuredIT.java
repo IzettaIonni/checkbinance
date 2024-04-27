@@ -410,6 +410,34 @@ public class TickerControllerITRESTAssuredIT {
     }
 
     @Test
+    void testSubscribeTicker_InvalidId() {
+        given()
+                .params("id", 2147483647)
+
+
+                .when()
+                .get("/ticker/subscribeticker")
+
+
+                .then()
+                .assertThat().status(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void testSubscribeTicker_InvalidName() {
+        given()
+                .params("name", "absolutely not valid name")
+
+
+                .when()
+                .get("/ticker/subscribeticker")
+
+
+                .then()
+                .assertThat().status(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     void testSubscribeTicker_BadRequestException() {
         given()
 

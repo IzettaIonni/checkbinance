@@ -45,7 +45,7 @@ class BinanceClientTest {
 
     @Test
     void testSymbolPrice() {
-        System.out.println(service.getPrice("LTCBTC"));
+        System.out.println(service.getPrice("ETHBTC"));
     }
 
     @Test

@@ -41,12 +41,12 @@ public class RequestSubscriptionsSimulation extends Simulation {
     }
 
     private RampRateOpenInjectionStep postEndpointInjectionProfile() {
-        int totalDesiredUserCount = 10;
-        double userRampUpPerInterval = 10;
-        double rampUpIntervalSeconds = 30;
+        int totalDesiredUserCount = 1;
+        double userRampUpPerInterval = 1;
+        double rampUpIntervalSeconds = 5;
 
-        int totalRampUptimeSeconds = 30;
-        int steadyStateDurationSeconds = 5;
+        int totalRampUptimeSeconds = 1;
+        int steadyStateDurationSeconds = 1;
         return rampUsersPerSec(userRampUpPerInterval / (rampUpIntervalSeconds / 60)).to(totalDesiredUserCount)
                 .during(Duration.ofSeconds(totalRampUptimeSeconds + steadyStateDurationSeconds));
     }
@@ -65,8 +65,7 @@ public class RequestSubscriptionsSimulation extends Simulation {
     private static HttpProtocolBuilder setupProtocolForSimulation() {
         return HttpDsl.http.baseUrl("http://localhost:8080")
                 .acceptHeader("application/json")
-                .maxConnectionsPerHost(1)
-                .userAgentHeader("Gatling/Performance Test");
+                .maxConnectionsPerHost(10);
     }
 
     private static ScenarioBuilder buildPostScenario() {
@@ -74,7 +73,7 @@ public class RequestSubscriptionsSimulation extends Simulation {
                 .feed(FEED_DATA)
                 .exec(http("add-subscription").post("/ticker/subscribeticker")
                         .header("Content-Type", "application/json")
-                        .body(StringBody("{ \"id\": \"${id}\" }"))
+                        .body(StringBody("{ \"id\": ${id} }"))
                         .check(status().is(200)))
                 .exec(http("check-subscription").get("/ticker/subscriptions")
                         .check(

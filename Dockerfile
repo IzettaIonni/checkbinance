@@ -3,7 +3,7 @@ ENV HOME=/usr/app
 RUN mkdir -p $HOME
 WORKDIR $HOME
 ADD .. $HOME
-RUN mvn package
+RUN --mount=type=cache,target=/root/.m2 mvn clean package
 
 FROM openjdk:11-jdk
 ENV DATASOURCE_URL=jdbc:postgresql://localhost:5432/CheckBinance

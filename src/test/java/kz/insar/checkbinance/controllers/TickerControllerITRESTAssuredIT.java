@@ -1,6 +1,8 @@
 package kz.insar.checkbinance.controllers;
 
+import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
+import kz.insar.checkbinance.api.SymbolParamsDTO;
 import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolPriceDTO;
 import kz.insar.checkbinance.client.SymbolStatus;
@@ -23,8 +25,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.LongFunction;
 import java.util.function.Supplier;
 
@@ -64,6 +69,18 @@ public class TickerControllerITRESTAssuredIT {
                 .build());
     }
 
+    private SymbolParamsDTO createSymbolParamDTO(String name) {
+        SymbolParamsDTO symbol = new SymbolParamsDTO();
+        symbol.setSymbol(UUID.randomUUID().toString());
+        symbol.setStatus(SymbolStatus.HALT);
+        symbol.setBaseAsset(UUID.randomUUID().toString());
+        symbol.setBaseAssetPrecision(ThreadLocalRandom.current().nextInt());
+        symbol.setQuoteAsset(UUID.randomUUID().toString());
+        symbol.setQuotePrecision(ThreadLocalRandom.current().nextInt());
+        symbol.setQuoteAssetPrecision(ThreadLocalRandom.current().nextInt());
+        return symbol;
+    }
+
     private static LocalDateTime T(String time) {
         return LocalDateTime.parse(time);
     }
@@ -87,8 +104,8 @@ public class TickerControllerITRESTAssuredIT {
     void testTickerLastPrice_shouldReturnPricesIfOK() {
         binanceAPIHelper.mockRequestLastPrice(
                 List.of("CHZBNB", "BEAMUSDT"),
-                List.of(SymbolPriceDTO.builder().price(12).symbol("CHZBNB").build(),
-                        SymbolPriceDTO.builder().price(26).symbol("BEAMUSDT").build())
+                List.of(SymbolPriceDTO.builder().price(10).symbol("CHZBNB").build(),
+                        SymbolPriceDTO.builder().price(25).symbol("BEAMUSDT").build())
         );
 
         var symbolOne = createSymbol("CHZBNB");
@@ -99,10 +116,10 @@ public class TickerControllerITRESTAssuredIT {
         given()
                 .params("sortKey", "ID", "sortDir", "DESC")
 
-                .when()
+        .when()
                 .get("/ticker/lastprice")
 
-                .then()
+        .then()
                 .log().all()
                 .assertThat()
                 .status(HttpStatus.OK)
@@ -338,7 +355,11 @@ public class TickerControllerITRESTAssuredIT {
 
     @Test
     void testExchangeInfo() {
-        given()
+        var expected = ExchangeInfoBySymbolsDTO.builder().serverTime(Instant.now().toEpochMilli())
+                .symbols(List.of(createSymbolParamDTO("CHZBNB"), createSymbolParamDTO("BEAMUSDT"))).build();
+
+        binanceAPIHelper.mockRequestExchangeInfo(List.of("CHZBNB", "BEAMUSDT"), expected);
+        var actual = given()
                 .param("symbols", asList("CHZBNB", "BEAMUSDT"))
 //                .log().all()
 
@@ -350,28 +371,16 @@ public class TickerControllerITRESTAssuredIT {
                 .assertThat()
                 .status(HttpStatus.OK)
                 .contentType("application/json")
-                .body("serverTime", notNullValue())
-                .body("symbols[0].symbol", anyOf(equalTo("CHZBNB"), equalTo("BEAMUSDT")))
-                .body("symbols[0].status", notNullValue())
-                .body("symbols[0].baseAsset", notNullValue())
-                .body("symbols[0].baseAssetPrecision", notNullValue())
-                .body("symbols[0].quoteAsset", notNullValue())
-                .body("symbols[0].quotePrecision", notNullValue())
-                .body("symbols[0].quoteAssetPrecision", notNullValue())
-                .body("symbols[1].symbol", anyOf(equalTo("CHZBNB"), equalTo("BEAMUSDT")))
-                .body("symbols[1].status", notNullValue())
-                .body("symbols[1].baseAsset", notNullValue())
-                .body("symbols[1].baseAssetPrecision", notNullValue())
-                .body("symbols[1].quoteAsset", notNullValue())
-                .body("symbols[1].quotePrecision", notNullValue())
-                .body("symbols[1].quoteAssetPrecision", notNullValue());
+                .extract().body()
+                // here's the magic
+                .jsonPath().getObject(".", ExchangeInfoBySymbolsDTO.class);
+
+        assertEquals(expected, actual);
     }
 
     @Test
     void testExchangeAllInfo() {
         given()
-//                .log().all()
-                .params("sortKey", "ID", "sortDir", "DESC")
 
         .when()
                 .get("/ticker/exchangeallinfo")
@@ -399,7 +408,7 @@ public class TickerControllerITRESTAssuredIT {
 
 
         .when()
-                .get("/ticker/subscribeticker")
+                .post("/ticker/subscribeticker")
 
 
         .then()
@@ -416,7 +425,7 @@ public class TickerControllerITRESTAssuredIT {
 
 
                 .when()
-                .get("/ticker/subscribeticker")
+                .post("/ticker/subscribeticker")
 
 
                 .then()
@@ -430,7 +439,7 @@ public class TickerControllerITRESTAssuredIT {
 
 
                 .when()
-                .get("/ticker/subscribeticker")
+                .post("/ticker/subscribeticker")
 
 
                 .then()
@@ -442,7 +451,7 @@ public class TickerControllerITRESTAssuredIT {
         given()
 
         .when()
-                .get("/ticker/subscribeticker")
+                .post("/ticker/subscribeticker")
 
         .then()
                 .assertThat().status(HttpStatus.BAD_REQUEST);
@@ -459,7 +468,7 @@ public class TickerControllerITRESTAssuredIT {
 
 
         .when()
-                .get("/ticker/unsubscribeticker")
+                .post("/ticker/unsubscribeticker")
 
 
         .then()
@@ -474,7 +483,7 @@ public class TickerControllerITRESTAssuredIT {
         given()
 
         .when()
-                .get("/ticker/unsubscribeticker")
+                .post("/ticker/unsubscribeticker")
 
         .then()
                 .assertThat().status(HttpStatus.BAD_REQUEST);

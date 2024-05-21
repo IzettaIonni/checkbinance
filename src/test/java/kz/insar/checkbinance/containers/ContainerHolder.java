@@ -36,6 +36,4 @@ public class ContainerHolder implements Extension, BeforeAllCallback {
     public void beforeAll(ExtensionContext extensionContext) throws Exception {
 
     }
-
-    public Integer asd = 1;
 }

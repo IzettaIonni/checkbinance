@@ -7,5 +7,5 @@ public enum SymbolStatus {
     END_OF_DAY,
     HALT,
     AUCTION_MATCH,
-    BREAK
+    BREAK;
 }

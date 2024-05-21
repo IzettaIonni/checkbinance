@@ -38,7 +38,7 @@ class TickerServiceIT {
 	@Autowired
 	private TickerServiceImpl tickerService;
 	//private final PostgreSQLContainer<?> postgreSQL = ContainerHolder.getPostgreSQL();
-	
+
 	private Symbol createSymbol(String name) {
 		return symbolService.createSymbol(SymbolCreate.builder()
 				.quotePrecision(567)
@@ -147,7 +147,7 @@ class TickerServiceIT {
 		//given
 		var symbolOne = createSymbol("BTCBNB");
 		var symbolTwo = createSymbol("ETHBNB");
-		
+
 
 		//when
 		var actual = tickerService.listSymbols();

@@ -11,6 +11,7 @@ import kz.insar.checkbinance.domain.sort.params.LastPriceColumns;
 import kz.insar.checkbinance.domain.sort.params.SortDirection;
 import kz.insar.checkbinance.domain.sort.params.SortParams;
 import kz.insar.checkbinance.repositories.SymbolRepository;
+import kz.insar.checkbinance.repositories.entities.SymbolEntity;
 import kz.insar.checkbinance.services.SymbolService;
 import org.easymock.IMocksControl;
 
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -90,10 +92,12 @@ public class TickerServiceImplTest {
     void testSubscribeOnPrice() {
         //given
         SymbolId idMock = control.createMock(SymbolId.class);
+        SymbolEntity entityMock = control.createMock(SymbolEntity.class);
+        expect(symbolRepositoryMock.findById(eq(idMock))).andReturn(Optional.of(entityMock));
         symbolServiceMock.addPriceSubscription(eq(idMock));
         control.replay();
 
-        //when
+        //whe
         service.subscribeOnPrice(idMock);
 
         //then

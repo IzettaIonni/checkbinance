@@ -115,13 +115,10 @@ public class TickerServiceImpl implements TickerService {
 
     @Override
     public void subscribeOnPrice(@NonNull SymbolId id) {
-        Supplier<ObjectNotFoundException> supplier = new Supplier<>() {
-            @Override
-            public ObjectNotFoundException get() {
-                return new ObjectNotFoundException("Symbol " + id + " not found ");
-            }
-        };
-        SymbolEntity symbolEntity = symbolRepository.findById(id).orElseThrow(supplier);
+
+        SymbolEntity symbolEntity = symbolRepository.
+                findById(id).orElseThrow(() -> new ObjectNotFoundException("Symbol " + id + " not found "));
+
         symbolService.addPriceSubscription(id);
     }
 

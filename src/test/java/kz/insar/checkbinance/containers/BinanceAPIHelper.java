@@ -1,6 +1,7 @@
 package kz.insar.checkbinance.containers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolPriceDTO;
 import lombok.AllArgsConstructor;
@@ -40,6 +41,23 @@ public class BinanceAPIHelper {
         requestDefinitions.add(request);
         mockServerClient.when(request).respond(response);
         return this;
+    }
+
+    @SneakyThrows
+    public BinanceAPIHelper mockRequestExchangeInfo(List<String>requestSymbols, ExchangeInfoBySymbolsDTO responseDTO) {
+        return mockRequest(request()
+                        .withMethod("GET")
+                        .withPath("/exchangeInfo")
+                        .withQueryStringParameter("symbols", objectMapper.writeValueAsString(requestSymbols)),
+                response().withBody(JsonBody.json(responseDTO)).withStatusCode(200));
+    }
+
+    @SneakyThrows
+    public BinanceAPIHelper mockRequestExchangeAllInfo(ExchangeInfoBySymbolsDTO responseDTO) {
+        return mockRequest(request()
+                        .withMethod("GET")
+                        .withPath("/exchangeInfo"),
+                response().withBody(JsonBody.json(responseDTO)).withStatusCode(200));
     }
 
     @SneakyThrows

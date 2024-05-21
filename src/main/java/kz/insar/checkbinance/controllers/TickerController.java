@@ -2,6 +2,7 @@ package kz.insar.checkbinance.controllers;
 
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
+import kz.insar.checkbinance.api.SymbolParamsDTO;
 import kz.insar.checkbinance.api.SymbolShortDTO;
 import kz.insar.checkbinance.client.BinanceClientExeption;
 import kz.insar.checkbinance.converters.ApiConvertrer;
@@ -22,6 +23,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

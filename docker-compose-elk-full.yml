@@ -1,0 +1,68 @@
+version: '3'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.13
+    ports:
+      - "9200:9200"
+    networks:
+      - elk-network
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.13
+    ports:
+      - "5001:5000"
+    volumes:
+      - "./logstash.yml:/usr/share/logstash/config/logstash.yml"
+      - ".:/usr/share/logstash/config"
+#      - "./logs:/usr/share/logstash/logs"
+      - "log-volume:/usr/share/logstash/logs"
+      - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf"
+    command: ["-f", "/usr/share/logstash/config/logstash.conf"]
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.13
+    ports:
+      - "5601:5601"
+    depends_on:
+      - logstash
+    networks:
+      - elk-network
+
+  postgres:
+    image: postgres:15
+    container_name: postgreDB
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: CheckBinance
+    ports:
+      - 5432:5432
+
+  checkbinance:
+    image: checkbinance
+    build: .
+    environment:
+      DATASOURCE_URL: jdbc:postgresql://postgreDB:5432/CheckBinance
+      DATASOURCE_USERNAME: postgres
+      DATASOURCE_PASSWORD: 123
+    ports:
+      - 8080:8080
+    volumes:
+#      - "./logs:/logs"
+      - "log-volume:/logs"
+    depends_on:
+      - postgres
+
+networks:
+  elk-network:
+    driver: bridge
+
+volumes:
+  log-volume:

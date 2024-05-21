@@ -2,19 +2,19 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern> %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n </pattern>
+            <pattern> %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M %X{RequestId} - %msg%n </pattern>
         </encoder>
     </appender>
     <appender name="SAVE-TO-FILE-APPLICATION" class="ch.qos.logback.core.FileAppender">
         <file>logs/application.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern> %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n </Pattern>
+            <Pattern> %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M %X{RequestId} - %msg%n </Pattern>
         </encoder>
     </appender>
     <appender name="SAVE-TO-FILE-GATLING" class="ch.qos.logback.core.FileAppender">
         <file>logs/gatling.log</file>
         <encoder  class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern> %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n </pattern>
+            <pattern> %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M %X{RequestId} - %msg%n </pattern>
         </encoder>
     </appender>
     <logger name="kz.insar.checkbinance" additivity="false" level="info">

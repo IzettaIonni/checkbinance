@@ -90,6 +90,11 @@ public class TickerControllerITRESTAssuredIT {
     }
 
     @Test
+    void testA() {
+        System.out.println("Meow");
+    }
+
+    @Test
     void testTickerLastPrice_shouldReturnPricesIfOK() {
         String symbolOne = "CHZBNB";
         String symbolTwo = "BEAMUSDT";

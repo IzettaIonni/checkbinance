@@ -1,14 +1,11 @@
 package kz.insar.checkbinance.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -57,7 +54,10 @@ public class BinanceClient {
     }
 
 
-    public List<RecentTradeDTO> getRecentTrades(String symbol, Integer limit) {
+    public List<RecentTradeDTO> getRecentTrades(@NonNull String symbol, int limit) {
+        if (limit < 1 || limit > 10) {
+            throw new IllegalArgumentException("Limit must be in range 1 to 10");
+        }
         URI requestUri = getBaseUrl()
                 .pathSegment("trades")
                 .queryParam("symbol", symbol)
@@ -65,22 +65,17 @@ public class BinanceClient {
                 .build()
                 .toUri();
 
-        try {
-            return restOperations.exchange(
-                    requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<RecentTradeDTO>>() {}
-                    )
-                    .getBody();
-        }
-        catch(Exception e) {
-            throw new BinanceClientExeption("Unable to get recent trades", e);
-        }
+        return restOperations.exchange(
+                requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<RecentTradeDTO>>() {}
+                )
+                .getBody();
 
     }
+
     public List<RecentTradeDTO> getRecentTrades(String symbol) {
         return getRecentTrades(symbol, 10);
     }
 
-    //Get prices of symbols form the list
     @SneakyThrows
     public List<SymbolPriceDTO> getPrices(List<String> symbols) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -89,18 +84,12 @@ public class BinanceClient {
                 .queryParam("symbols", objectMapper.writeValueAsString(symbols))
                 .build()
                 .toUri();
-        try {
-            return restOperations.exchange(
-                            requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<SymbolPriceDTO>>() {}
-                    )
-                    .getBody();
-        }
-        catch(Exception e) {
-            throw new BinanceClientExeption("Unable to get symbols prices", e);
-        }
+        return restOperations.exchange(
+                        requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<SymbolPriceDTO>>() {}
+                )
+                .getBody();
     }
 
-    @SneakyThrows
     public SymbolPriceDTO getPrice(String symbol) {
         ObjectMapper objectMapper = new ObjectMapper();
         URI requestUri = getBaseUrl()
@@ -109,19 +98,12 @@ public class BinanceClient {
                 .build()
                 .toUri();
 
-        try {
-            return restOperations.exchange(
-                            requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<SymbolPriceDTO>() {}
-                    )
-                    .getBody();
-        }
-        catch(Exception e) {
-            throw new BinanceClientExeption("Unable to get symbol price", e);
-        }
+        return restOperations.exchange(
+                        requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<SymbolPriceDTO>() {}
+                )
+                .getBody();
     }
 
-
-    @SneakyThrows
     public List<SymbolPriceDTO> getPrices() {
         ObjectMapper objectMapper = new ObjectMapper();
         URI requestUri = getBaseUrl()
@@ -129,14 +111,8 @@ public class BinanceClient {
                 .build()
                 .toUri();
 
-        try {
-            return restOperations.exchange(
-                            requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<SymbolPriceDTO>>() {}
-                    )
-                    .getBody();
-        }
-        catch(Exception e) {
-            throw new BinanceClientExeption("Unable to get all symbols prices", e);
-        }
+        return restOperations.exchange(
+                        requestUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<SymbolPriceDTO>>() {}
+                ).getBody();
     }
 }

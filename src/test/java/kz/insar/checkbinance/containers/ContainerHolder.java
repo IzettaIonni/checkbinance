@@ -16,15 +16,15 @@ public class ContainerHolder implements Extension, BeforeAllCallback {
     private static final PostgreSQLContainer<?> postgreSql = PostgreSQLContainerBuilder
             .getInstance().startCommonContainer();
 
-    public static final PostgreSQLContainer<?> getPostgreSQL() {
-        return postgreSql;
-    }
-
     private static final MockServerContainer mockServer = MockServerContainerBuilder
             .getInstance().startMockBinanceContainer();
 
     public static final MockServerContainer getMockServer() {
         return mockServer;
+    }
+
+    public static final PostgreSQLContainer<?> getPostgreSQL() {
+        return postgreSql;
     }
 
     public static BinanceAPIHelper getBinanceAPIHelper() {

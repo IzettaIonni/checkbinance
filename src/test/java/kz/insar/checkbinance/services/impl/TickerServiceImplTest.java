@@ -3,7 +3,7 @@ package kz.insar.checkbinance.services.impl;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.client.BinanceClient;
 import kz.insar.checkbinance.client.SymbolPriceDTO;
-import kz.insar.checkbinance.converters.ApiConvertrer;
+import kz.insar.checkbinance.converters.ApiConverter;
 import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.domain.sort.comparators.LastPriceDTOComparator;
@@ -29,7 +29,7 @@ public class TickerServiceImplTest {
 
     private IMocksControl control;
     private BinanceClient binanceClientMock;
-    private ApiConvertrer apiConverterMock;
+    private ApiConverter apiConverterMock;
     private SymbolService symbolServiceMock;
     private SymbolRepository symbolRepositoryMock;
     private TickerServiceImpl service;
@@ -38,7 +38,7 @@ public class TickerServiceImplTest {
     void setUp() {
         control = createStrictControl();
         binanceClientMock = control.createMock(BinanceClient.class);
-        apiConverterMock = control.createMock(ApiConvertrer.class);
+        apiConverterMock = control.createMock(ApiConverter.class);
         symbolServiceMock = control.createMock(SymbolService.class);
         symbolRepositoryMock = control.createMock(SymbolRepository.class);
         service = new TickerServiceImpl(binanceClientMock, apiConverterMock,

@@ -22,42 +22,4 @@ class BinanceClientTest {
 
     private final PostgreSQLContainer<?> postgreSQL = ContainerHolder.getPostgreSQL();
 
-    @BeforeEach
-    void setUp() {
-        service = new BinanceClient("https://api.binance.com/api/v3");
-    }
-
-    @Test
-    void test() {
-        URI requestUri = UriComponentsBuilder.fromHttpUrl("https://api.binance.com/api/v3")
-                .queryParam("symbols", "1")
-                .pathSegment("exchangeInfo")
-                .build()
-                .toUri();
-        System.out.println(requestUri);
-    }
-
-    @Test
-    void testGetExchangeInfo() {
-        List<String> request_symbols = List.of("BNBBTC", "BTCUSDT");
-        System.out.println(service.getExchangeInfoBySymbols(request_symbols));
-    }
-
-    @Test
-    void testSymbolPrice() {
-        System.out.println(service.getPrice("ETHBTC"));
-    }
-
-    @Test
-    void testSymbolPricesWithoutParams() {
-        System.out.println(service.getPrices());
-    }
-
-    @Test
-    void testSymbolPricesWithParams() {
-        List<String> symbols = new ArrayList<>();
-        symbols.add("BNBBTC");
-        symbols.add("LTCBTC");
-        System.out.println(service.getPrices(symbols));
-    }
 }

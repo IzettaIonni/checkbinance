@@ -1,11 +1,11 @@
-package kz.insar.checkbinance;
+package kz.insar.checkbinance.services.impl;
 
-import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.api.SymbolParamsDTO;
+import kz.insar.checkbinance.client.SymbolPriceDTO;
 import kz.insar.checkbinance.client.SymbolStatus;
+import kz.insar.checkbinance.containers.BinanceAPIHelper;
 import kz.insar.checkbinance.containers.ContainerHolder;
-import kz.insar.checkbinance.converters.ApiConvertrer;
 import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolCreate;
 import kz.insar.checkbinance.domain.SymbolId;
@@ -13,14 +13,13 @@ import kz.insar.checkbinance.domain.sort.params.LastPriceColumns;
 import kz.insar.checkbinance.domain.sort.params.SortDirection;
 import kz.insar.checkbinance.domain.sort.params.SortParams;
 import kz.insar.checkbinance.services.SymbolService;
-import kz.insar.checkbinance.services.TickerService;
-import kz.insar.checkbinance.services.impl.TickerServiceImpl;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.MockServerContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,13 +30,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@ExtendWith(ContainerHolder.class)
 class TickerServiceIT {
 
 	@Autowired
 	private SymbolService symbolService;
 	@Autowired
 	private TickerServiceImpl tickerService;
-	//private final PostgreSQLContainer<?> postgreSQL = ContainerHolder.getPostgreSQL();
+	private static BinanceAPIHelper binanceAPIHelper;
+
+	@BeforeAll
+	static void beforeClass() {
+		binanceAPIHelper = ContainerHolder.getBinanceAPIHelper();
+	}
+
+	@AfterEach
+	void tearDown() {
+		binanceAPIHelper.cleanUp();
+	}
 
 	private Symbol createSymbol(String name) {
 		return symbolService.createSymbol(SymbolCreate.builder()
@@ -71,6 +81,13 @@ class TickerServiceIT {
 		var lastPriceDTOOne = createLastPriceDTO(symbolOne.getName());
 		var lastPriceDTOTwo = createLastPriceDTO(symbolTwo.getName());
 
+		List<SymbolPriceDTO> mockResponse = List.of(
+				SymbolPriceDTO.builder().symbol(symbolOne.getName()).price(50600).build(),
+				SymbolPriceDTO.builder().symbol(symbolTwo.getName()).price(44444).build()
+				);
+
+		binanceAPIHelper.mockRequestGetPrices(List.of(symbolOne.getName(), symbolTwo.getName()), mockResponse);
+
 		//when
 		var listOfSymbols = tickerService.lastPrices(sortParams);
 		var actual = List.of(listOfSymbols.get(0).getSymbol(), listOfSymbols.get(1).getSymbol());
@@ -92,7 +109,7 @@ class TickerServiceIT {
 		var lastPriceDTOTwo = createLastPriceDTO(symbolTwo.getName());
 
 		//when
-		var listOfSymbols = tickerService.lastPrices(sortParams);
+		var listOfSymbols = tickerService.legacyLastPrices(sortParams);
 		var actual = List.of(listOfSymbols.get(0).getSymbol(), listOfSymbols.get(1).getSymbol());
 
 		//then

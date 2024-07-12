@@ -26,3 +26,5 @@ spring:
 
 binance-client:
   base-url: https://api.binance.com/api/v3
+
+logging.level.org.zalando.logbook: TRACE

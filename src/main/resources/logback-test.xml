@@ -24,6 +24,7 @@
     <logger name="io.gatling.http.engine.response" level="TRACE" additivity="false">
         <appender-ref ref="SAVE-TO-FILE-GATLING" />
     </logger>
+    <logger name="org.zalando.logbook" level="TRACE"/>
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>

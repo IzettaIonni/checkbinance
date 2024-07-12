@@ -13,35 +13,24 @@ import kz.insar.checkbinance.common.EpochMilisToTimeConverter;
 import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolUpdate;
 import kz.insar.checkbinance.domain.SymbolCreate;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import net.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.Null;
-import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.function.LongFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
-public class ApiConvertrer {
+public class ApiConverter {
 
     private final Supplier<LocalDateTime> currentTime;
 
     private final LongFunction<LocalDateTime> epochMiliConverter;
 
-    public ApiConvertrer(Supplier<LocalDateTime> currentTime, LongFunction<LocalDateTime> epochMiliConverter) {
+    public ApiConverter(Supplier<LocalDateTime> currentTime, LongFunction<LocalDateTime> epochMiliConverter) {
        if (currentTime == null) {
            throw new NullPointerException();
        }
@@ -49,16 +38,16 @@ public class ApiConvertrer {
        this.epochMiliConverter = epochMiliConverter;
     }
 
-    public ApiConvertrer(Supplier<LocalDateTime> currentTime) {
+    public ApiConverter(Supplier<LocalDateTime> currentTime) {
         this(currentTime, new EpochMilisToTimeConverter());
     }
 
-    public ApiConvertrer(LongFunction<LocalDateTime> epochMiliConverter) {
+    public ApiConverter(LongFunction<LocalDateTime> epochMiliConverter) {
         this(new CurrentTimeSupplier(),epochMiliConverter);
     }
 
    @Autowired
-    public ApiConvertrer() {
+    public ApiConverter() {
         this(new CurrentTimeSupplier(), new EpochMilisToTimeConverter());
     }
 

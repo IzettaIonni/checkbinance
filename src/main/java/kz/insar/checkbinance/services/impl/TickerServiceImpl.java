@@ -5,7 +5,7 @@ import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.client.BinanceClient;
 import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolDTO;
-import kz.insar.checkbinance.converters.ApiConvertrer;
+import kz.insar.checkbinance.converters.ApiConverter;
 import kz.insar.checkbinance.domain.sort.comparators.LastPriceDTOComparator;
 import kz.insar.checkbinance.domain.sort.params.LastPriceColumns;
 import kz.insar.checkbinance.domain.sort.params.SortParams;
@@ -36,7 +36,7 @@ public class TickerServiceImpl implements TickerService {
     private final BinanceClient binanceClient;
 
     @NonNull
-    private final ApiConvertrer apiConvertrer;
+    private final ApiConverter apiConverter;
 
     @NonNull
     private final SymbolService symbolService;
@@ -48,8 +48,8 @@ public class TickerServiceImpl implements TickerService {
     public List<LastPriceDTO> lastPrices(SortParams<LastPriceColumns> sortParams) {
         List<Symbol> subscriptions = listSubscriptionOnPrices();
         List<LastPriceDTO> prices = new ArrayList<>();
-        if (subscriptions == null || subscriptions.size() == 0) return prices;
-        prices = apiConvertrer.toApi(binanceClient.getPrices(apiConvertrer.toDomainRequest(subscriptions)), subscriptions);
+        if (subscriptions == null || subscriptions.isEmpty()) return prices;
+        prices = apiConverter.toApi(binanceClient.getPrices(apiConverter.toDomainRequest(subscriptions)), subscriptions);
         LastPriceDTOComparator sort = new LastPriceDTOComparator(sortParams.getDir(), sortParams.getColumn());
         prices.sort(sort);
         return prices;
@@ -59,11 +59,11 @@ public class TickerServiceImpl implements TickerService {
     public List<LastPriceDTO> legacyLastPrices(int limit, SortParams<LastPriceColumns> sortParams) {
         List<Symbol> subscriptions = listSubscriptionOnPrices();
         List<LastPriceDTO> prices = new ArrayList<>();
-        if (subscriptions == null || subscriptions.size() == 0) return prices;
+        if (subscriptions == null || subscriptions.isEmpty()) return prices;
         for (Symbol symbol : subscriptions) {
             var recentTrades = binanceClient.getRecentTrades(symbol.getName(), limit);
             for (RecentTradeDTO recentTrade : recentTrades) {
-                prices.add(apiConvertrer.toApi(symbol.getName(), symbol.getId().getId(), recentTrade));
+                prices.add(apiConverter.toApi(symbol.getName(), symbol.getId().getId(), recentTrade));
             }
         }
         LastPriceDTOComparator sort = new LastPriceDTOComparator(sortParams.getDir(), sortParams.getColumn());
@@ -79,12 +79,12 @@ public class TickerServiceImpl implements TickerService {
 
     @Override
     public ExchangeInfoBySymbolsDTO exchangeInfo(List<String> symbols) {
-        return apiConvertrer.toApi(binanceClient.getExchangeInfoBySymbols(symbols));
+        return apiConverter.toApi(binanceClient.getExchangeInfoBySymbols(symbols));
     }
 
     @Override
     public ExchangeInfoBySymbolsDTO exchangeInfo() {
-        return apiConvertrer.toApi(binanceClient.getExchangeInfo());
+        return apiConverter.toApi(binanceClient.getExchangeInfo());
     }
 
     @Override
@@ -96,12 +96,12 @@ public class TickerServiceImpl implements TickerService {
         for (SymbolDTO params : exchangeInfo.getSymbols()) {
             if (existSymbols.containsKey(params.getSymbol())) {
                 //Update
-                var request = apiConvertrer.toDomainUpdate(existSymbols.get(params.getSymbol()), params);
+                var request = apiConverter.toDomainUpdate(existSymbols.get(params.getSymbol()), params);
                 result.add(symbolService.updateSymbol(request).getName());
             }
             else {
                 //Create
-                var request =apiConvertrer.toDomainCreate(params);
+                var request = apiConverter.toDomainCreate(params);
                 result.add(symbolService.createSymbol(request).getName());
             }
         }

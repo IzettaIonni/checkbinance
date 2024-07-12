@@ -10,16 +10,11 @@ import kz.insar.checkbinance.domain.SymbolId;
 import org.easymock.IMocksControl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.Bean;
 
 import java.math.BigDecimal;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.function.Supplier;
 
 import static org.easymock.EasyMock.*;
@@ -30,7 +25,7 @@ public class ApiConverterTest {
 
     private Supplier<LocalDateTime> currentTimeMock;
 
-    private ApiConvertrer service;
+    private ApiConverter service;
 
     private IMocksControl control;
 
@@ -38,7 +33,7 @@ public class ApiConverterTest {
     void setUp() {
         control = createStrictControl();
         currentTimeMock = control.createMock(Supplier.class);
-        service = new ApiConvertrer(currentTimeMock);
+        service = new ApiConverter(currentTimeMock);
     }
 
     static LocalDateTime T(String time) {

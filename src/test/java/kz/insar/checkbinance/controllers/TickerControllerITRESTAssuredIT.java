@@ -3,16 +3,10 @@ package kz.insar.checkbinance.controllers;
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.api.SymbolParamsDTO;
-import kz.insar.checkbinance.client.SymbolPriceDTO;
 import kz.insar.checkbinance.containers.BinanceAPIHelper;
 import kz.insar.checkbinance.containers.ContainerHolder;
+import kz.insar.checkbinance.helpers.AssertionHelper;
 import kz.insar.checkbinance.helpers.CheckbinanceServiceHelper;
-import kz.insar.checkbinance.helpers.symbol.TestSymbolBuilders;
-import kz.insar.checkbinance.helpers.symbol.TestSymbolCreator;
-import kz.insar.checkbinance.helpers.symbol.TestSymbolRepository;
-import kz.insar.checkbinance.helpers.symbol.TestSymbolRepositoryImpl;
-import kz.insar.checkbinance.services.SymbolService;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,10 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -49,8 +41,7 @@ public class TickerControllerITRESTAssuredIT {
 
     @Autowired
     private MockMvc mvc;
-    @Autowired
-    private SymbolService symbolService;
+    private static AssertionHelper assertionHelper;
     private static BinanceAPIHelper binanceAPIHelper;
     @Autowired
     private CheckbinanceServiceHelper checkbinanceServiceHelper;
@@ -77,6 +68,7 @@ public class TickerControllerITRESTAssuredIT {
     @BeforeAll
     static void beforeClass() {
         binanceAPIHelper = ContainerHolder.getBinanceAPIHelper();
+        assertionHelper = new AssertionHelper();
     }
 
     @BeforeEach
@@ -87,11 +79,6 @@ public class TickerControllerITRESTAssuredIT {
     @AfterEach
     void tearDown() {
         binanceAPIHelper.cleanUp();
-    }
-
-    @Test
-    void testA() {
-        System.out.println("Meow");
     }
 
     @Test
@@ -117,11 +104,7 @@ public class TickerControllerITRESTAssuredIT {
                 .extract().body()
                 .jsonPath().getList(".", LastPriceDTO.class);
 
-        var expected = checkbinanceServiceHelper.toLastPriceDTO(symbolPriceDTOList,
-                checkbinanceServiceHelper.getSymbols());
-
-        assertThat(actual.get(0).getTime()).isCloseTo(expected.get(0).getTime(), within(1, ChronoUnit.SECONDS)); //todo
-        assertThat(expected).usingRecursiveFieldByFieldElementComparatorIgnoringFields("time").containsExactlyElementsOf(actual);
+        assertionHelper.lastPriceAssertion(symbolPriceDTOList, checkbinanceServiceHelper.getSymbols(), actual);
     }
 
     @Test
@@ -248,11 +231,7 @@ public class TickerControllerITRESTAssuredIT {
                 .extract().body()
                 .jsonPath().getList(".", LastPriceDTO.class);
 
-        List<LastPriceDTO> expected =
-                checkbinanceServiceHelper.
-                        convertRecentTradesWithSymbol(checkbinanceServiceHelper.getSymbols(), recentTradesList);
-
-        assertThat(actual).containsExactlyElementsOf(expected);
+        assertionHelper.legacyLastPriceAssertion(recentTradesList, checkbinanceServiceHelper.getSymbols(), actual);
     }
 
     @Test
@@ -263,7 +242,6 @@ public class TickerControllerITRESTAssuredIT {
 
         checkbinanceServiceHelper.
                 createAndSubscribeSymbol(symbolOne).createAndSubscribeSymbol(symbolTwo);
-
 
         List<LastPriceDTO> actual = given()
                 .param("sortKey", "ID")
@@ -280,11 +258,7 @@ public class TickerControllerITRESTAssuredIT {
                 .extract().body()
                 .jsonPath().getList(".", LastPriceDTO.class);
 
-        List<LastPriceDTO> expected =
-                checkbinanceServiceHelper.
-                        convertRecentTradesWithSymbol(checkbinanceServiceHelper.getSymbols(), recentTradesList);
-
-        assertThat(actual).containsExactlyElementsOf(expected);
+        assertionHelper.legacyLastPriceAssertion(recentTradesList, checkbinanceServiceHelper.getSymbols(), actual);
     }
 
     @Test

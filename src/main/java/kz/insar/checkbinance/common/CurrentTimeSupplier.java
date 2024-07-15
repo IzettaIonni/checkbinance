@@ -23,6 +23,6 @@ public class CurrentTimeSupplier implements Supplier<LocalDateTime> {
     }
     @Override
     public LocalDateTime get() {
-        return LocalDateTime.ofInstant(clock.instant(), ZoneOffset.UTC);
+        return LocalDateTime.ofInstant(clock.instant(), clock.getZone());
     }
 }

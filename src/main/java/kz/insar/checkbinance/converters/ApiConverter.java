@@ -38,6 +38,7 @@ public class ApiConverter {
        this.epochMiliConverter = epochMiliConverter;
     }
 
+    @Autowired
     public ApiConverter(Supplier<LocalDateTime> currentTime) {
         this(currentTime, new EpochMilisToTimeConverter());
     }
@@ -46,7 +47,6 @@ public class ApiConverter {
         this(new CurrentTimeSupplier(),epochMiliConverter);
     }
 
-   @Autowired
     public ApiConverter() {
         this(new CurrentTimeSupplier(), new EpochMilisToTimeConverter());
     }

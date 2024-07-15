@@ -49,24 +49,27 @@ public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<C
     public TestSymbolRepository<?> getSymbolRepository() {
         return testSymbolRepository;
     }
-
     @Override
-    public CheckbinanceServiceHelper createSymbol(TestSymbol testSymbol) {
-        testSymbolRepository.createSymbol(testSymbol);
+    public CheckbinanceServiceHelper getSelf() {
         return this;
     }
-
-    @Override
-    public CheckbinanceServiceHelper subscribeSymbol(TestSymbol testSymbol) {
-        testSymbolRepository.subscribeSymbol(testSymbol);
-        return this;
-    }
-
-    @Override
-    public CheckbinanceServiceHelper unsubscribeSymbol(TestSymbol testSymbol) {
-        testSymbolRepository.unsubscribeSymbol(testSymbol);
-        return this;
-    }
+//    @Override
+//    public CheckbinanceServiceHelper createSymbol(TestSymbol testSymbol) {
+//        testSymbolRepository.createSymbol(testSymbol);
+//        return this;
+//    }
+//
+//    @Override
+//    public CheckbinanceServiceHelper subscribeSymbol(TestSymbol testSymbol) {
+//        testSymbolRepository.subscribeSymbol(testSymbol);
+//        return this;
+//    }
+//
+//    @Override
+//    public CheckbinanceServiceHelper unsubscribeSymbol(TestSymbol testSymbol) {
+//        testSymbolRepository.unsubscribeSymbol(testSymbol);
+//        return this;
+//    }
 
     @Deprecated
     public SymbolStatus getRandomSymbolStatus() {

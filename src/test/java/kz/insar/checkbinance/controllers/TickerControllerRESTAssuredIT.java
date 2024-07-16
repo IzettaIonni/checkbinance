@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 @AutoConfigureMockMvc
 @ExtendWith(ContainerHolder.class)
-public class TickerControllerITRESTAssuredIT {
+public class TickerControllerRESTAssuredIT {
 
     @Autowired
     private MockMvc mvc;
@@ -82,7 +82,7 @@ public class TickerControllerITRESTAssuredIT {
     }
 
     @Test
-    void testTickerLastPrice_shouldReturnPricesIfOK() {
+    void testLastPrice_shouldReturnPricesIfOK() {
         String symbolOne = "CHZBNB";
         String symbolTwo = "BEAMUSDT";
         var symbolPriceDTOList = binanceAPIHelper.mockRequestLastPrice(List.of(symbolOne, symbolTwo));
@@ -108,7 +108,7 @@ public class TickerControllerITRESTAssuredIT {
     }
 
     @Test
-    void testTickerLastPrice_shouldReturnExceptionIfSymbolNotFound() {
+    void testLastPrice_shouldReturnExceptionIfSymbolNotFound() {
         String symbolOne = "CHZBNB";
         String symbolTwo = "BEAMUSDT";
         binanceAPIHelper.mockRequestLastPriceErrorNotFound(List.of(symbolOne, symbolTwo));
@@ -274,9 +274,21 @@ public class TickerControllerITRESTAssuredIT {
                 .status(HttpStatus.OK)
                 .extract().body().equals(null);
     }
+    @Test
+    void testLegacyLastPrice_shouldReturnServiceUnavailableIfBinanceAPIReturns503() {
+
+    }
+    @Test
+    void testLegacyLastPrice_shouldReturnNotFoundIfStockClientReturns404() {
+
+    }
+    @Test
+    void testLegacyLastPrice_shouldReturnForbiddenIfStockClientReturnsWAFLimit() {
+
+    }
 
     @Test
-    void testExchangeInfo() {
+    void testExchangeInfo_shouldReturnInfoIfOK() {
         var expected = ExchangeInfoBySymbolsDTO.builder().serverTime(Instant.now().toEpochMilli())
                 .symbols(List.of(createSymbolParamDTO("CHZBNB"), createSymbolParamDTO("BEAMUSDT"))).build();
 
@@ -297,6 +309,26 @@ public class TickerControllerITRESTAssuredIT {
                 .jsonPath().getObject(".", ExchangeInfoBySymbolsDTO.class);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void testExchangeInfo_shouldReturnBadRequestIfSymbolsIsNull() {
+
+    }
+
+    @Test
+    void testExchangeInfo_shouldReturnServiceUnavailableIfBinanceAPIReturns503() {
+
+    }
+
+    @Test
+    void testExchangeInfo_shouldReturnNotFoundIfStockClientReturns404() {
+
+    }
+
+    @Test
+    void testExchangeInfo_shouldReturnForbiddenIfStockClientReturnsWAFLimit() {
+        
     }
 
     @Test

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class BNBLastPriceResponse {
     @NonNull
     private final List<BNBLastPrice> prices;
+    private final Function<String, SymbolId> symbolIdExtractor;
 
     public List<String> getUniqueSymbol() {
         return new ArrayList<>(prices.stream().map(BNBLastPrice::getSymbol).collect(Collectors.toSet()));
@@ -30,23 +31,27 @@ public class BNBLastPriceResponse {
         return this.getPrices().stream().map(BNBLastPrice::toSymbolPriceDTO).collect(Collectors.toList());
     }
 
-
-    @Deprecated
     public List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual) {
+        if (symbolIdExtractor == null) throw new UnsupportedOperationException("symbolIdExtractor does not set");
+        return toLastPriceDTO(actual, symbolIdExtractor);
+    }
+
+    public List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual, Function<String, SymbolId> symbolIdExtractor) {
         List<LastPriceDTO> lastPriceDTOList = new ArrayList<>();
         for (int i = 0 ; i < prices.size(); i++) {
             var price = prices.get(i);
             var actualLastPrice = actual.get(i);
             lastPriceDTOList.add(
-                    LastPriceDTO.builder().symbol(price.getSymbol()).price(price.getPrice()).id(actualLastPrice.getId()).time(actualLastPrice.getTime()).build()
+                    LastPriceDTO.builder()
+                            .symbol(price.getSymbol())
+                            .price(price.getPrice())
+                            .id(symbolIdExtractor.apply(price.getSymbol()).getId())
+                            .time(actualLastPrice.getTime())
+                            .build()
             );
         }
 
         return lastPriceDTOList;
-    }
-
-    public List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual, Function<String, SymbolId> symbolIdExtractor) {
-        throw new UnsupportedOperationException();
     }
 
     public List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual, TestSymbolRepository<?> symbolIdExtractor) {
@@ -69,5 +74,13 @@ public class BNBLastPriceResponse {
             return addPrice(testSymbol.getName(), price);
         }
 
+        public BNBLastPriceResponseBuilder symbolIdExtractor(Function<String, SymbolId> symbolIdExtractor) {
+            this.symbolIdExtractor = symbolIdExtractor;
+            return this;
+        }
+
+        public BNBLastPriceResponseBuilder symbolIdExtractor(TestSymbolRepository<?> symbolIdExtractor) {
+            return symbolIdExtractor(symbolIdExtractor::getSymbolId);
+        }
     }
 }

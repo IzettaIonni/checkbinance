@@ -93,6 +93,7 @@ public class TickerControllerRESTAssuredIT {
         var response = BNBLastPriceResponse.builder()
                 .addPrice(checkbinanceServiceHelper.getSymbol(-2), ThreadLocalRandom.current().nextInt())
                 .addPrice(checkbinanceServiceHelper.getSymbol(-1), ThreadLocalRandom.current().nextInt())
+                .symbolIdExtractor(checkbinanceServiceHelper)
                 .build();
 
         binanceAPIHelper.mockRequestLastPrice(response);
@@ -120,7 +121,7 @@ public class TickerControllerRESTAssuredIT {
 
         assertThat(actual).extracting(LastPriceDTO::getId).allSatisfy(Assertions::assertNotNull);
 
-        var expected = response.toLastPriceDTO(actual, checkbinanceServiceHelper);
+        var expected = response.toLastPriceDTO(actual);
 
         assertEquals(expected, actual);
     }

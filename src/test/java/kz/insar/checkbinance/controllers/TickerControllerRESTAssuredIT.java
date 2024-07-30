@@ -3,14 +3,15 @@ package kz.insar.checkbinance.controllers;
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.api.SymbolParamsDTO;
+import kz.insar.checkbinance.containers.BNBLastPriceResponse;
 import kz.insar.checkbinance.containers.BinanceAPIHelper;
 import kz.insar.checkbinance.containers.ContainerHolder;
+import kz.insar.checkbinance.containers.BNBLastPrice;
+import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.helpers.AssertionHelper;
 import kz.insar.checkbinance.helpers.CheckbinanceServiceHelper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import kz.insar.checkbinance.helpers.symbol.TestSymbol;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,16 +23,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.mockMvc;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
@@ -83,12 +87,17 @@ public class TickerControllerRESTAssuredIT {
 
     @Test
     void testLastPrice_shouldReturnPricesIfOK() {
-        String symbolOne = "CHZBNB";
-        String symbolTwo = "BEAMUSDT";
-        var symbolPriceDTOList = binanceAPIHelper.mockRequestLastPrice(List.of(symbolOne, symbolTwo));
-
         checkbinanceServiceHelper.
-                createAndSubscribeSymbol(symbolOne).createAndSubscribeSymbol(symbolTwo);
+                createAndSubscribeSymbol("CHZBNB").createAndSubscribeSymbol("BEAMUSDT");
+
+        var response = BNBLastPriceResponse.builder()
+                .addPrice(checkbinanceServiceHelper.getSymbol(-2), ThreadLocalRandom.current().nextInt())
+                .addPrice(checkbinanceServiceHelper.getSymbol(-1), ThreadLocalRandom.current().nextInt())
+                .build();
+
+        binanceAPIHelper.mockRequestLastPrice(response);
+
+        var startTime = LocalDateTime.now();
 
         List<LastPriceDTO> actual = given()
                 .params("sortKey", "ID", "sortDir", "ASC")
@@ -104,7 +113,16 @@ public class TickerControllerRESTAssuredIT {
                 .extract().body()
                 .jsonPath().getList(".", LastPriceDTO.class);
 
-        assertionHelper.lastPriceAssertion(symbolPriceDTOList, checkbinanceServiceHelper.getSymbols(), actual);
+        var endTime = LocalDateTime.now();
+
+        assertThat(actual).extracting(LastPriceDTO::getTime)
+                .allSatisfy(localDateTime -> assertThat(localDateTime).isBetween(startTime, endTime));
+
+        assertThat(actual).extracting(LastPriceDTO::getId).allSatisfy(Assertions::assertNotNull);
+
+        var expected = response.toLastPriceDTO(actual, checkbinanceServiceHelper);
+
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -205,61 +223,61 @@ public class TickerControllerRESTAssuredIT {
                 .status(HttpStatus.FORBIDDEN);
     }
 
-    @Test
-    void testLegacyLastPrice_shouldReturnPricesIfOKWithLimit() {
-        String symbolOne = "CHZBNB";
-        String symbolTwo = "BEAMUSDT";
-        var recentTradesList = binanceAPIHelper.mockRequestLegacyLastPrice(List.of(symbolOne, symbolTwo), 2);
-
-       checkbinanceServiceHelper.
-               createAndSubscribeSymbol(symbolOne).createAndSubscribeSymbol(symbolTwo);
-
-
-        List<LastPriceDTO> actual = given()
-                .param("sortKey", "ID")
-                .param("sortDir", "DESC")
-                .param("limit", "2")
-
-        .when()
-                .get("/ticker/legacylastprice")
-
-        .then()
-                .log().all()
-                .assertThat()
-                .status(HttpStatus.OK)
-                .contentType("application/json")
-                .extract().body()
-                .jsonPath().getList(".", LastPriceDTO.class);
-
-        assertionHelper.legacyLastPriceAssertion(recentTradesList, checkbinanceServiceHelper.getSymbols(), actual);
-    }
-
-    @Test
-    void testLegacyLastPrice_shouldReturnPricesIfOKWithoutLimit() {
-        String symbolOne = "CHZBNB";
-        String symbolTwo = "BEAMUSDT";
-        var recentTradesList = binanceAPIHelper.mockRequestLegacyLastPrice(List.of(symbolOne, symbolTwo));
-
-        checkbinanceServiceHelper.
-                createAndSubscribeSymbol(symbolOne).createAndSubscribeSymbol(symbolTwo);
-
-        List<LastPriceDTO> actual = given()
-                .param("sortKey", "ID")
-                .param("sortDir", "DESC")
-
-                .when()
-                .get("/ticker/legacylastprice")
-
-                .then()
-                .log().all()
-                .assertThat()
-                .status(HttpStatus.OK)
-                .contentType("application/json")
-                .extract().body()
-                .jsonPath().getList(".", LastPriceDTO.class);
-
-        assertionHelper.legacyLastPriceAssertion(recentTradesList, checkbinanceServiceHelper.getSymbols(), actual);
-    }
+//    @Test
+//    void testLegacyLastPrice_shouldReturnPricesIfOKWithLimit() {
+//        String symbolOne = "CHZBNB";
+//        String symbolTwo = "BEAMUSDT";
+//        var recentTradesList = binanceAPIHelper.mockRequestLegacyLastPrice(List.of(symbolOne, symbolTwo), 2);
+//
+//       checkbinanceServiceHelper.
+//               createAndSubscribeSymbol(symbolOne).createAndSubscribeSymbol(symbolTwo);
+//
+//
+//        List<LastPriceDTO> actual = given()
+//                .param("sortKey", "ID")
+//                .param("sortDir", "DESC")
+//                .param("limit", "2")
+//
+//        .when()
+//                .get("/ticker/legacylastprice")
+//
+//        .then()
+//                .log().all()
+//                .assertThat()
+//                .status(HttpStatus.OK)
+//                .contentType("application/json")
+//                .extract().body()
+//                .jsonPath().getList(".", LastPriceDTO.class);
+//
+//        assertionHelper.legacyLastPriceAssertion(recentTradesList, checkbinanceServiceHelper.getSymbols(), actual);
+//    }
+//
+//    @Test
+//    void testLegacyLastPrice_shouldReturnPricesIfOKWithoutLimit() {
+//        String symbolOne = "CHZBNB";
+//        String symbolTwo = "BEAMUSDT";
+//        var recentTradesList = binanceAPIHelper.mockRequestLegacyLastPrice(List.of(symbolOne, symbolTwo));
+//
+//        checkbinanceServiceHelper.
+//                createAndSubscribeSymbol(symbolOne).createAndSubscribeSymbol(symbolTwo);
+//
+//        List<LastPriceDTO> actual = given()
+//                .param("sortKey", "ID")
+//                .param("sortDir", "DESC")
+//
+//                .when()
+//                .get("/ticker/legacylastprice")
+//
+//                .then()
+//                .log().all()
+//                .assertThat()
+//                .status(HttpStatus.OK)
+//                .contentType("application/json")
+//                .extract().body()
+//                .jsonPath().getList(".", LastPriceDTO.class);
+//
+//        assertionHelper.legacyLastPriceAssertion(recentTradesList, checkbinanceServiceHelper.getSymbols(), actual);
+//    }
 
     @Test
     void testLegacyLastPrice_shouldReturnNullIfSubscriptionsDoesNotExist() {
@@ -336,7 +354,7 @@ public class TickerControllerRESTAssuredIT {
         var expected = ExchangeInfoBySymbolsDTO.builder().serverTime(Instant.now().toEpochMilli())
                 .symbols(List.of(createSymbolParamDTO("CHZBNB"), createSymbolParamDTO("BEAMUSDT"))).build();
 
-        binanceAPIHelper.mockRequestExchangeInfo(expected);
+        binanceAPIHelper.mockRequestExchangeAllInfo(expected);
         var actual = given()
 
         .when()

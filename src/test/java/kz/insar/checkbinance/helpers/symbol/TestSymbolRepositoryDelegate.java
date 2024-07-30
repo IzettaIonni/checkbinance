@@ -46,6 +46,10 @@ public interface TestSymbolRepositoryDelegate<T extends TestSymbolRepositoryDele
         return getSymbolRepository().getSymbolId(testSymbol);
     }
     @Override
+    default SymbolId getSymbolId(String symbolName) {
+        return getSymbolRepository().getSymbolId(symbolName);
+    }
+    @Override
     default TestSymbol getFirstSymbol() {
         return getSymbolRepository().getSymbol(0);
     }

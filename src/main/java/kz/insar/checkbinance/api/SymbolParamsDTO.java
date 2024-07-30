@@ -1,6 +1,7 @@
 package kz.insar.checkbinance.api;
 
 import kz.insar.checkbinance.client.SymbolStatus;
+import lombok.Builder;
 import lombok.Data;
 
 @Data

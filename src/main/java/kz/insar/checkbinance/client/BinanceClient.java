@@ -91,7 +91,6 @@ public class BinanceClient {
     }
 
     public SymbolPriceDTO getPrice(String symbol) {
-        ObjectMapper objectMapper = new ObjectMapper();
         URI requestUri = getBaseUrl()
                 .pathSegment("ticker", "price")
                 .queryParam("symbol", symbol)

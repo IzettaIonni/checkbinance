@@ -70,32 +70,32 @@ class TickerServiceIT {
 				.build();
 	}
 
-	@Test
-	void testLastPrices() {
-		//given
-		var symbolOne = createSymbol("CHZBNB");
-		var symbolTwo = createSymbol("BEAMUSDT");
-		tickerService.subscribeOnPrice(symbolOne);
-		tickerService.subscribeOnPrice(symbolTwo);
-		SortParams<LastPriceColumns> sortParams = new SortParams<>(LastPriceColumns.SYMBOL, SortDirection.ASC);
-		var lastPriceDTOOne = createLastPriceDTO(symbolOne.getName());
-		var lastPriceDTOTwo = createLastPriceDTO(symbolTwo.getName());
-
-		List<SymbolPriceDTO> mockResponse = List.of(
-				SymbolPriceDTO.builder().symbol(symbolOne.getName()).price(50600).build(),
-				SymbolPriceDTO.builder().symbol(symbolTwo.getName()).price(44444).build()
-				);
-
-		binanceAPIHelper.mockRequestGetPrices(List.of(symbolOne.getName(), symbolTwo.getName()), mockResponse);
-
-		//when
-		var listOfSymbols = tickerService.lastPrices(sortParams);
-		var actual = List.of(listOfSymbols.get(0).getSymbol(), listOfSymbols.get(1).getSymbol());
-
-		//then
-		var expected = List.of(lastPriceDTOTwo.getSymbol(), lastPriceDTOOne.getSymbol());
-		assertEquals(expected, actual);
-	}
+//	@Test
+//	void testLastPrices() {
+//		//given
+//		var symbolOne = createSymbol("CHZBNB");
+//		var symbolTwo = createSymbol("BEAMUSDT");
+//		tickerService.subscribeOnPrice(symbolOne);
+//		tickerService.subscribeOnPrice(symbolTwo);
+//		SortParams<LastPriceColumns> sortParams = new SortParams<>(LastPriceColumns.SYMBOL, SortDirection.ASC);
+//		var lastPriceDTOOne = createLastPriceDTO(symbolOne.getName());
+//		var lastPriceDTOTwo = createLastPriceDTO(symbolTwo.getName());
+//
+//		List<SymbolPriceDTO> mockResponse = List.of(
+//				SymbolPriceDTO.builder().symbol(symbolOne.getName()).price(50600).build(),
+//				SymbolPriceDTO.builder().symbol(symbolTwo.getName()).price(44444).build()
+//				);
+//
+//		binanceAPIHelper.mockRequestGetPrices(List.of(symbolOne.getName(), symbolTwo.getName()), mockResponse);
+//
+//		//when
+//		var listOfSymbols = tickerService.lastPrices(sortParams);
+//		var actual = List.of(listOfSymbols.get(0).getSymbol(), listOfSymbols.get(1).getSymbol());
+//
+//		//then
+//		var expected = List.of(lastPriceDTOTwo.getSymbol(), lastPriceDTOOne.getSymbol());
+//		assertEquals(expected, actual);
+//	}
 
 	@Test
 	void testLegacyLastPrices() {

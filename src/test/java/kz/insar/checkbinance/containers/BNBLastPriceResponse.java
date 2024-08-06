@@ -10,9 +10,7 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,7 +25,7 @@ public class BNBLastPriceResponse {
         return new ArrayList<>(prices.stream().map(BNBLastPrice::getSymbol).collect(Collectors.toSet()));
     }
 
-    public List<SymbolPriceDTO> toSymbolPriceDTO() {
+    public List<SymbolPriceDTO> toSymbolPriceDTOs() {
         return this.getPrices().stream().map(BNBLastPrice::toSymbolPriceDTO).collect(Collectors.toList());
     }
 
@@ -38,7 +36,7 @@ public class BNBLastPriceResponse {
 
     public List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual, Function<String, SymbolId> symbolIdExtractor) {
         List<LastPriceDTO> lastPriceDTOList = new ArrayList<>();
-        for (int i = 0 ; i < prices.size(); i++) {
+        for (int i = 0; i < prices.size(); i++) {
             var price = prices.get(i);
             var actualLastPrice = actual.get(i);
             lastPriceDTOList.add(

@@ -81,6 +81,7 @@ public class BinanceAPIHelper {
                 .withQueryStringParameter("symbols", objectMapper.writeValueAsString(requestSymbols));
     }
 
+    @Deprecated
     @SneakyThrows
     public BinanceAPIHelper mockRequestExchangeInfo(List<String>requestSymbols, ExchangeInfoBySymbolsDTO responseDTO) {
         return mockRequest(
@@ -89,10 +90,22 @@ public class BinanceAPIHelper {
                 response().withBody(JsonBody.json(responseDTO)).withStatusCode(200));
     }
 
+    public BinanceAPIHelper mockRequestExchangeInfo(BNBExchangeInfoResponse response) {
+        return mockRequestExchangeInfo(
+                response.getRequestSymbols(),
+                response.toExchangeInfoBySymbolsDTO()
+        );
+    }
+
+    @Deprecated
     @SneakyThrows
     public BinanceAPIHelper mockRequestExchangeAllInfo(ExchangeInfoBySymbolsDTO responseDTO) {
         return mockRequest(buildRequestExchangeInfoGet(),
                 response().withBody(JsonBody.json(responseDTO)).withStatusCode(200));
+    }
+
+    public BinanceAPIHelper mockRequestExchangeAllInfo(BNBExchangeInfoResponse response) {
+        return mockRequestExchangeAllInfo(response.toExchangeInfoBySymbolsDTO());
     }
 
     @SneakyThrows
@@ -153,9 +166,9 @@ public class BinanceAPIHelper {
     }
 
     private BinanceAPIHelper mockRequestLegacyLastPrice(
-            String requestSymbol, int requestLimit, List<RecentTradeDTO> responseDTOList) {
+            String requestSymbol, int requestLimit, BNBLegacyLastPriceResponse response) {
         return mockRequestLegacyLastPrice(requestSymbol, requestLimit,
-                response().withBody(JsonBody.json(responseDTOList)).withStatusCode(200));
+                response().withBody(JsonBody.json(response.toRecentTradeDTOs)).withStatusCode(200));
     }
 
     public BinanceAPIHelper mockRequestLegacyLastPrice(LegacyLastPriceMockWrapper requestSymbol) {

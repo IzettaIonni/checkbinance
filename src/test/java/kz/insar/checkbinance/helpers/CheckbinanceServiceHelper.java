@@ -4,6 +4,8 @@ import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolPriceDTO;
 import kz.insar.checkbinance.client.SymbolStatus;
+import kz.insar.checkbinance.containers.BNBExchangeInfoResponse;
+import kz.insar.checkbinance.containers.BNBLastPriceResponse;
 import kz.insar.checkbinance.containers.RecentTradesWithSymbol;
 import kz.insar.checkbinance.converters.ApiConverter;
 import kz.insar.checkbinance.domain.Symbol;
@@ -21,7 +23,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Component //todo is there more suitable bean type?
+@Component
 @AllArgsConstructor
 public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<CheckbinanceServiceHelper>,
         TestSymbolBuilders<CheckbinanceServiceHelper> {
@@ -39,6 +41,11 @@ public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<C
                 TestSymbolRepositoryImpl.builder().withCoreIssuer(symbolService, tickerService).build()
         );
     }
+
+    public BNBLastPriceResponse.BNBLastPriceResponseBuilder createBNBLastPriceResponseBuilder() {
+        return BNBLastPriceResponse.builder().symbolIdExtractor(this);
+    }
+
 
     @Override
     public TestSymbolCreator<CheckbinanceServiceHelper> buildSymbol() {

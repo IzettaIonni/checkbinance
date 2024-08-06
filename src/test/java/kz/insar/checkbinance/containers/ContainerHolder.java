@@ -1,15 +1,11 @@
 package kz.insar.checkbinance.containers;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.mockserver.client.MockServerClient;
-import org.springframework.test.web.reactive.server.MockServerConfigurer;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
-
-import java.lang.annotation.Annotation;
 
 public class ContainerHolder implements Extension, BeforeAllCallback {
 
@@ -27,7 +23,7 @@ public class ContainerHolder implements Extension, BeforeAllCallback {
         return postgreSql;
     }
 
-    public static BinanceAPIHelper getBinanceAPIHelper() {
+    public static BinanceAPIHelper createBinanceAPIHelper() {
         return new BinanceAPIHelper(new MockServerClient(mockServer.getHost(), mockServer.getServerPort()));
     }
 

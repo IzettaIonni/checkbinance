@@ -2,7 +2,6 @@ package kz.insar.checkbinance.services.impl;
 
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.api.SymbolParamsDTO;
-import kz.insar.checkbinance.client.SymbolPriceDTO;
 import kz.insar.checkbinance.client.SymbolStatus;
 import kz.insar.checkbinance.containers.BinanceAPIHelper;
 import kz.insar.checkbinance.containers.ContainerHolder;
@@ -41,7 +40,7 @@ class TickerServiceIT {
 
 	@BeforeAll
 	static void beforeClass() {
-		binanceAPIHelper = ContainerHolder.getBinanceAPIHelper();
+		binanceAPIHelper = ContainerHolder.createBinanceAPIHelper();
 	}
 
 	@AfterEach

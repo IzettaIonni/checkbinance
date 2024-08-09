@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class BinanceConfig {
 
     @Bean
-    BinanceClient binanceClient(@Value(value = "${binance-client.base-url}") String baseUrl,
+    BinanceClient binanceClient(@Value(value = "${binance-client.base-url:https://api.binance.com/api/v3}") String baseUrl,
                                 RestTemplateBuilder restTemplateBuilder) {
         return new BinanceClient(
                 baseUrl, restTemplateBuilder.errorHandler(new BinanceRestTemplateErrorHandler()).build());

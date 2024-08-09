@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @AutoConfigureMockMvc
 @ExtendWith(ContainerHolder.class)
+@ActiveProfiles(value = {"test", "test1"})
 public class TickerControllerRESTAssuredIT {
 
     @Autowired

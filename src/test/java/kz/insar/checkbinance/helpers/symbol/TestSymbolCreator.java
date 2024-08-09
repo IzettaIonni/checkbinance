@@ -44,9 +44,16 @@ public class TestSymbolCreator<T extends TestSymbolRepository<T>> {
     }
 
     public TestSymbolCreator<T> withRandomName() {
-        return withName(getRandomString(64));
+        for (int i = 0; i < 10; i++) {
+            var name = getRandomString(64);
+            if (!repository.isSymbolPresent(name)) {
+                return withName(name);
+            }
+        }
+        throw new IllegalStateException();
     }
 
+    //todo is null name possible?
     public TestSymbolCreator<T> withNullName() {
         return withName(null);
     }

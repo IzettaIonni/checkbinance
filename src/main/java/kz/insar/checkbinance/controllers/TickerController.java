@@ -17,6 +17,7 @@ import kz.insar.checkbinance.domain.exeptions.ObjectNotFoundException;
 import kz.insar.checkbinance.services.TickerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
@@ -140,8 +141,9 @@ public class TickerController {
         return response;
     }
 
+    @Profile("test")
     @GetMapping("/updatesymbols")
-    public void updateSymbols() {
+    public void updateSymbolsTest() {
         tickerService.updateSymbols();
     }
 

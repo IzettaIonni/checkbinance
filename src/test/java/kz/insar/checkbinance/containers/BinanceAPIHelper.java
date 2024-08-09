@@ -171,6 +171,7 @@ public class BinanceAPIHelper {
                 response().withBody(JsonBody.json(response.toRecentTradeDTOs)).withStatusCode(200));
     }
 
+    @Deprecated
     public BinanceAPIHelper mockRequestLegacyLastPrice(LegacyLastPriceMockWrapper requestSymbol) {
         var convertedRecentTrades = new ArrayList<RecentTradeDTO>();
         for (var trade : requestSymbol.getRecentTrades())
@@ -181,6 +182,7 @@ public class BinanceAPIHelper {
                 convertedRecentTrades);
     }
 
+    @Deprecated
     public BinanceAPIHelper mockRequestLegacyLastPrice(List<LegacyLastPriceMockWrapper> requestSymbols) {
         BinanceAPIHelper result = mockRequestLegacyLastPrice(requestSymbols.get(0));
         for (int i = 1; i < requestSymbols.size(); i++)

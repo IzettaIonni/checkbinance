@@ -12,7 +12,12 @@ public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
 
     T subscribeSymbol(TestSymbol testSymbol);
     T unsubscribeSymbol(TestSymbol testSymbol);
-
+    default boolean isSymbolPresent(String symbolName) {
+        return getSymbols().stream().map(TestSymbol::getName).anyMatch(s -> s.equals(symbolName));
+    }
+    default boolean isSymbolPresent(TestSymbol testSymbol) {
+        return isSymbolPresent(testSymbol.getName());
+    }
     int getSymbolCount();
     List<TestSymbol> getSymbols();
     TestSymbol getSymbol(int creationIndex);

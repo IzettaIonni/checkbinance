@@ -27,6 +27,9 @@ public class TestSymbolRepositoryImpl implements TestSymbolRepository<TestSymbol
 
     @Override
     public TestSymbolRepositoryImpl createSymbol(TestSymbol testSymbol) {
+        if (isSymbolPresent(testSymbol)) {
+            throw new IllegalArgumentException("Symbol is already present in repository");
+        }
         var symbol = issuer.createSymbol(testSymbol);
         symbols.add(testSymbol);
         symbolIds.add(symbol.getId());

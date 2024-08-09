@@ -5,6 +5,7 @@ import kz.insar.checkbinance.domain.SymbolId;
 import lombok.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Builder(toBuilder = true)
 @ToString

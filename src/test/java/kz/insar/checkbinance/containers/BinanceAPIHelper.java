@@ -168,7 +168,32 @@ public class BinanceAPIHelper {
     private BinanceAPIHelper mockRequestLegacyLastPrice(
             String requestSymbol, int requestLimit, BNBLegacyLastPriceResponse response) {
         return mockRequestLegacyLastPrice(requestSymbol, requestLimit,
-                response().withBody(JsonBody.json(response.toRecentTradeDTOs)).withStatusCode(200));
+                response().withBody(JsonBody.json(response.toRecentTradeDTOs())).withStatusCode(200));
+    }
+
+    private BinanceAPIHelper mockRequestLegacyLastPrice(
+            String requestSymbol, int requestLimit, BNBLegacyLastPriceResponse response, List<Long> responseIds) {
+        return mockRequestLegacyLastPrice(requestSymbol, requestLimit,
+                response().withBody(JsonBody.json(response.toRecentTradeDTOs(responseIds))).withStatusCode(200));
+    }
+
+    private BinanceAPIHelper mockRequestLegacyLastPrice(
+            List<String> requestSymbols, int requestLimit, List<BNBLegacyLastPriceResponse> responses) {
+        if (requestSymbols.size() != responses.size()) throw new IllegalArgumentException("request symbols and responses doesn't match");
+        for (int i = 1; i < responses.size(); i++) {
+            mockRequestLegacyLastPrice(requestSymbols.get(i), requestLimit, responses.get(i));
+        }
+        return this;
+    }
+
+    private BinanceAPIHelper mockRequestLegacyLastPrice(
+            List<String> requestSymbols, int requestLimit, List<BNBLegacyLastPriceResponse> responses, List<List<Long>> responsesIds) {
+        if (requestSymbols.size() != responses.size() || responses.size() != responsesIds.size())
+            throw new IllegalArgumentException("request symbols and responses doesn't match");
+        for (int i = 1; i < responses.size(); i++) {
+            mockRequestLegacyLastPrice(requestSymbols.get(i), requestLimit, responses.get(i), responsesIds.get(i));
+        }
+        return this;
     }
 
     @Deprecated
@@ -179,7 +204,18 @@ public class BinanceAPIHelper {
         return mockRequestLegacyLastPrice(
                 requestSymbol.getSymbol(),
                 requestSymbol.getRequestLimit(),
-                convertedRecentTrades);
+                BNBLegacyLastPriceResponse.of(requestSymbol.getRecentTrades().stream().map((trade) -> {
+                        return BNBLegacyLastPrice.builder()
+                                .symbol(requestSymbol.getSymbol())
+                                .time(trade.getTime())
+                                .price(trade.getPrice())
+                                .id(trade.getId())
+                                .qty(trade.getQty())
+                                .quoteQty(trade.getQuoteQty())
+                                .isBuyerMaker(trade.getIsBuyerMaker())
+                                .isBestMatch(trade.getIsBestMatch())
+                                .build();
+                }).collect(Collectors.toList())));
     }
 
     @Deprecated

@@ -1,5 +1,6 @@
 package kz.insar.checkbinance.containers;
 
+import kz.insar.checkbinance.client.RecentTradeDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -12,8 +13,8 @@ public class BNBLegacyLastPrice {
     @NonNull
     private final String symbol;
     private final Long time;
-    private final Integer price;
-    private final Long BinanceId;
+    private final BigDecimal price;
+    private final Long id;
     private final BigDecimal qty;
     private final BigDecimal quoteQty;
     private final Boolean isBuyerMaker;

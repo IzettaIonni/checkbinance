@@ -16,7 +16,6 @@ public class BNBLegacyLastPrice {
     private final String symbol;
     private final Long time;
     private final BigDecimal price;
-    private final Long id;
     private final BigDecimal qty;
     private final BigDecimal quoteQty;
     private final Boolean isBuyerMaker;
@@ -31,11 +30,10 @@ public class BNBLegacyLastPrice {
 
         public BNBLegacyLastPriceBuilder withRandomParams() {
             symbol = RandomStringUtils.random(32);
-            time = ThreadLocalRandom.current().nextLong();
-            price = BigDecimal.valueOf(ThreadLocalRandom.current().nextLong());
-            id = ThreadLocalRandom.current().nextLong();
-            qty = BigDecimal.valueOf(ThreadLocalRandom.current().nextLong());
-            quoteQty = BigDecimal.valueOf(ThreadLocalRandom.current().nextLong());
+            time = ThreadLocalRandom.current().nextLong(999999999); //Caused by DateTime boundaries
+            price = BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE));
+            qty = BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE));
+            quoteQty = BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE));
             isBuyerMaker = ThreadLocalRandom.current().nextBoolean();
             isBestMatch = ThreadLocalRandom.current().nextBoolean();
             return this;

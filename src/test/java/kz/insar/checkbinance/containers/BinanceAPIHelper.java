@@ -14,6 +14,7 @@ import org.mockserver.model.RequestDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.mockserver.model.HttpRequest.request;
@@ -172,7 +173,7 @@ public class BinanceAPIHelper {
     }
 
     public BinanceAPIHelper mockRequestLegacyLastPrice(String requestSymbol, BNBLegacyLastPriceResponse response) {
-        return mockRequestLegacyLastPrice(requestSymbol, response.getPrices().size(), response);
+        return mockRequestLegacyLastPrice(requestSymbol, response.getPricesQuantity(), response);
     }
 
     public BinanceAPIHelper mockRequestLegacyLastPrice(
@@ -185,31 +186,36 @@ public class BinanceAPIHelper {
     }
 
     public BinanceAPIHelper mockRequestLegacyLastPrice(List<String> requestSymbols, List<BNBLegacyLastPriceResponse> responses) {
-        var limit = responses.get(0).getPrices().size();
-        if (!responses.stream().allMatch(response -> response.getPrices().size() == limit)) throw new IllegalArgumentException("Different responses' prices size");
+        var limit = responses.get(0).getPricesQuantity();
+        if (!responses.stream().allMatch(response -> Objects.equals(response.getPricesQuantity(), limit)))
+            throw new IllegalArgumentException("Different responses' prices size"); //todo some uncertainty exception
         return mockRequestLegacyLastPrice(requestSymbols, limit, responses);
     }
 
     @Deprecated
     public BinanceAPIHelper mockRequestLegacyLastPrice(LegacyLastPriceMockWrapper requestSymbol) {
-        var convertedRecentTrades = new ArrayList<RecentTradeDTO>();
-        for (var trade : requestSymbol.getRecentTrades())
-            convertedRecentTrades.add(trade.toRecentTradeDTO());
+        var idIterator = requestSymbol.getRecentTrades().stream()
+                .map(RecentTradesMockWrapper::getId).collect(Collectors.toList()).iterator();
         return mockRequestLegacyLastPrice(
                 requestSymbol.getSymbol(),
                 requestSymbol.getRequestLimit(),
-                BNBLegacyLastPriceResponse.of(requestSymbol.getRecentTrades().stream().map((trade) -> {
-                        return BNBLegacyLastPrice.builder()
-                                .symbol(requestSymbol.getSymbol())
-                                .time(trade.getTime())
-                                .price(trade.getPrice())
-                                .id(trade.getId())
-                                .qty(trade.getQty())
-                                .quoteQty(trade.getQuoteQty())
-                                .isBuyerMaker(trade.getIsBuyerMaker())
-                                .isBestMatch(trade.getIsBestMatch())
-                                .build();
-                }).collect(Collectors.toList())));
+                BNBLegacyLastPriceResponse.builder()
+                        .addPrices(
+                            requestSymbol.getRecentTrades().stream().map((trade) -> {
+                            return BNBLegacyLastPrice.builder()
+                                    .symbol(requestSymbol.getSymbol())
+                                    .time(trade.getTime())
+                                    .price(trade.getPrice())
+                                    .qty(trade.getQty())
+                                    .quoteQty(trade.getQuoteQty())
+                                    .isBuyerMaker(trade.getIsBuyerMaker())
+                                    .isBestMatch(trade.getIsBestMatch())
+                                    .build();
+                            }).collect(Collectors.toList())
+                        )
+                        .idGenerator(idIterator::next)
+                        .build()
+        );
     }
 
     @Deprecated

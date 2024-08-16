@@ -1,10 +1,12 @@
 package kz.insar.checkbinance.containers;
 
+import com.google.common.collect.Iterables;
+import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.client.RecentTradeDTO;
+import kz.insar.checkbinance.domain.SymbolId;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bouncycastle.pqc.jcajce.provider.bike.BIKEKeyFactorySpi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,22 +14,24 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Builder(toBuilder = true)
 public class BNBLegacyLastPriceResponse {
 
     @NonNull
-    @Getter
     private final List<BNBLegacyLastPrice> prices;
-    @NonNull
     private final Supplier<Long> idGenerator;
+    private final Function<String, SymbolId> symbolIdExtractor;
+
+    public Integer getPricesQuantity() {
+        return prices.size();
+    }
 
     public List<RecentTradeDTO> toRecentTradeDTOs() {
         return toRecentTradeDTOs(prices.stream().map((price) -> idGenerator.get()).collect(Collectors.toList()));
     }
 
-    private List<RecentTradeDTO> toRecentTradeDTOs(List<Long> ids) {
+    public List<RecentTradeDTO> toRecentTradeDTOs(List<Long> ids) {
         List<RecentTradeDTO> recentTradeDTOs = new ArrayList<>();
         for (int i = 0; i < prices.size(); i++) {
             var price = prices.get(i);
@@ -46,6 +50,25 @@ public class BNBLegacyLastPriceResponse {
         return recentTradeDTOs;
     }
 
+    private List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual, Function<String, SymbolId> symbolIdExtractor) {
+        List<LastPriceDTO> lastPriceDTOList = new ArrayList<>();
+        for (int i = 0; i < prices.size(); i++) {
+            var price = prices.get(i);
+            var actualPrice = actual.get(i);
+            lastPriceDTOList.add(LastPriceDTO.builder()
+                            .symbol(price.getSymbol())
+                            .price(price.getPrice())
+                            .id(symbolIdExtractor.apply(price.getSymbol()).getId())
+                            .time(actualPrice.getTime())
+                            .build());
+        }
+        return lastPriceDTOList;
+    }
+
+    private List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual) {
+        toLastPriceDTO(actual, symbolIdExtractor);
+    }
+
     public static BNBLegacyLastPriceResponse of(BNBLegacyLastPrice price) {
         return BNBLegacyLastPriceResponse.builder().addPrice(price).build();
     }
@@ -55,6 +78,7 @@ public class BNBLegacyLastPriceResponse {
     }
 
     public static class BNBLegacyLastPriceResponseBuilder {
+
         private List<BNBLegacyLastPrice> prices = new ArrayList<>();
 
         private BNBLegacyLastPriceResponseBuilder prices(List<BNBLegacyLastPrice> prices) {
@@ -71,18 +95,8 @@ public class BNBLegacyLastPriceResponse {
             return this;
         }
 
-        public BNBLegacyLastPriceResponseBuilder withIdGeneratorFromList(List<Long> ids) {
-            idGenerator = () -> ids.iterator().next();
-            return this;
-        }
-
-        public BNBLegacyLastPriceResponseBuilder withoutIds() {
-            idGenerator = () -> null;
-            return this;
-        }
-
-        public BNBLegacyLastPriceResponseBuilder witRandomIds() {
-            idGenerator = () -> ThreadLocalRandom.current().nextLong();
+        public BNBLegacyLastPriceResponseBuilder symbolIdExtractor(Function<String, SymbolId> symbolIdExtractor) {
+            this.symbolIdExtractor = symbolIdExtractor;
             return this;
         }
     }

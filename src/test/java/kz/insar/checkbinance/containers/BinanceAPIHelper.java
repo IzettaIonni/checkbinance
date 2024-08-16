@@ -32,23 +32,6 @@ public class BinanceAPIHelper {
         this(mockServerClient, new ArrayList<>(), new ObjectMapper());
     }
 
-//    private List<RecentTradeDTO> createRecentTradeDTO(int limit) {
-//        List<RecentTradeDTO> list = new ArrayList<>();
-//        Long id = ThreadLocalRandom.current().nextLong();
-//        for (int i = 0; i < limit; i++) {
-//            list.add(RecentTradeDTO.builder()
-//                    .id(id)
-//                    .price(BigDecimal.valueOf(ThreadLocalRandom.current().nextInt()))
-//                    .qty(BigDecimal.valueOf(ThreadLocalRandom.current().nextInt()))
-//                    .quoteQty(BigDecimal.valueOf(ThreadLocalRandom.current().nextInt()))
-//                    .time(1692277878000L)
-//                    .isBuyerMaker(ThreadLocalRandom.current().nextBoolean())
-//                    .isBestMatch(ThreadLocalRandom.current().nextBoolean())
-//                    .build());
-//        }
-//        return list;
-//    }
-
     public void cleanUp() {
         for (var request : requestDefinitions) {
             mockServerClient.clear(request);
@@ -227,6 +210,34 @@ public class BinanceAPIHelper {
         for (int i = 1; i < requestSymbols.size(); i++)
             mockRequestLegacyLastPriceWrapper(requestSymbols.get(i));
         return result;
+    }
+
+    private BinanceAPIHelper mockRequestLegacyLastPriceError(String requestSymbol, int limit, int responseErrorCode) {
+        return mockRequestLegacyLastPrice(requestSymbol, limit, response().withStatusCode(responseErrorCode));
+    }
+
+    private BinanceAPIHelper mockRequestLegacyLastPriceError(String requestSymbol, int responseErrorCode) {
+        return mockRequestLegacyLastPriceError(requestSymbol, 1, responseErrorCode);
+    }
+
+    public BinanceAPIHelper mockRequestLegacyLastPriceErrorNotFound(String requestSymbol) {
+        return mockRequestLegacyLastPriceError(requestSymbol, 404);
+    }
+
+    public BinanceAPIHelper mockRequestLegacyLastPriceErrorWAFLimit(String requestSymbol) {
+        return mockRequestLegacyLastPriceError(requestSymbol, 403);
+    }
+
+    public BinanceAPIHelper mockRequestLegacyLastPriceErrorRateLimit(String requestSymbol) {
+        return mockRequestLegacyLastPriceError(requestSymbol, 429);
+    }
+
+    public BinanceAPIHelper mockRequestLegacyLastPriceErrorPartialSuccess(String requestSymbol) {
+        return mockRequestLegacyLastPriceError(requestSymbol, 409);
+    }
+
+    public BinanceAPIHelper mockRequestLegacyLastPriceErrorServiceUnavailable(String requestSymbol) {
+        return mockRequestLegacyLastPriceError(requestSymbol, 503);
     }
 
 }

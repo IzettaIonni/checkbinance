@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -121,27 +122,6 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testLastPrice_shouldReturnExceptionIfSymbolNotFound() {
-        String symbolOne = "CHZBNB";
-        String symbolTwo = "BEAMUSDT";
-        binanceAPIHelper.mockRequestLastPriceErrorNotFound(List.of(symbolOne, symbolTwo));
-
-        checkbinanceServiceHelper.
-                createAndSubscribeSymbol(symbolOne).createAndSubscribeSymbol(symbolTwo);
-
-        given()
-                .params("sortKey", "ID", "sortDir", "DESC")
-
-        .when()
-                .get("/ticker/lastprice")
-
-        .then()
-                .log().all()
-                .assertThat()
-                .status(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
     void testLastPrice_shouldReturnNullIfSubscriptionsDoesNotExist() {
         given()
                 .params("sortKey", "ID", "sortDir", "DESC")
@@ -153,6 +133,90 @@ public class TickerControllerRESTAssuredIT {
                 .assertThat()
                 .status(HttpStatus.OK)
                 .body("isEmpty()", Matchers.is(true));
+    }
+
+    @Test
+    void testLastPrice_shouldReturnNotFoundIfStockClientReturns404() {
+        checkbinanceServiceHelper.
+                createAndSubscribeSymbol("CHZBNB").createAndSubscribeSymbol("BEAMUSDT");
+
+        binanceAPIHelper.mockRequestLastPriceErrorPartialSuccess(
+                List.of(checkbinanceServiceHelper.getSymbol(0).getName(),
+                        checkbinanceServiceHelper.getSymbol(0).getName()));
+
+        given()
+                .params("sortKey", "ID", "sortDir", "DESC")
+
+                .when()
+                .get("/ticker/lastprice")
+
+                .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.NOT_FOUND).body("isEmpty()", Matchers.is(true));
+    }
+
+    @Test
+    void testLastPrice_shouldReturnForbiddenIfStockClientReturns403() {
+        checkbinanceServiceHelper.
+                createAndSubscribeSymbol("CHZBNB").createAndSubscribeSymbol("BEAMUSDT");
+
+        binanceAPIHelper.mockRequestLastPriceErrorPartialSuccess(
+                List.of(checkbinanceServiceHelper.getSymbol(0).getName(),
+                        checkbinanceServiceHelper.getSymbol(0).getName()));
+
+        given()
+                .params("sortKey", "ID", "sortDir", "DESC")
+
+        .when()
+                .get("/ticker/lastprice")
+
+        .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.FORBIDDEN).body("isEmpty()", Matchers.is(true));
+    }
+
+    @Test
+    void testLastPrice_shouldReturnForbiddenIfBinanceAPIReturns429() {
+        checkbinanceServiceHelper.
+                createAndSubscribeSymbol("CHZBNB").createAndSubscribeSymbol("BEAMUSDT");
+
+        binanceAPIHelper.mockRequestLastPriceErrorPartialSuccess(
+                List.of(checkbinanceServiceHelper.getSymbol(0).getName(),
+                        checkbinanceServiceHelper.getSymbol(0).getName()));
+
+        given()
+                .params("sortKey", "ID", "sortDir", "DESC")
+
+        .when()
+                .get("/ticker/lastprice")
+
+        .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.FORBIDDEN).body("isEmpty()", Matchers.is(true));
+    }
+
+    @Test
+    void testLastPrice_shouldReturnInternalServiceErrorIfBinanceAPIReturns409() {
+        checkbinanceServiceHelper.
+                createAndSubscribeSymbol("CHZBNB").createAndSubscribeSymbol("BEAMUSDT");
+
+        binanceAPIHelper.mockRequestLastPriceErrorPartialSuccess(
+                List.of(checkbinanceServiceHelper.getSymbol(0).getName(),
+                        checkbinanceServiceHelper.getSymbol(0).getName()));
+
+        given()
+                .params("sortKey", "ID", "sortDir", "DESC")
+
+        .when()
+                .get("/ticker/lastprice")
+
+        .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR).body("isEmpty()", Matchers.is(true));
     }
 
     @Test
@@ -173,67 +237,20 @@ public class TickerControllerRESTAssuredIT {
         .then()
                 .log().all()
                 .assertThat()
-                .status(HttpStatus.SERVICE_UNAVAILABLE);
-    }
-
-    @Test
-    void testLastPrice_shouldReturnNotFoundIfStockClientReturns404() {
-        String symbolOne = "CHZBNB";
-        String symbolTwo = "BEAMUSDT";
-        binanceAPIHelper.mockRequestLastPriceErrorNotFound(List.of(symbolOne, symbolTwo));
-
-        checkbinanceServiceHelper.
-                createAndSubscribeSymbol(symbolOne).createAndSubscribeSymbol(symbolTwo);
-
-        given()
-                .params("sortKey", "ID", "sortDir", "DESC")
-
-                .when()
-                .get("/ticker/lastprice")
-
-                .then()
-                .log().all()
-                .assertThat()
-                .status(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void testLastPrice_shouldReturnForbiddenIfStockClientReturnsWAFLimit() {
-        String symbolOne = "CHZBNB";
-        String symbolTwo = "BEAMUSDT";
-        binanceAPIHelper.mockRequestLastPriceErrorWAFLimit(List.of(symbolOne, symbolTwo));
-
-        checkbinanceServiceHelper.
-                createAndSubscribeSymbol(symbolOne).createAndSubscribeSymbol(symbolTwo);
-
-        given()
-                .params("sortKey", "ID", "sortDir", "DESC")
-
-                .when()
-                .get("/ticker/lastprice")
-
-                .then()
-                .log().all()
-                .assertThat()
-                .status(HttpStatus.FORBIDDEN);
+                .status(HttpStatus.SERVICE_UNAVAILABLE).body("isEmpty()", Matchers.is(true));
     }
 
     @Test
     void testLegacyLastPrice_shouldReturnPricesIfOKWithLimit() {
         checkbinanceServiceHelper.createAndSubscribeSymbol("CHZBNB").createAndSubscribeSymbol("BEAMUSDT");
 
-        var idIterator = List.of(10L, 12L, 13L, 14L, 15L).iterator();
         var responses = List.of(
-            BNBLegacyLastPriceResponse.builder()
+                checkbinanceServiceHelper.createBNBLegacyLastPriceResponseBuilder()
                             .addRandomPrice(checkbinanceServiceHelper.getSymbol(0))
-                            .addRandomPrice(checkbinanceServiceHelper.getSymbol(0))
-                            .idGenerator(idIterator::next)
-                            .symbolIdExtractor(checkbinanceServiceHelper).build(),
-            BNBLegacyLastPriceResponse.builder()
+                            .addRandomPrice(checkbinanceServiceHelper.getSymbol(0)).build(),
+                checkbinanceServiceHelper.createBNBLegacyLastPriceResponseBuilder()
                             .addRandomPrice(checkbinanceServiceHelper.getSymbol(1))
-                            .addRandomPrice(checkbinanceServiceHelper.getSymbol(1))
-                            .idGenerator(idIterator::next)
-                            .symbolIdExtractor(checkbinanceServiceHelper).build()
+                            .addRandomPrice(checkbinanceServiceHelper.getSymbol(1)).build()
         );
 
         binanceAPIHelper.mockRequestLegacyLastPrice(responses);
@@ -256,42 +273,52 @@ public class TickerControllerRESTAssuredIT {
 
         assertThat(actual).extracting(LastPriceDTO::getId).allSatisfy(Assertions::assertNotNull);
 
-        var expected = Stream.concat(responses.get(0).toLastPriceDTO().stream(), responses.get(1).toLastPriceDTO().stream()).collect(Collectors.toList());
+        List<LastPriceDTO> expected = new ArrayList<>();
+        responses.stream().map(BNBLegacyLastPriceResponse::toLastPriceDTO).forEach(expected::addAll);
 
         assertEquals(expected, actual);
     }
 
-//    @Test
-//    void testLegacyLastPrice_shouldReturnPricesIfOKWithoutLimit() {
-//        String symbolOne = "CHZBNB";
-//        String symbolTwo = "BEAMUSDT";
-//        var recentTradesList = binanceAPIHelper.mockRequestLegacyLastPrice(List.of(symbolOne, symbolTwo));
-//
-//        checkbinanceServiceHelper.
-//                createAndSubscribeSymbol(symbolOne).createAndSubscribeSymbol(symbolTwo);
-//
-//        List<LastPriceDTO> actual = given()
-//                .param("sortKey", "ID")
-//                .param("sortDir", "DESC")
-//
-//                .when()
-//                .get("/ticker/legacylastprice")
-//
-//                .then()
-//                .log().all()
-//                .assertThat()
-//                .status(HttpStatus.OK)
-//                .contentType("application/json")
-//                .extract().body()
-//                .jsonPath().getList(".", LastPriceDTO.class);
-//
-//        assertionHelper.legacyLastPriceAssertion(recentTradesList, checkbinanceServiceHelper.getSymbols(), actual);
-//    }
+    @Test
+    void testLegacyLastPrice_shouldReturnPricesIfOKWithoutLimit() {
+        checkbinanceServiceHelper.createAndSubscribeSymbol("CHZBNB").createAndSubscribeSymbol("BEAMUSDT");
+
+        var responses = List.of(
+                checkbinanceServiceHelper.createBNBLegacyLastPriceResponseBuilder()
+                        .addRandomPrice(checkbinanceServiceHelper.getSymbol(0)).build(),
+                checkbinanceServiceHelper.createBNBLegacyLastPriceResponseBuilder()
+                        .addRandomPrice(checkbinanceServiceHelper.getSymbol(1)).build()
+        );
+
+        binanceAPIHelper.mockRequestLegacyLastPrice(responses);
+
+        List<LastPriceDTO> actual = given()
+                .param("sortKey", "ID")
+                .param("sortDir", "ASC")
+
+        .when()
+                .get("/ticker/legacylastprice")
+
+        .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.OK)
+                .contentType("application/json")
+                .extract().body()
+                .jsonPath().getList(".", LastPriceDTO.class);
+
+        assertThat(actual).extracting(LastPriceDTO::getId).allSatisfy(Assertions::assertNotNull);
+
+        List<LastPriceDTO> expected = new ArrayList<>();
+        responses.stream().map(BNBLegacyLastPriceResponse::toLastPriceDTO).forEach(expected::addAll);
+
+        assertEquals(expected, actual);
+    }
 
     @Test
     void testLegacyLastPrice_shouldReturnNullIfSubscriptionsDoesNotExist() {
         given()
-                .params("sortKey", "ID", "sortDir", "DESC")
+                .params("sortKey", "ID", "sortDir", "ASC")
 
         .when()
                 .get("/ticker/legacylastprice")
@@ -299,19 +326,101 @@ public class TickerControllerRESTAssuredIT {
         .then()
                 .assertThat()
                 .status(HttpStatus.OK)
-                .extract().body().equals(null);
+                .body("isEmpty()", Matchers.is(true));
     }
     @Test
-    void testLegacyLastPrice_shouldReturnServiceUnavailableIfBinanceAPIReturns503() {
+    void testLegacyLastPrice_shouldReturnNotFoundIfBinanceAPIReturns404() {
+        checkbinanceServiceHelper.
+                createAndSubscribeSymbol("CHZBNB");
 
+        binanceAPIHelper.mockRequestLegacyLastPriceErrorNotFound(
+                checkbinanceServiceHelper.getSymbol(0).getName());
+
+        given()
+                .params("sortKey", "ID", "sortDir", "ASC")
+
+        .when()
+                .get("/ticker/legacylastprice")
+
+        .then()
+                .assertThat()
+                .status(HttpStatus.NOT_FOUND).body("isEmpty()", Matchers.is(true));
     }
-    @Test
-    void testLegacyLastPrice_shouldReturnNotFoundIfStockClientReturns404() {
 
+    @Test
+    void testLegacyLastPrice_shouldReturnForbiddenIfBinanceAPIReturns403() {
+        checkbinanceServiceHelper.
+                createAndSubscribeSymbol("CHZBNB");
+
+        binanceAPIHelper.mockRequestLegacyLastPriceErrorWAFLimit(
+                checkbinanceServiceHelper.getSymbol(0).getName());
+
+        given()
+                .params("sortKey", "ID", "sortDir", "ASC")
+
+                .when()
+                .get("/ticker/legacylastprice")
+
+                .then()
+                .assertThat()
+                .status(HttpStatus.FORBIDDEN).body("isEmpty()", Matchers.is(true));
     }
-    @Test
-    void testLegacyLastPrice_shouldReturnForbiddenIfStockClientReturnsWAFLimit() {
 
+    @Test
+    void testLegacyLastPrice_shouldReturnForbiddenIfBinanceAPIReturns429() {
+        checkbinanceServiceHelper.
+                createAndSubscribeSymbol("CHZBNB");
+
+        binanceAPIHelper.mockRequestLegacyLastPriceErrorWAFLimit(
+                checkbinanceServiceHelper.getSymbol(0).getName());
+
+        given()
+                .params("sortKey", "ID", "sortDir", "ASC")
+
+                .when()
+                .get("/ticker/legacylastprice")
+
+                .then()
+                .assertThat()
+                .status(HttpStatus.FORBIDDEN).body("isEmpty()", Matchers.is(true));
+    }
+
+    @Test
+    void testLegacyLastPrice_shouldReturnNotFoundIfBinanceAPIReturns409() {
+        checkbinanceServiceHelper.
+                createAndSubscribeSymbol("CHZBNB");
+
+        binanceAPIHelper.mockRequestLegacyLastPriceErrorPartialSuccess(
+                checkbinanceServiceHelper.getSymbol(0).getName());
+
+        given()
+                .params("sortKey", "ID", "sortDir", "ASC")
+
+                .when()
+                .get("/ticker/legacylastprice")
+
+                .then()
+                .assertThat()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR).body("isEmpty()", Matchers.is(true));
+    }
+
+    @Test
+    void testLegacyLastPrice_shouldReturnNotFoundIfBinanceAPIReturns503() {
+        checkbinanceServiceHelper.
+                createAndSubscribeSymbol("CHZBNB");
+
+        binanceAPIHelper.mockRequestLegacyLastPriceErrorServiceUnavailable(
+                checkbinanceServiceHelper.getSymbol(0).getName());
+
+        given()
+                .params("sortKey", "ID", "sortDir", "ASC")
+
+                .when()
+                .get("/ticker/legacylastprice")
+
+                .then()
+                .assertThat()
+                .status(HttpStatus.SERVICE_UNAVAILABLE).body("isEmpty()", Matchers.is(true));
     }
 
     @Test
@@ -333,7 +442,7 @@ public class TickerControllerRESTAssuredIT {
             .then()
                 .log().all()
                 .assertThat()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.NOT_FOUND)
                 .contentType("application/json")
                 .extract().body()
                 .jsonPath().getObject(".", ExchangeInfoBySymbolsDTO.class);

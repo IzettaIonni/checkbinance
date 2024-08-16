@@ -55,7 +55,7 @@ public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<C
         return BNBLegacyLastPriceResponse.builder().idGenerator(this).symbolIdExtractor(this);
     }
 
-    public Long createBinanceTradeId() {
+    public Long createBinanceTradeId() { //todo is it good idea to contain ids in Map<String, Long> with symbol name?
         long id = ThreadLocalRandom.current().nextLong(Long.MAX_VALUE);
         while (binanceTradeIds.contains(id)) id = ThreadLocalRandom.current().nextLong(Long.MAX_VALUE);
         return id;

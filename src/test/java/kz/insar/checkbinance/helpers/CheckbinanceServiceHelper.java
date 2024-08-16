@@ -6,6 +6,7 @@ import kz.insar.checkbinance.client.SymbolPriceDTO;
 import kz.insar.checkbinance.client.SymbolStatus;
 import kz.insar.checkbinance.containers.BNBExchangeInfoResponse;
 import kz.insar.checkbinance.containers.BNBLastPriceResponse;
+import kz.insar.checkbinance.containers.BNBLegacyLastPriceResponse;
 import kz.insar.checkbinance.containers.RecentTradesWithSymbol;
 import kz.insar.checkbinance.converters.ApiConverter;
 import kz.insar.checkbinance.domain.Symbol;
@@ -14,7 +15,9 @@ import kz.insar.checkbinance.helpers.symbol.*;
 import kz.insar.checkbinance.services.SymbolService;
 import kz.insar.checkbinance.services.TickerService;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +27,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<CheckbinanceServiceHelper>,
         TestSymbolBuilders<CheckbinanceServiceHelper> {
 
@@ -34,6 +37,8 @@ public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<C
     private final TickerService tickerService;
     @NonNull
     private final TestSymbolRepository<?> testSymbolRepository;
+    @Getter
+    private final List<Long> binanceTradeIds = new ArrayList<>();
 
     @Autowired
     public CheckbinanceServiceHelper(SymbolService symbolService, TickerService tickerService) {
@@ -46,6 +51,23 @@ public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<C
         return BNBLastPriceResponse.builder().symbolIdExtractor(this);
     }
 
+    public BNBLegacyLastPriceResponse.BNBLegacyLastPriceResponseBuilder createBNBLegacyLastPriceResponseBuilder() {
+        return BNBLegacyLastPriceResponse.builder().idGenerator(this).symbolIdExtractor(this);
+    }
+
+    public Long createBinanceTradeId() {
+        long id = ThreadLocalRandom.current().nextLong(Long.MAX_VALUE);
+        while (binanceTradeIds.contains(id)) id = ThreadLocalRandom.current().nextLong(Long.MAX_VALUE);
+        return id;
+    }
+
+    public boolean isBinanceTradeIdPresent(Long id) {
+        return binanceTradeIds.contains(id);
+    }
+
+    public boolean isBinanceTradeIdDuplicated(Long id) {
+        return binanceTradeIds.stream().filter(id::equals).count() > 1;
+    }
 
     @Override
     public TestSymbolCreator<CheckbinanceServiceHelper> buildSymbol() {

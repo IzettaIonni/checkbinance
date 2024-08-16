@@ -5,6 +5,7 @@ import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.common.EpochMilisToTimeConverter;
 import kz.insar.checkbinance.domain.SymbolId;
+import kz.insar.checkbinance.helpers.CheckbinanceServiceHelper;
 import kz.insar.checkbinance.helpers.symbol.TestSymbol;
 import kz.insar.checkbinance.helpers.symbol.TestSymbolRepository;
 import lombok.Builder;
@@ -128,6 +129,15 @@ public class BNBLegacyLastPriceResponse {
 
         public BNBLegacyLastPriceResponseBuilder symbolIdExtractor(TestSymbolRepository<?> symbolIdExtractor) {
             return symbolIdExtractor(symbolIdExtractor::getSymbolId);
+        }
+
+        public BNBLegacyLastPriceResponseBuilder idGenerator(Supplier<Long> idGenerator) {
+            this.idGenerator = idGenerator;
+            return this;
+        }
+
+        public BNBLegacyLastPriceResponseBuilder idGenerator(CheckbinanceServiceHelper idGenerator) {
+            return idGenerator(idGenerator::createBinanceTradeId);
         }
 
         public BNBLegacyLastPriceResponseBuilder withRandomIdGenerator() {

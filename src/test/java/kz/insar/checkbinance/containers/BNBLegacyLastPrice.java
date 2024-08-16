@@ -29,6 +29,10 @@ public class BNBLegacyLastPrice {
             return this;
         }
 
+        public BNBLegacyLastPriceBuilder symbol(@NonNull TestSymbol symbol) {
+            return symbol(symbol.getName());
+        }
+
         public BNBLegacyLastPriceBuilder withRandomParams() {
             symbol = RandomStringUtils.random(32);
             time = ThreadLocalRandom.current().nextLong(999999999); //Caused by DateTime boundaries

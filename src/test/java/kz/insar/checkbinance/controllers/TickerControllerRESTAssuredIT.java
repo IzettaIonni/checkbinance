@@ -223,23 +223,20 @@ public class TickerControllerRESTAssuredIT {
         checkbinanceServiceHelper.createAndSubscribeSymbol("CHZBNB").createAndSubscribeSymbol("BEAMUSDT");
 
         var idIterator = List.of(10L, 12L, 13L, 14L, 15L).iterator();
-        var response = List.of(
+        var responses = List.of(
             BNBLegacyLastPriceResponse.builder()
-                            .addPrice(BNBLegacyLastPrice.builder().withRandomParams()
-                                    .symbol(checkbinanceServiceHelper.getSymbol(0).getName()).build())
-                            .addPrice(BNBLegacyLastPrice.builder().withRandomParams()
-                                    .symbol(checkbinanceServiceHelper.getSymbol(0).getName()).build())
-                            .idGenerator(idIterator::next).build(),
+                            .addRandomPrice(checkbinanceServiceHelper.getSymbol(0))
+                            .addRandomPrice(checkbinanceServiceHelper.getSymbol(0))
+                            .idGenerator(idIterator::next)
+                            .symbolIdExtractor(checkbinanceServiceHelper).build(),
             BNBLegacyLastPriceResponse.builder()
-                            .addPrice(BNBLegacyLastPrice.builder().withRandomParams()
-                                    .symbol(checkbinanceServiceHelper.getSymbol(1).getName()).build())
-                            .addPrice(BNBLegacyLastPrice.builder().withRandomParams()
-                                    .symbol(checkbinanceServiceHelper.getSymbol(1).getName()).build())
-                            .idGenerator(idIterator::next).build()
+                            .addRandomPrice(checkbinanceServiceHelper.getSymbol(1))
+                            .addRandomPrice(checkbinanceServiceHelper.getSymbol(1))
+                            .idGenerator(idIterator::next)
+                            .symbolIdExtractor(checkbinanceServiceHelper).build()
         );
 
-        binanceAPIHelper.mockRequestLegacyLastPrice(List.of(checkbinanceServiceHelper.getSymbol(0).getName(),
-                checkbinanceServiceHelper.getSymbol(1).getName()), response);
+        binanceAPIHelper.mockRequestLegacyLastPrice(responses);
 
         List<LastPriceDTO> actual = given()
                 .param("sortKey", "ID")
@@ -259,10 +256,7 @@ public class TickerControllerRESTAssuredIT {
 
         assertThat(actual).extracting(LastPriceDTO::getId).allSatisfy(Assertions::assertNotNull);
 
-        var expected = Stream.concat(
-                response.get(0).toLastPriceDTO(List.of(actual.get(0), actual.get(1)), checkbinanceServiceHelper::getSymbolId).stream(),
-                response.get(1).toLastPriceDTO(List.of(actual.get(2), actual.get(3)), checkbinanceServiceHelper::getSymbolId).stream()
-        ).collect(Collectors.toList());
+        var expected = Stream.concat(responses.get(0).toLastPriceDTO().stream(), responses.get(1).toLastPriceDTO().stream()).collect(Collectors.toList());
 
         assertEquals(expected, actual);
     }

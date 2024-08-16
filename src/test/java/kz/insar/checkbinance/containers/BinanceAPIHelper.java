@@ -2,7 +2,6 @@ package kz.insar.checkbinance.containers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
-import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.client.SymbolPriceDTO;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -192,8 +191,12 @@ public class BinanceAPIHelper {
         return mockRequestLegacyLastPrice(requestSymbols, limit, responses);
     }
 
+    public BinanceAPIHelper mockRequestLegacyLastPrice(List<BNBLegacyLastPriceResponse> responses) {
+        return mockRequestLegacyLastPrice(responses.stream().map(BNBLegacyLastPriceResponse::getCommonSymbolName).collect(Collectors.toList()), responses);
+    }
+
     @Deprecated
-    public BinanceAPIHelper mockRequestLegacyLastPrice(LegacyLastPriceMockWrapper requestSymbol) {
+    public BinanceAPIHelper mockRequestLegacyLastPriceWrapper(LegacyLastPriceMockWrapper requestSymbol) {
         var idIterator = requestSymbol.getRecentTrades().stream()
                 .map(RecentTradesMockWrapper::getId).collect(Collectors.toList()).iterator();
         return mockRequestLegacyLastPrice(
@@ -219,10 +222,10 @@ public class BinanceAPIHelper {
     }
 
     @Deprecated
-    public BinanceAPIHelper mockRequestLegacyLastPrice(List<LegacyLastPriceMockWrapper> requestSymbols) {
-        BinanceAPIHelper result = mockRequestLegacyLastPrice(requestSymbols.get(0));
+    public BinanceAPIHelper mockRequestLegacyLastPriceWrapper(List<LegacyLastPriceMockWrapper> requestSymbols) {
+        BinanceAPIHelper result = mockRequestLegacyLastPriceWrapper(requestSymbols.get(0));
         for (int i = 1; i < requestSymbols.size(); i++)
-            mockRequestLegacyLastPrice(requestSymbols.get(i));
+            mockRequestLegacyLastPriceWrapper(requestSymbols.get(i));
         return result;
     }
 

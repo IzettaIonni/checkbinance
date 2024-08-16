@@ -5,6 +5,8 @@ import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.client.RecentTradeDTO;
 import kz.insar.checkbinance.common.EpochMilisToTimeConverter;
 import kz.insar.checkbinance.domain.SymbolId;
+import kz.insar.checkbinance.helpers.symbol.TestSymbol;
+import kz.insar.checkbinance.helpers.symbol.TestSymbolRepository;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -27,6 +29,13 @@ public class BNBLegacyLastPriceResponse {
 
     public Integer getPricesQuantity() {
         return prices.size();
+    }
+
+    public String getCommonSymbolName() {
+        var name = prices.get(0).getSymbol();
+        if (!prices.stream().map(BNBLegacyLastPrice::getSymbol).allMatch(name::equals))
+            throw new IllegalStateException(); //todo some uncertainty exception
+        return name;
     }
 
     public List<RecentTradeDTO> toRecentTradeDTOs() {
@@ -52,7 +61,7 @@ public class BNBLegacyLastPriceResponse {
         return recentTradeDTOs;
     }
 
-    public List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual, Function<String, SymbolId> symbolIdExtractor) {
+    public List<LastPriceDTO> toLastPriceDTO(Function<String, SymbolId> symbolIdExtractor) {
         List<LastPriceDTO> lastPriceDTOList = new ArrayList<>();
         for (int i = 0; i < prices.size(); i++) {
             var price = prices.get(i);
@@ -66,8 +75,12 @@ public class BNBLegacyLastPriceResponse {
         return lastPriceDTOList;
     }
 
-    public List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual) {
-        return toLastPriceDTO(actual, symbolIdExtractor);
+    public List<LastPriceDTO> toLastPriceDTO(TestSymbolRepository<?> symbolIdExtractor) {
+        return toLastPriceDTO(symbolIdExtractor::getSymbolId);
+    }
+
+    public List<LastPriceDTO> toLastPriceDTO() {
+        return toLastPriceDTO(symbolIdExtractor);
     }
 
     public static BNBLegacyLastPriceResponse of(BNBLegacyLastPrice price) {
@@ -91,6 +104,18 @@ public class BNBLegacyLastPriceResponse {
             return this;
         }
 
+        public BNBLegacyLastPriceResponseBuilder addRandomPrice() {
+            return addPrice(BNBLegacyLastPrice.builder().withRandomParams().build());
+        }
+
+        public BNBLegacyLastPriceResponseBuilder addRandomPrice(String name) {
+            return addPrice(BNBLegacyLastPrice.builder().withRandomParams().symbol(name).build());
+        }
+
+        public BNBLegacyLastPriceResponseBuilder addRandomPrice(TestSymbol name) {
+            return addRandomPrice(name.getName());
+        }
+
         public BNBLegacyLastPriceResponseBuilder addPrices(List<BNBLegacyLastPrice> prices) {
             this.prices.addAll(prices);
             return this;
@@ -99,6 +124,10 @@ public class BNBLegacyLastPriceResponse {
         public BNBLegacyLastPriceResponseBuilder symbolIdExtractor(Function<String, SymbolId> symbolIdExtractor) {
             this.symbolIdExtractor = symbolIdExtractor;
             return this;
+        }
+
+        public BNBLegacyLastPriceResponseBuilder symbolIdExtractor(TestSymbolRepository<?> symbolIdExtractor) {
+            return symbolIdExtractor(symbolIdExtractor::getSymbolId);
         }
 
         public BNBLegacyLastPriceResponseBuilder withRandomIdGenerator() {

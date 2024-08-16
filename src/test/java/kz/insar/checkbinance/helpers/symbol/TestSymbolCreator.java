@@ -53,7 +53,6 @@ public class TestSymbolCreator<T extends TestSymbolRepository<T>> {
         throw new IllegalStateException();
     }
 
-    //todo is null name possible?
     public TestSymbolCreator<T> withNullName() {
         return withName(null);
     }

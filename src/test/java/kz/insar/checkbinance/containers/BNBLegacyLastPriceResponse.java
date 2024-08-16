@@ -66,7 +66,7 @@ public class BNBLegacyLastPriceResponse {
     }
 
     private List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual) {
-        toLastPriceDTO(actual, symbolIdExtractor);
+        return toLastPriceDTO(actual, symbolIdExtractor);
     }
 
     public static BNBLegacyLastPriceResponse of(BNBLegacyLastPrice price) {

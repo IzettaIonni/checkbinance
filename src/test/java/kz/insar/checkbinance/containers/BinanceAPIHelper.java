@@ -165,19 +165,17 @@ public class BinanceAPIHelper {
                 response);
     }
 
-    private BinanceAPIHelper mockRequestLegacyLastPrice(
+    public BinanceAPIHelper mockRequestLegacyLastPrice(
             String requestSymbol, int requestLimit, BNBLegacyLastPriceResponse response) {
         return mockRequestLegacyLastPrice(requestSymbol, requestLimit,
                 response().withBody(JsonBody.json(response.toRecentTradeDTOs())).withStatusCode(200));
     }
 
-    private BinanceAPIHelper mockRequestLegacyLastPrice(
-            String requestSymbol, int requestLimit, BNBLegacyLastPriceResponse response, List<Long> responseIds) {
-        return mockRequestLegacyLastPrice(requestSymbol, requestLimit,
-                response().withBody(JsonBody.json(response.toRecentTradeDTOs(responseIds))).withStatusCode(200));
+    public BinanceAPIHelper mockRequestLegacyLastPrice(String requestSymbol, BNBLegacyLastPriceResponse response) {
+        return mockRequestLegacyLastPrice(requestSymbol, response.getPrices().size(), response);
     }
 
-    private BinanceAPIHelper mockRequestLegacyLastPrice(
+    public BinanceAPIHelper mockRequestLegacyLastPrice(
             List<String> requestSymbols, int requestLimit, List<BNBLegacyLastPriceResponse> responses) {
         if (requestSymbols.size() != responses.size()) throw new IllegalArgumentException("request symbols and responses doesn't match");
         for (int i = 1; i < responses.size(); i++) {
@@ -186,14 +184,10 @@ public class BinanceAPIHelper {
         return this;
     }
 
-    private BinanceAPIHelper mockRequestLegacyLastPrice(
-            List<String> requestSymbols, int requestLimit, List<BNBLegacyLastPriceResponse> responses, List<List<Long>> responsesIds) {
-        if (requestSymbols.size() != responses.size() || responses.size() != responsesIds.size())
-            throw new IllegalArgumentException("request symbols and responses doesn't match");
-        for (int i = 1; i < responses.size(); i++) {
-            mockRequestLegacyLastPrice(requestSymbols.get(i), requestLimit, responses.get(i), responsesIds.get(i));
-        }
-        return this;
+    public BinanceAPIHelper mockRequestLegacyLastPrice(List<String> requestSymbols, List<BNBLegacyLastPriceResponse> responses) {
+        var limit = responses.get(0).getPrices().size();
+        if (!responses.stream().allMatch(response -> response.getPrices().size() == limit)) throw new IllegalArgumentException("Different responses' prices size");
+        return mockRequestLegacyLastPrice(requestSymbols, limit, responses);
     }
 
     @Deprecated

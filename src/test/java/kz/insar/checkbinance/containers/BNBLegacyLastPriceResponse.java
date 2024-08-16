@@ -3,6 +3,7 @@ package kz.insar.checkbinance.containers;
 import com.google.common.collect.Iterables;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.client.RecentTradeDTO;
+import kz.insar.checkbinance.common.EpochMilisToTimeConverter;
 import kz.insar.checkbinance.domain.SymbolId;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class BNBLegacyLastPriceResponse {
 
     @NonNull
     private final List<BNBLegacyLastPrice> prices;
+    @NonNull
     private final Supplier<Long> idGenerator;
     private final Function<String, SymbolId> symbolIdExtractor;
 
@@ -50,22 +52,21 @@ public class BNBLegacyLastPriceResponse {
         return recentTradeDTOs;
     }
 
-    private List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual, Function<String, SymbolId> symbolIdExtractor) {
+    public List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual, Function<String, SymbolId> symbolIdExtractor) {
         List<LastPriceDTO> lastPriceDTOList = new ArrayList<>();
         for (int i = 0; i < prices.size(); i++) {
             var price = prices.get(i);
-            var actualPrice = actual.get(i);
             lastPriceDTOList.add(LastPriceDTO.builder()
                             .symbol(price.getSymbol())
                             .price(price.getPrice())
                             .id(symbolIdExtractor.apply(price.getSymbol()).getId())
-                            .time(actualPrice.getTime())
+                            .time(new EpochMilisToTimeConverter().apply(price.getTime()))
                             .build());
         }
         return lastPriceDTOList;
     }
 
-    private List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual) {
+    public List<LastPriceDTO> toLastPriceDTO(List<LastPriceDTO> actual) {
         return toLastPriceDTO(actual, symbolIdExtractor);
     }
 
@@ -97,6 +98,11 @@ public class BNBLegacyLastPriceResponse {
 
         public BNBLegacyLastPriceResponseBuilder symbolIdExtractor(Function<String, SymbolId> symbolIdExtractor) {
             this.symbolIdExtractor = symbolIdExtractor;
+            return this;
+        }
+
+        public BNBLegacyLastPriceResponseBuilder withRandomIdGenerator() {
+            idGenerator = () -> ThreadLocalRandom.current().nextLong();
             return this;
         }
     }

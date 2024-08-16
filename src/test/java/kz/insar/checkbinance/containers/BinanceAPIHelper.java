@@ -179,7 +179,7 @@ public class BinanceAPIHelper {
     public BinanceAPIHelper mockRequestLegacyLastPrice(
             List<String> requestSymbols, int requestLimit, List<BNBLegacyLastPriceResponse> responses) {
         if (requestSymbols.size() != responses.size()) throw new IllegalArgumentException("request symbols and responses doesn't match");
-        for (int i = 1; i < responses.size(); i++) {
+        for (int i = 0; i < responses.size(); i++) {
             mockRequestLegacyLastPrice(requestSymbols.get(i), requestLimit, responses.get(i));
         }
         return this;

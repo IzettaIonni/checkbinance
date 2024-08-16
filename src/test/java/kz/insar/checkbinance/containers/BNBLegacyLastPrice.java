@@ -1,6 +1,7 @@
 package kz.insar.checkbinance.containers;
 
 import kz.insar.checkbinance.client.RecentTradeDTO;
+import kz.insar.checkbinance.helpers.symbol.TestSymbol;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;

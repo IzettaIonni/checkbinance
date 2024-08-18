@@ -11,6 +11,9 @@ public interface SymbolRepository extends JpaRepository<SymbolEntity, Integer> {
     default Optional<SymbolEntity> findById(SymbolId id) {
         return findById(id.getId());
     }
+    default void deleteById(SymbolId id) {
+        deleteById(id.getId());
+    }
 
     //@Query(~OQL)
     Optional<SymbolEntity> findBySymbolName(String symbolName);

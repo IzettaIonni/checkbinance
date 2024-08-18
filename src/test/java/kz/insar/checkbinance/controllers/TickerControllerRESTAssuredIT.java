@@ -4,6 +4,7 @@ import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.containers.*;
 import kz.insar.checkbinance.helpers.CheckbinanceServiceHelper;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -434,27 +435,102 @@ public class TickerControllerRESTAssuredIT {
 
     @Test
     void testExchangeInfo_shouldReturnNotFoundIfStockClientReturns404() {
+        var requestSymbols = List.of(
+                RandomStringUtils.randomAlphabetic(32),
+                RandomStringUtils.randomAlphabetic(32));
 
+        binanceAPIHelper.mockRequestExchangeInfoErrorNotFound(requestSymbols);
+
+        given()
+                .param("symbols", requestSymbols)
+
+        .when()
+                .get("/ticker/exchangeinfo")
+
+        .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.NOT_FOUND);
     }
 
     @Test
     void testExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturns403() {
+        var requestSymbols = List.of(
+                RandomStringUtils.randomAlphabetic(32),
+                RandomStringUtils.randomAlphabetic(32));
 
+        binanceAPIHelper.mockRequestExchangeInfoErrorWAFLimit(requestSymbols);
+
+        given()
+                .param("symbols", requestSymbols)
+
+                .when()
+                .get("/ticker/exchangeinfo")
+
+                .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.FORBIDDEN);
     }
 
     @Test
     void testExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturns429() {
+        var requestSymbols = List.of(
+                RandomStringUtils.randomAlphabetic(32),
+                RandomStringUtils.randomAlphabetic(32));
 
+        binanceAPIHelper.mockRequestExchangeInfoErrorRateLimit(requestSymbols);
+
+        given()
+                .param("symbols", requestSymbols)
+
+                .when()
+                .get("/ticker/exchangeinfo")
+
+                .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.FORBIDDEN);
     }
 
     @Test
     void testExchangeInfo_shouldReturnInternalServerErrorIfBinanceAPIReturns409() {
+        var requestSymbols = List.of(
+                RandomStringUtils.randomAlphabetic(32),
+                RandomStringUtils.randomAlphabetic(32));
 
+        binanceAPIHelper.mockRequestExchangeInfoErrorPartialSuccess(requestSymbols);
+
+        given()
+                .param("symbols", requestSymbols)
+
+                .when()
+                .get("/ticker/exchangeinfo")
+
+                .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     void testExchangeInfo_shouldReturnServiceUnavailableIfBinanceAPIReturns503() {
+        var requestSymbols = List.of(
+                RandomStringUtils.randomAlphabetic(32),
+                RandomStringUtils.randomAlphabetic(32));
 
+        binanceAPIHelper.mockRequestExchangeInfoErrorServiceUnavailable(requestSymbols);
+
+        given()
+                .param("symbols", requestSymbols)
+
+                .when()
+                .get("/ticker/exchangeinfo")
+
+                .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @Test
@@ -484,23 +560,78 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testAllExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturns403() {
+    void testAllExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturns404() {
+        binanceAPIHelper.mockRequestExchangeAllInfoErrorNotFound();
 
+        given()
+
+        .when()
+                .get("/ticker/exchangeallinfo")
+
+        .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void testAllExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturns403() {
+        binanceAPIHelper.mockRequestExchangeAllInfoErrorWAFLimit();
+
+        given()
+
+        .when()
+                .get("/ticker/exchangeallinfo")
+
+        .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.FORBIDDEN);
     }
 
     @Test
     void testAllExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturns429() {
+        binanceAPIHelper.mockRequestExchangeAllInfoErrorRateLimit();
 
+        given()
+
+                .when()
+                .get("/ticker/exchangeallinfo")
+
+                .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.FORBIDDEN);
     }
 
     @Test
     void testAllExchangeInfo_shouldReturnInternalServerErrorIfBinanceAPIReturns409() {
+        binanceAPIHelper.mockRequestExchangeAllInfoErrorPartialSuccess();
 
+        given()
+
+                .when()
+                .get("/ticker/exchangeallinfo")
+
+                .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     void testAllExchangeInfo_shouldReturnServiceUnavailableIfBinanceAPIReturns503() {
+        binanceAPIHelper.mockRequestExchangeAllInfoErrorServiceUnavailable();
 
+        given()
+
+                .when()
+                .get("/ticker/exchangeallinfo")
+
+                .then()
+                .log().all()
+                .assertThat()
+                .status(HttpStatus.SERVICE_UNAVAILABLE);
     }
 
 

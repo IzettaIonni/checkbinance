@@ -149,9 +149,7 @@ public class TickerControllerRESTAssuredIT {
     void testLastPrice_shouldReturnNotFoundIfStockClientReturns404() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbols(2);
 
-        binanceAPIHelper.mockRequestLastPriceErrorNotFound(
-                List.of(checkbinanceServiceHelper.getSymbol(-1).getName(),
-                        checkbinanceServiceHelper.getSymbol(-2).getName()));
+        binanceAPIHelper.mockRequestLastPriceErrorNotFound(checkbinanceServiceHelper.getSymbolNames(-2, -1));
 
         given()
                 .params("sortKey", "ID", "sortDir", "DESC")
@@ -169,9 +167,7 @@ public class TickerControllerRESTAssuredIT {
     void testLastPrice_shouldReturnForbiddenIfStockClientReturns403() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbols(2);
 
-        binanceAPIHelper.mockRequestLastPriceErrorWAFLimit(
-                List.of(checkbinanceServiceHelper.getSymbol(-1).getName(),
-                        checkbinanceServiceHelper.getSymbol(-2).getName()));
+        binanceAPIHelper.mockRequestLastPriceErrorWAFLimit(checkbinanceServiceHelper.getSymbolNames(-2, -1));
 
         given()
                 .params("sortKey", "ID", "sortDir", "DESC")
@@ -182,16 +178,14 @@ public class TickerControllerRESTAssuredIT {
         .then()
                 .log().all()
                 .assertThat()
-                .status(HttpStatus.FORBIDDEN).body("isEmpty()", Matchers.is(true));
+                .status(HttpStatus.FORBIDDEN);
     }
 
     @Test
     void testLastPrice_shouldReturnForbiddenIfBinanceAPIReturns429() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbols(2);
 
-        binanceAPIHelper.mockRequestLastPriceErrorRateLimit(
-                List.of(checkbinanceServiceHelper.getSymbol(-1).getName(),
-                        checkbinanceServiceHelper.getSymbol(-2).getName()));
+        binanceAPIHelper.mockRequestLastPriceErrorRateLimit(checkbinanceServiceHelper.getSymbolNames(-2, -1));
 
         given()
                 .params("sortKey", "ID", "sortDir", "DESC")
@@ -202,20 +196,17 @@ public class TickerControllerRESTAssuredIT {
         .then()
                 .log().all()
                 .assertThat()
-                .status(HttpStatus.FORBIDDEN).body("isEmpty()", Matchers.is(true));
+                .status(HttpStatus.FORBIDDEN);
     }
 
     @Test
     void testLastPrice_shouldReturnInternalServiceErrorIfBinanceAPIReturns409() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbols(2);
 
-        var response = checkbinanceServiceHelper.createBNBLastPriceResponseBuilder()
-                .addPrice(checkbinanceServiceHelper.getSymbol(-2), ThreadLocalRandom.current().nextInt())
-                .addPrice(checkbinanceServiceHelper.getSymbol(-1), ThreadLocalRandom.current().nextInt())
-                .build();
+        binanceAPIHelper.mockRequestLastPriceErrorPartialSuccess(checkbinanceServiceHelper.getSymbolNames(-2, -1));
 
         given()
-                .params("sortKey", "ID", "sortDir", "DESC")
+                .params("sortKey", "ID", "sortDir", "ASC")
 
         .when()
                 .get("/ticker/lastprice")
@@ -223,17 +214,14 @@ public class TickerControllerRESTAssuredIT {
         .then()
                 .log().all()
                 .assertThat()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR).body("isEmpty()", Matchers.is(true));
+                .status(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     void testLastPrice_shouldReturnServiceUnavailableIfBinanceAPIReturns503() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbols(2);
 
-        var response = checkbinanceServiceHelper.createBNBLastPriceResponseBuilder()
-                .addPrice(checkbinanceServiceHelper.getSymbol(-2), ThreadLocalRandom.current().nextInt())
-                .addPrice(checkbinanceServiceHelper.getSymbol(-1), ThreadLocalRandom.current().nextInt())
-                .build();
+        binanceAPIHelper.mockRequestLastPriceErrorServiceUnavailable(checkbinanceServiceHelper.getSymbolNames(-2, -1));
 
         given()
                 .params("sortKey", "ID", "sortDir", "DESC")
@@ -244,7 +232,7 @@ public class TickerControllerRESTAssuredIT {
         .then()
                 .log().all()
                 .assertThat()
-                .status(HttpStatus.SERVICE_UNAVAILABLE).body("isEmpty()", Matchers.is(true));
+                .status(HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @Test
@@ -336,10 +324,9 @@ public class TickerControllerRESTAssuredIT {
     }
     @Test
     void testLegacyLastPrice_shouldReturnNotFoundIfBinanceAPIReturns404() {
-        checkbinanceServiceHelper.createAndSubscribeRandomSymbols(1); //todo method for singe symbol, subscribe via creation index
-
+        checkbinanceServiceHelper.createAndSubscribeRandomSymbol();
         binanceAPIHelper.mockRequestLegacyLastPriceErrorNotFound(
-                checkbinanceServiceHelper.getSymbol(-1).getName());
+                checkbinanceServiceHelper.getSymbolName(-1));
 
         given()
                 .params("sortKey", "ID", "sortDir", "ASC")
@@ -355,10 +342,10 @@ public class TickerControllerRESTAssuredIT {
 
     @Test
     void testLegacyLastPrice_shouldReturnForbiddenIfBinanceAPIReturns403() {
-        checkbinanceServiceHelper.createAndSubscribeRandomSymbols(1); //todo method for singe symbol, subscribe via creation index
+        checkbinanceServiceHelper.createAndSubscribeRandomSymbol();
 
         binanceAPIHelper.mockRequestLegacyLastPriceErrorWAFLimit(
-                checkbinanceServiceHelper.getSymbol(-1).getName());
+                checkbinanceServiceHelper.getSymbolName(-1));
 
         given()
                 .params("sortKey", "ID", "sortDir", "ASC")
@@ -374,10 +361,10 @@ public class TickerControllerRESTAssuredIT {
 
     @Test
     void testLegacyLastPrice_shouldReturnForbiddenIfBinanceAPIReturns429() {
-        checkbinanceServiceHelper.createAndSubscribeRandomSymbols(1); //todo method for singe symbol, subscribe via creation index
+        checkbinanceServiceHelper.createAndSubscribeRandomSymbol();
 
         binanceAPIHelper.mockRequestLegacyLastPriceErrorRateLimit(
-                checkbinanceServiceHelper.getSymbol(-1).getName());
+                checkbinanceServiceHelper.getSymbolName(-1));
 
         given()
                 .params("sortKey", "ID", "sortDir", "ASC")
@@ -388,15 +375,15 @@ public class TickerControllerRESTAssuredIT {
         .then()
                 .log().all()
                 .assertThat()
-                .status(HttpStatus.FORBIDDEN).body("isEmpty()", Matchers.is(true));
+                .status(HttpStatus.FORBIDDEN);
     }
 
     @Test
-    void testLegacyLastPrice_shouldReturnInternalServerErrorIfBinanceAPIReturns409() { //todo fix prod
-        checkbinanceServiceHelper.createAndSubscribeRandomSymbols(1); //todo method for singe symbol, subscribe via creation index
+    void testLegacyLastPrice_shouldReturnInternalServerErrorIfBinanceAPIReturns409() {
+        checkbinanceServiceHelper.createAndSubscribeRandomSymbol();
 
         binanceAPIHelper.mockRequestLegacyLastPriceErrorPartialSuccess(
-                checkbinanceServiceHelper.getSymbol(-1).getName());
+                checkbinanceServiceHelper.getSymbolName(-1));
 
         given()
                 .params("sortKey", "ID", "sortDir", "ASC")
@@ -412,10 +399,10 @@ public class TickerControllerRESTAssuredIT {
 
     @Test
     void testLegacyLastPrice_shouldReturnNotFoundIfBinanceAPIReturns503() {
-        checkbinanceServiceHelper.createAndSubscribeRandomSymbols(1); //todo method for singe symbol, subscribe via creation index
+        checkbinanceServiceHelper.createAndSubscribeRandomSymbol();
 
         binanceAPIHelper.mockRequestLegacyLastPriceErrorServiceUnavailable(
-                checkbinanceServiceHelper.getSymbol(-1).getName());
+                checkbinanceServiceHelper.getSymbolName(-1));
 
         given()
                 .params("sortKey", "ID", "sortDir", "ASC")

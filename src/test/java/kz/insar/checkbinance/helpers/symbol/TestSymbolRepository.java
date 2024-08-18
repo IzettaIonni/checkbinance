@@ -29,6 +29,17 @@ public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
     default boolean isSymbolPresent(TestSymbol testSymbol) {
         return isSymbolPresent(testSymbol.getName());
     }
+    default boolean isSymbolPresent(SymbolId id) {
+        return isSymbolPresent(getSymbol(id).getName());
+    }
+    default boolean isSymbolDuplicated(String symbol) {
+        return getSymbols().stream().map(TestSymbol::getName)
+                .filter(testSymbolName -> testSymbolName.equals(symbol)).count() > 1;
+    }
+    default boolean isSymbolDuplicated(TestSymbol testSymbol) {
+        return isSymbolDuplicated(testSymbol.getName());
+    }
+
     int getSymbolCount();
     List<TestSymbol> getSymbols();
     TestSymbol getSymbol(int creationIndex);

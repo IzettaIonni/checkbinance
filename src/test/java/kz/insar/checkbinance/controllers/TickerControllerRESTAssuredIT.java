@@ -135,7 +135,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testLastPrice_shouldReturnNotFoundIfStockClientReturns404() {
+    void testLastPrice_shouldReturnNotFoundIfStockClientReturnsNotFound() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbols(2);
 
         binanceAPIHelper.mockRequestLastPriceErrorNotFound(checkbinanceServiceHelper.getSymbolNames(-2, -1));
@@ -153,7 +153,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testLastPrice_shouldReturnForbiddenIfStockClientReturns403() {
+    void testLastPrice_shouldReturnForbiddenIfStockClientReturnsWAFLimit() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbols(2);
 
         binanceAPIHelper.mockRequestLastPriceErrorWAFLimit(checkbinanceServiceHelper.getSymbolNames(-2, -1));
@@ -171,7 +171,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testLastPrice_shouldReturnForbiddenIfBinanceAPIReturns429() {
+    void testLastPrice_shouldReturnForbiddenIfBinanceAPIReturnsRateLimit() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbols(2);
 
         binanceAPIHelper.mockRequestLastPriceErrorRateLimit(checkbinanceServiceHelper.getSymbolNames(-2, -1));
@@ -189,7 +189,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testLastPrice_shouldReturnInternalServiceErrorIfBinanceAPIReturns409() {
+    void testLastPrice_shouldReturnInternalServiceErrorIfBinanceAPIReturnsPartialSuccess() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbols(2);
 
         binanceAPIHelper.mockRequestLastPriceErrorPartialSuccess(checkbinanceServiceHelper.getSymbolNames(-2, -1));
@@ -207,7 +207,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testLastPrice_shouldReturnServiceUnavailableIfBinanceAPIReturns503() {
+    void testLastPrice_shouldReturnServiceUnavailableIfBinanceAPIReturnsServiceUnavailable() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbols(2);
 
         binanceAPIHelper.mockRequestLastPriceErrorServiceUnavailable(checkbinanceServiceHelper.getSymbolNames(-2, -1));
@@ -312,7 +312,7 @@ public class TickerControllerRESTAssuredIT {
                 .body("isEmpty()", Matchers.is(true));
     }
     @Test
-    void testLegacyLastPrice_shouldReturnNotFoundIfBinanceAPIReturns404() {
+    void testLegacyLastPrice_shouldReturnNotFoundIfBinanceAPIReturnsNotFound() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbol();
         binanceAPIHelper.mockRequestLegacyLastPriceErrorNotFound(
                 checkbinanceServiceHelper.getSymbolName(-1));
@@ -330,7 +330,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testLegacyLastPrice_shouldReturnForbiddenIfBinanceAPIReturns403() {
+    void testLegacyLastPrice_shouldReturnForbiddenIfBinanceAPIReturnsWAFLimit() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbol();
 
         binanceAPIHelper.mockRequestLegacyLastPriceErrorWAFLimit(
@@ -349,7 +349,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testLegacyLastPrice_shouldReturnForbiddenIfBinanceAPIReturns429() {
+    void testLegacyLastPrice_shouldReturnForbiddenIfBinanceAPIReturnsRateLimit() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbol();
 
         binanceAPIHelper.mockRequestLegacyLastPriceErrorRateLimit(
@@ -368,7 +368,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testLegacyLastPrice_shouldReturnInternalServerErrorIfBinanceAPIReturns409() {
+    void testLegacyLastPrice_shouldReturnInternalServerErrorIfBinanceAPIReturnsPartialSuccess() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbol();
 
         binanceAPIHelper.mockRequestLegacyLastPriceErrorPartialSuccess(
@@ -387,7 +387,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testLegacyLastPrice_shouldReturnNotFoundIfBinanceAPIReturns503() {
+    void testLegacyLastPrice_shouldReturnNotFoundIfBinanceAPIReturnsServiceUnavailable() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbol();
 
         binanceAPIHelper.mockRequestLegacyLastPriceErrorServiceUnavailable(
@@ -434,7 +434,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testExchangeInfo_shouldReturnNotFoundIfStockClientReturns404() {
+    void testExchangeInfo_shouldReturnNotFoundIfStockClientReturnsNotFound() {
         var requestSymbols = List.of(
                 RandomStringUtils.randomAlphabetic(32),
                 RandomStringUtils.randomAlphabetic(32));
@@ -454,7 +454,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturns403() {
+    void testExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturnsWAFLimit() {
         var requestSymbols = List.of(
                 RandomStringUtils.randomAlphabetic(32),
                 RandomStringUtils.randomAlphabetic(32));
@@ -474,7 +474,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturns429() {
+    void testExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturnsRateLimit() {
         var requestSymbols = List.of(
                 RandomStringUtils.randomAlphabetic(32),
                 RandomStringUtils.randomAlphabetic(32));
@@ -494,7 +494,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testExchangeInfo_shouldReturnInternalServerErrorIfBinanceAPIReturns409() {
+    void testExchangeInfo_shouldReturnInternalServerErrorIfBinanceAPIReturnsPartialSuccess() {
         var requestSymbols = List.of(
                 RandomStringUtils.randomAlphabetic(32),
                 RandomStringUtils.randomAlphabetic(32));
@@ -514,7 +514,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testExchangeInfo_shouldReturnServiceUnavailableIfBinanceAPIReturns503() {
+    void testExchangeInfo_shouldReturnServiceUnavailableIfBinanceAPIReturnsServiceUnavailable() {
         var requestSymbols = List.of(
                 RandomStringUtils.randomAlphabetic(32),
                 RandomStringUtils.randomAlphabetic(32));
@@ -560,7 +560,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testAllExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturns404() {
+    void testAllExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturnsNotFound() {
         binanceAPIHelper.mockRequestExchangeAllInfoErrorNotFound();
 
         given()
@@ -575,7 +575,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testAllExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturns403() {
+    void testAllExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturnsWAFLimit() {
         binanceAPIHelper.mockRequestExchangeAllInfoErrorWAFLimit();
 
         given()
@@ -590,7 +590,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testAllExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturns429() {
+    void testAllExchangeInfo_shouldReturnForbiddenIfBinanceAPIReturnsRateLimit() {
         binanceAPIHelper.mockRequestExchangeAllInfoErrorRateLimit();
 
         given()
@@ -605,7 +605,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testAllExchangeInfo_shouldReturnInternalServerErrorIfBinanceAPIReturns409() {
+    void testAllExchangeInfo_shouldReturnInternalServerErrorIfBinanceAPIReturnsPartialSuccess() {
         binanceAPIHelper.mockRequestExchangeAllInfoErrorPartialSuccess();
 
         given()
@@ -620,7 +620,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testAllExchangeInfo_shouldReturnServiceUnavailableIfBinanceAPIReturns503() {
+    void testAllExchangeInfo_shouldReturnServiceUnavailableIfBinanceAPIReturnsServiceUnavailable() {
         binanceAPIHelper.mockRequestExchangeAllInfoErrorServiceUnavailable();
 
         given()

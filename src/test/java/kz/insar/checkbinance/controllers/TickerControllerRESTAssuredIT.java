@@ -82,12 +82,14 @@ public class TickerControllerRESTAssuredIT {
     @Order(1)
     void testTestSymbolRepositoryCleansUp_fillAndClean() {
         checkbinanceServiceHelper.createRandomSymbols(10).createAndSubscribeRandomSymbols(10);
+        assertFalse(checkbinanceServiceHelper.getSymbols().isEmpty());
         System.err.println(checkbinanceServiceHelper.getSymbols());
     }
 
     @Test
     @Order(2)
     void testTestSymbolRepositoryCleansUp_check() {
+        assertTrue(checkbinanceServiceHelper.getSymbols().isEmpty());
         System.err.println(checkbinanceServiceHelper.getSymbols());
     }
 

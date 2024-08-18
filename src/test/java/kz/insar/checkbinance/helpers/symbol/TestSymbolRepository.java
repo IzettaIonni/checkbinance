@@ -10,9 +10,19 @@ import java.util.stream.Collectors;
 public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
 
     T createSymbol(TestSymbol testSymbol);
+    T deleteSymbol(SymbolId id);
+    default T deleteSymbol(TestSymbol testSymbol) {
+        return deleteSymbol(testSymbol.getId());
+    }
+    default T deleteSymbol(int index) {
+        return deleteSymbol(getSymbolId(index));
+    }
 
     T subscribeSymbol(TestSymbol testSymbol);
     T unsubscribeSymbol(TestSymbol testSymbol);
+
+    T cleanUp();
+
     default boolean isSymbolPresent(String symbolName) {
         return getSymbols().stream().map(TestSymbol::getName).anyMatch(s -> s.equals(symbolName));
     }
@@ -22,6 +32,9 @@ public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
     int getSymbolCount();
     List<TestSymbol> getSymbols();
     TestSymbol getSymbol(int creationIndex);
+    default TestSymbol getSymbol(SymbolId id) {
+        return getSymbols().stream().filter(testSymbol -> testSymbol.getId().equals(id)).findFirst().orElseThrow();
+    }
     SymbolId getSymbolId(int creationIndex);
     SymbolId getSymbolId(TestSymbol testSymbol);
     default SymbolId getSymbolId(String symbolName) {

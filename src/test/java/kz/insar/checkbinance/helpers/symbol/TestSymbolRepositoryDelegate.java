@@ -16,6 +16,11 @@ public interface TestSymbolRepositoryDelegate<T extends TestSymbolRepositoryDele
         return getSelf();
     }
     @Override
+    default T deleteSymbol(SymbolId id) {
+        getSymbolRepository().deleteSymbol(id);
+        return getSelf();
+    }
+    @Override
     default T subscribeSymbol(TestSymbol testSymbol) {
         getSymbolRepository().subscribeSymbol(testSymbol);
         return getSelf();
@@ -23,6 +28,11 @@ public interface TestSymbolRepositoryDelegate<T extends TestSymbolRepositoryDele
     @Override
     default T unsubscribeSymbol(TestSymbol testSymbol) {
         getSymbolRepository().unsubscribeSymbol(testSymbol);
+        return getSelf();
+    }
+    @Override
+    default T cleanUp() {
+        getSymbolRepository().cleanUp();
         return getSelf();
     }
     @Override

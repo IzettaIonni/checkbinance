@@ -2,6 +2,7 @@ package kz.insar.checkbinance.helpers.symbol;
 
 import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolCreate;
+import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.services.SymbolService;
 import kz.insar.checkbinance.services.TickerService;
 import lombok.Builder;
@@ -30,6 +31,11 @@ public class TestSymbolIssuerCore implements TestSymbolRepositoryImpl.TestSymbol
                 .quoteAssetPrecision(testSymbol.getQuoteAssetPrecision())
                 .status(testSymbol.getStatus())
                 .build());
+    }
+
+    @Override
+    public void deleteSymbol(SymbolId id) {
+        symbolService.deleteSymbol(id);
     }
 
     @Override

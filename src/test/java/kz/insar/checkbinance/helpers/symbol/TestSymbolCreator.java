@@ -26,7 +26,7 @@ public class TestSymbolCreator<T extends TestSymbolRepository<T>> {
     }
 
     private String getRandomString(int limit) {
-        return RandomStringUtils.randomAscii(limit);
+        return RandomStringUtils.randomAlphabetic(limit);
     }
 
     private String getRandomString() {

@@ -22,7 +22,7 @@ public class BNBLastPriceResponse {
     private final Function<String, SymbolId> symbolIdExtractor;
 
     public List<String> getUniqueSymbols() {
-        return new ArrayList<>(prices.stream().map(BNBLastPrice::getSymbol).collect(Collectors.toSet()));
+        return prices.stream().map(BNBLastPrice::getSymbol).distinct().collect(Collectors.toList());
     }
 
     public List<SymbolPriceDTO> toSymbolPriceDTOs() {

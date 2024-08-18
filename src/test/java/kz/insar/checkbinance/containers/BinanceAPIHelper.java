@@ -110,7 +110,7 @@ public class BinanceAPIHelper {
     }
 
     public BinanceAPIHelper mockRequestLastPrice(BNBLastPriceResponse response) {
-        return mockRequestLastPrice(response.getUniqueSymbol(), response);
+        return mockRequestLastPrice(response.getUniqueSymbols(), response);
     }
 
     private BinanceAPIHelper mockRequestLastPriceError(List<String> requestSymbols, int responseErrorCode) {

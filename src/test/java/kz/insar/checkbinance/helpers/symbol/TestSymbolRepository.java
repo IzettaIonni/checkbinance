@@ -3,6 +3,7 @@ package kz.insar.checkbinance.helpers.symbol;
 import kz.insar.checkbinance.domain.SymbolId;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,12 +28,37 @@ public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
         return getSymbols().stream().filter((symbol) -> symbol.getName().equals(symbolName)).map(TestSymbol::getId).findFirst().orElseThrow();
     }
 
+    default int normalizeCreationIndex(int creationIndex) {
+        if (creationIndex < 0) {
+            return getSymbolCount() + creationIndex;
+        }
+        else return creationIndex;
+    }
+
     default TestSymbol getFirstSymbol() {
         return getSymbol(0);
     }
 
     default TestSymbol getLastSymbol() {
         return getSymbol(getSymbolCount()-1);
+    }
+
+    /**
+     * @param indexFrom include
+     * @param indexTo include
+     */
+    default List<String> getSymbolNames(int indexFrom, int indexTo) {
+        var result = new ArrayList<String>();
+        indexFrom = normalizeCreationIndex(indexFrom);
+        indexTo = normalizeCreationIndex(indexTo);
+        for (int i = indexFrom; i <= indexTo; i++) {
+            result.add(getSymbol(i).getName());
+        }
+        return null;
+    }
+
+    default String getSymbolName(int index) {
+        return getSymbolNames(index, index).get(0);
     }
 
 }

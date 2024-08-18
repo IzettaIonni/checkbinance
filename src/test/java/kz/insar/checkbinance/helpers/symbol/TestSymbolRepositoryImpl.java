@@ -18,12 +18,7 @@ public class TestSymbolRepositoryImpl implements TestSymbolRepository<TestSymbol
     private final List<TestSymbol> symbols = new ArrayList<>();
     private final List<SymbolId> symbolIds = new ArrayList<>();
 
-    private int normalizeCreationIndex(int creationIndex) {
-        if (creationIndex < 0) {
-            return getSymbolCount() + creationIndex;
-        }
-        else return creationIndex;
-    }
+
 
     @Override
     public TestSymbolRepositoryImpl createSymbol(TestSymbol testSymbol) {

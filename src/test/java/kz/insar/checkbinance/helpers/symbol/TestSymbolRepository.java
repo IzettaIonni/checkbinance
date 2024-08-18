@@ -67,7 +67,7 @@ public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
         for (int i = indexFrom; i <= indexTo; i++) {
             result.add(getSymbol(i).getName());
         }
-        return null;
+        return result;
     }
 
     default String getSymbolName(int index) {

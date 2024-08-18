@@ -176,7 +176,7 @@ public class BinanceAPIHelper {
     public BinanceAPIHelper mockRequestLegacyLastPrice(List<String> requestSymbols, List<BNBLegacyLastPriceResponse> responses) {
         var limit = responses.get(0).getPricesQuantity();
         if (!responses.stream().allMatch(response -> Objects.equals(response.getPricesQuantity(), limit)))
-            throw new IllegalArgumentException("Different responses' prices size"); //todo some uncertainty exception
+            throw new IllegalArgumentException("Different responses' prices size");
         return mockRequestLegacyLastPrice(requestSymbols, limit, responses);
     }
 

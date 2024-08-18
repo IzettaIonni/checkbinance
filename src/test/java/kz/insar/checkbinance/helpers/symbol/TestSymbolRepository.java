@@ -1,11 +1,9 @@
 package kz.insar.checkbinance.helpers.symbol;
 
 import kz.insar.checkbinance.domain.SymbolId;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
 
@@ -21,7 +19,7 @@ public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
     T subscribeSymbol(TestSymbol testSymbol);
     T unsubscribeSymbol(TestSymbol testSymbol);
 
-    T cleanUp();
+    T cleanTestSymbols();
 
     default boolean isSymbolPresent(String symbolName) {
         return getSymbols().stream().map(TestSymbol::getName).anyMatch(s -> s.equals(symbolName));
@@ -40,7 +38,9 @@ public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
         return isSymbolDuplicated(testSymbol.getName());
     }
 
-    int getSymbolCount();
+    default int getSymbolsCount() {
+        return getSymbols().size();
+    }
     List<TestSymbol> getSymbols();
     TestSymbol getSymbol(int creationIndex);
     default TestSymbol getSymbol(SymbolId id) {
@@ -54,7 +54,7 @@ public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
 
     default int normalizeCreationIndex(int creationIndex) {
         if (creationIndex < 0) {
-            return getSymbolCount() + creationIndex;
+            return getSymbolsCount() + creationIndex;
         }
         else return creationIndex;
     }
@@ -64,7 +64,7 @@ public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
     }
 
     default TestSymbol getLastSymbol() {
-        return getSymbol(getSymbolCount()-1);
+        return getSymbol(getSymbolsCount()-1);
     }
 
     /**

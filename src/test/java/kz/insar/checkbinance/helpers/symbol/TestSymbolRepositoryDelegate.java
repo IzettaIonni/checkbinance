@@ -1,7 +1,6 @@
 package kz.insar.checkbinance.helpers.symbol;
 
 import kz.insar.checkbinance.domain.SymbolId;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -31,13 +30,13 @@ public interface TestSymbolRepositoryDelegate<T extends TestSymbolRepositoryDele
         return getSelf();
     }
     @Override
-    default T cleanUp() {
-        getSymbolRepository().cleanUp();
+    default T cleanTestSymbols() {
+        getSymbolRepository().cleanTestSymbols();
         return getSelf();
     }
     @Override
-    default int getSymbolCount() {
-        return getSymbolRepository().getSymbolCount();
+    default int getSymbolsCount() {
+        return getSymbolRepository().getSymbolsCount();
     }
     @Override
     default List<TestSymbol> getSymbols() {
@@ -65,7 +64,7 @@ public interface TestSymbolRepositoryDelegate<T extends TestSymbolRepositoryDele
     }
     @Override
     default TestSymbol getLastSymbol() {
-        return getSymbolRepository().getSymbol(getSymbolCount()-1);
+        return getSymbolRepository().getSymbol(getSymbolsCount()-1);
     }
 
 }

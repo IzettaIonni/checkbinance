@@ -29,6 +29,7 @@ public class BNBLegacyLastPriceResponse {
     @NonNull
     private final Supplier<Long> idGenerator;
     private final Function<String, SymbolId> symbolIdExtractor;
+    private final EpochMilisToTimeConverter epochMilisToTimeConverter;
 
     public Integer getPricesQuantity() {
         return prices.size();
@@ -37,7 +38,7 @@ public class BNBLegacyLastPriceResponse {
     public String getCommonSymbolName() {
         var name = prices.get(0).getSymbol();
         if (!prices.stream().map(BNBLegacyLastPrice::getSymbol).allMatch(name::equals))
-            throw new IllegalStateException(); //todo some uncertainty exception
+            throw new IllegalStateException();
         return name;
     }
 

@@ -11,7 +11,9 @@ import kz.insar.checkbinance.helpers.symbol.TestSymbolRepository;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.RandomStringUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -70,7 +72,7 @@ public class BNBLegacyLastPriceResponse {
                             .symbol(price.getSymbol())
                             .price(price.getPrice())
                             .id(symbolIdExtractor.apply(price.getSymbol()).getId())
-                            .time(new EpochMilisToTimeConverter().apply(price.getTime()))
+                            .time(new EpochMilisToTimeConverter().apply(price.getTime())) //todo review time on prod
                             .build());
         }
         return lastPriceDTOList;
@@ -96,9 +98,6 @@ public class BNBLegacyLastPriceResponse {
 
         private List<BNBLegacyLastPrice> prices = new ArrayList<>();
 
-        private BNBLegacyLastPriceResponseBuilder prices(List<BNBLegacyLastPrice> prices) {
-            return addPrices(prices);
-        }
 
         public BNBLegacyLastPriceResponseBuilder addPrice(BNBLegacyLastPrice price) {
             prices.add(price);
@@ -106,15 +105,31 @@ public class BNBLegacyLastPriceResponse {
         }
 
         public BNBLegacyLastPriceResponseBuilder addRandomPrice() {
-            return addPrice(BNBLegacyLastPrice.builder().withRandomParams().build());
+            return addPrice(BNBLegacyLastPrice.builder()
+                    .symbol(RandomStringUtils.randomAlphabetic(32))
+                    .time(ThreadLocalRandom.current().nextLong(999999999))
+                    .price(BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE)))
+                    .qty(BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE)))
+                    .quoteQty(BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE)))
+                    .isBuyerMaker(ThreadLocalRandom.current().nextBoolean())
+                    .isBestMatch(ThreadLocalRandom.current().nextBoolean())
+                    .build());
         }
 
-        public BNBLegacyLastPriceResponseBuilder addRandomPrice(String name) {
-            return addPrice(BNBLegacyLastPrice.builder().withRandomParams().symbol(name).build());
+        public BNBLegacyLastPriceResponseBuilder addRandomPrice(String symbol) {
+            return addPrice(BNBLegacyLastPrice.builder()
+                    .symbol(symbol)
+                    .time(ThreadLocalRandom.current().nextLong(999999999))
+                    .price(BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE)))
+                    .qty(BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE)))
+                    .quoteQty(BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE)))
+                    .isBuyerMaker(ThreadLocalRandom.current().nextBoolean())
+                    .isBestMatch(ThreadLocalRandom.current().nextBoolean())
+                    .build());
         }
 
-        public BNBLegacyLastPriceResponseBuilder addRandomPrice(TestSymbol name) {
-            return addRandomPrice(name.getName());
+        public BNBLegacyLastPriceResponseBuilder addRandomPrice(TestSymbol symbol) {
+            return addRandomPrice(symbol.getName());
         }
 
         public BNBLegacyLastPriceResponseBuilder addPrices(List<BNBLegacyLastPrice> prices) {
@@ -137,7 +152,7 @@ public class BNBLegacyLastPriceResponse {
         }
 
         public BNBLegacyLastPriceResponseBuilder idGenerator(CheckbinanceServiceHelper idGenerator) {
-            return idGenerator(idGenerator::createBinanceTradeId);
+            return idGenerator(() -> idGenerator.createBinanceTradeId().getLastTradeId());
         }
 
         public BNBLegacyLastPriceResponseBuilder withRandomIdGenerator() {

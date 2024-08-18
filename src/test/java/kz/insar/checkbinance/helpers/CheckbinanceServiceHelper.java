@@ -1,20 +1,16 @@
 package kz.insar.checkbinance.helpers;
 
-import kz.insar.checkbinance.api.LastPriceDTO;
-import kz.insar.checkbinance.client.RecentTradeDTO;
-import kz.insar.checkbinance.client.SymbolPriceDTO;
 import kz.insar.checkbinance.client.SymbolStatus;
-import kz.insar.checkbinance.containers.BNBExchangeInfoResponse;
 import kz.insar.checkbinance.containers.BNBLastPriceResponse;
 import kz.insar.checkbinance.containers.BNBLegacyLastPriceResponse;
-import kz.insar.checkbinance.containers.RecentTradesWithSymbol;
-import kz.insar.checkbinance.converters.ApiConverter;
 import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolCreate;
 import kz.insar.checkbinance.helpers.symbol.*;
+import kz.insar.checkbinance.helpers.trade.BinanceTradeIdRepository;
+import kz.insar.checkbinance.helpers.trade.BinanceTradeIdRepositoryDelegate;
+import kz.insar.checkbinance.helpers.trade.BinanceTradeIdRepositoryImpl;
 import kz.insar.checkbinance.services.SymbolService;
 import kz.insar.checkbinance.services.TickerService;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +18,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 @RequiredArgsConstructor
 public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<CheckbinanceServiceHelper>,
-        TestSymbolBuilders<CheckbinanceServiceHelper> {
+        TestSymbolBuilders<CheckbinanceServiceHelper>, BinanceTradeIdRepositoryDelegate<CheckbinanceServiceHelper> {
 
     @NonNull
     private final SymbolService symbolService;
@@ -37,13 +32,16 @@ public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<C
     private final TickerService tickerService;
     @NonNull
     private final TestSymbolRepository<?> testSymbolRepository;
-    @Getter
-    private final List<Long> binanceTradeIds = new ArrayList<>();
+    @NonNull
+    private final BinanceTradeIdRepositoryImpl binanceTradeIdRepository;
 
     @Autowired
     public CheckbinanceServiceHelper(SymbolService symbolService, TickerService tickerService) {
-        this(symbolService, tickerService,
-                TestSymbolRepositoryImpl.builder().withCoreIssuer(symbolService, tickerService).build()
+        this(
+                symbolService,
+                tickerService,
+                TestSymbolRepositoryImpl.builder().withCoreIssuer(symbolService, tickerService).build(),
+                new BinanceTradeIdRepositoryImpl()
         );
     }
 
@@ -55,20 +53,6 @@ public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<C
         return BNBLegacyLastPriceResponse.builder().idGenerator(this).symbolIdExtractor(this);
     }
 
-    public Long createBinanceTradeId() { //todo is it good idea to contain ids in Map<String, Long> with symbol name?
-        long id = ThreadLocalRandom.current().nextLong(Long.MAX_VALUE);
-        while (binanceTradeIds.contains(id)) id = ThreadLocalRandom.current().nextLong(Long.MAX_VALUE);
-        return id;
-    }
-
-    public boolean isBinanceTradeIdPresent(Long id) {
-        return binanceTradeIds.contains(id);
-    }
-
-    public boolean isBinanceTradeIdDuplicated(Long id) {
-        return binanceTradeIds.stream().filter(id::equals).count() > 1;
-    }
-
     @Override
     public TestSymbolCreator<CheckbinanceServiceHelper> buildSymbol() {
         return new TestSymbolCreator<>(this);
@@ -78,27 +62,16 @@ public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<C
     public TestSymbolRepository<?> getSymbolRepository() {
         return testSymbolRepository;
     }
+
+    @Override
+    public BinanceTradeIdRepository<?> getBinanceTradeIdRepository() {
+        return binanceTradeIdRepository;
+    }
+
     @Override
     public CheckbinanceServiceHelper getSelf() {
         return this;
     }
-//    @Override
-//    public CheckbinanceServiceHelper createSymbol(TestSymbol testSymbol) {
-//        testSymbolRepository.createSymbol(testSymbol);
-//        return this;
-//    }
-//
-//    @Override
-//    public CheckbinanceServiceHelper subscribeSymbol(TestSymbol testSymbol) {
-//        testSymbolRepository.subscribeSymbol(testSymbol);
-//        return this;
-//    }
-//
-//    @Override
-//    public CheckbinanceServiceHelper unsubscribeSymbol(TestSymbol testSymbol) {
-//        testSymbolRepository.unsubscribeSymbol(testSymbol);
-//        return this;
-//    }
 
     @Deprecated
     public SymbolStatus getRandomSymbolStatus() {

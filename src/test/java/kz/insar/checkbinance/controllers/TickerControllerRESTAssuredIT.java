@@ -2,7 +2,6 @@ package kz.insar.checkbinance.controllers;
 
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
-import kz.insar.checkbinance.api.SymbolParamsDTO;
 import kz.insar.checkbinance.containers.*;
 import kz.insar.checkbinance.helpers.CheckbinanceServiceHelper;
 import org.hamcrest.Matchers;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -45,19 +43,6 @@ public class TickerControllerRESTAssuredIT {
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Deprecated
-    private SymbolParamsDTO createSymbolParamDTO(String name) {
-        SymbolParamsDTO symbol = new SymbolParamsDTO();
-        symbol.setSymbol(UUID.randomUUID().toString());
-        symbol.setStatus(checkbinanceServiceHelper.getRandomSymbolStatus());
-        symbol.setBaseAsset(UUID.randomUUID().toString());
-        symbol.setBaseAssetPrecision(ThreadLocalRandom.current().nextInt());
-        symbol.setQuoteAsset(UUID.randomUUID().toString());
-        symbol.setQuotePrecision(ThreadLocalRandom.current().nextInt());
-        symbol.setQuoteAssetPrecision(ThreadLocalRandom.current().nextInt());
-        return symbol;
-    }
-
     private static LocalDateTime T(String time) {
         return LocalDateTime.parse(time);
     }
@@ -75,7 +60,8 @@ public class TickerControllerRESTAssuredIT {
     @AfterEach
     void tearDown() {
         binanceAPIHelper.cleanUp();
-        checkbinanceServiceHelper.cleanUp();
+        checkbinanceServiceHelper.cleanTestSymbols();
+        checkbinanceServiceHelper.cleanBinanceTradeIds();
     }
 
     @Test

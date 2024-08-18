@@ -54,6 +54,12 @@ public class BinanceAPIHelper {
         return buildRequestGet("/exchangeInfo");
     }
 
+    @SneakyThrows
+    private HttpRequest buildRequestExchangeInfoGet(List<String> requestSymbols) {
+        return buildRequestGet("/exchangeInfo")
+                .withQueryStringParameter("symbols", objectMapper.writeValueAsString(requestSymbols));
+    }
+
     private HttpRequest buildRequestTickerPriceGet() {
         return buildRequestGet("/ticker/price");
     }
@@ -64,31 +70,31 @@ public class BinanceAPIHelper {
                 .withQueryStringParameter("symbols", objectMapper.writeValueAsString(requestSymbols));
     }
 
-    @Deprecated
     @SneakyThrows
-    public BinanceAPIHelper mockRequestExchangeInfo(List<String>requestSymbols, ExchangeInfoBySymbolsDTO responseDTO) {
-        return mockRequest(
-                buildRequestExchangeInfoGet()
-                        .withQueryStringParameter("symbols", objectMapper.writeValueAsString(requestSymbols)),
-                response().withBody(JsonBody.json(responseDTO)).withStatusCode(200));
+    public BinanceAPIHelper mockRequestExchangeInfo(List<String>requestSymbols, HttpResponse response) {
+        return mockRequest(buildRequestExchangeInfoGet(requestSymbols), response);
+    }
+
+    public BinanceAPIHelper mockRequestExchangeInfo(List<String>requestSymbols, BNBExchangeInfoResponse response) {
+        var responseDTO = response.toExchangeInfoBySymbolsDTO();
+        return mockRequestExchangeInfo(requestSymbols, response().withBody(JsonBody.json(responseDTO)).withStatusCode(200));
     }
 
     public BinanceAPIHelper mockRequestExchangeInfo(BNBExchangeInfoResponse response) {
         return mockRequestExchangeInfo(
                 response.getRequestSymbols(),
-                response.toExchangeInfoBySymbolsDTO()
+                response
         );
     }
 
-    @Deprecated
     @SneakyThrows
-    public BinanceAPIHelper mockRequestExchangeAllInfo(ExchangeInfoBySymbolsDTO responseDTO) {
-        return mockRequest(buildRequestExchangeInfoGet(),
-                response().withBody(JsonBody.json(responseDTO)).withStatusCode(200));
+    public BinanceAPIHelper mockRequestExchangeAllInfo(HttpResponse response) {
+        return mockRequest(buildRequestExchangeInfoGet(), response);
     }
 
     public BinanceAPIHelper mockRequestExchangeAllInfo(BNBExchangeInfoResponse response) {
-        return mockRequestExchangeAllInfo(response.toExchangeInfoBySymbolsDTO());
+        var responseDTO = response.toExchangeInfoBySymbolsDTO();
+        return mockRequestExchangeAllInfo(response().withBody(JsonBody.json(responseDTO)).withStatusCode(200));
     }
 
     @SneakyThrows
@@ -176,40 +182,6 @@ public class BinanceAPIHelper {
 
     public BinanceAPIHelper mockRequestLegacyLastPrice(List<BNBLegacyLastPriceResponse> responses) {
         return mockRequestLegacyLastPrice(responses.stream().map(BNBLegacyLastPriceResponse::getCommonSymbolName).collect(Collectors.toList()), responses);
-    }
-
-    @Deprecated
-    public BinanceAPIHelper mockRequestLegacyLastPriceWrapper(LegacyLastPriceMockWrapper requestSymbol) {
-        var idIterator = requestSymbol.getRecentTrades().stream()
-                .map(RecentTradesMockWrapper::getId).collect(Collectors.toList()).iterator();
-        return mockRequestLegacyLastPrice(
-                requestSymbol.getSymbol(),
-                requestSymbol.getRequestLimit(),
-                BNBLegacyLastPriceResponse.builder()
-                        .addPrices(
-                            requestSymbol.getRecentTrades().stream().map((trade) -> {
-                            return BNBLegacyLastPrice.builder()
-                                    .symbol(requestSymbol.getSymbol())
-                                    .time(trade.getTime())
-                                    .price(trade.getPrice())
-                                    .qty(trade.getQty())
-                                    .quoteQty(trade.getQuoteQty())
-                                    .isBuyerMaker(trade.getIsBuyerMaker())
-                                    .isBestMatch(trade.getIsBestMatch())
-                                    .build();
-                            }).collect(Collectors.toList())
-                        )
-                        .idGenerator(idIterator::next)
-                        .build()
-        );
-    }
-
-    @Deprecated
-    public BinanceAPIHelper mockRequestLegacyLastPriceWrapper(List<LegacyLastPriceMockWrapper> requestSymbols) {
-        BinanceAPIHelper result = mockRequestLegacyLastPriceWrapper(requestSymbols.get(0));
-        for (int i = 1; i < requestSymbols.size(); i++)
-            mockRequestLegacyLastPriceWrapper(requestSymbols.get(i));
-        return result;
     }
 
     private BinanceAPIHelper mockRequestLegacyLastPriceError(String requestSymbol, int limit, int responseErrorCode) {

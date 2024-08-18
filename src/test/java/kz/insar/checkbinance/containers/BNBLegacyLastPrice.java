@@ -33,15 +33,5 @@ public class BNBLegacyLastPrice {
             return symbol(symbol.getName());
         }
 
-        public BNBLegacyLastPriceBuilder withRandomParams() {
-            symbol = RandomStringUtils.random(32);
-            time = ThreadLocalRandom.current().nextLong(999999999); //Caused by DateTime boundaries
-            price = BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE));
-            qty = BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE));
-            quoteQty = BigDecimal.valueOf(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE));
-            isBuyerMaker = ThreadLocalRandom.current().nextBoolean();
-            isBestMatch = ThreadLocalRandom.current().nextBoolean();
-            return this;
-        }
     }
 }

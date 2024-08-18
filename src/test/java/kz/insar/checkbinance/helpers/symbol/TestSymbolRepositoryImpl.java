@@ -52,15 +52,10 @@ public class TestSymbolRepositoryImpl implements TestSymbolRepository<TestSymbol
     }
 
     @Override
-    public TestSymbolRepositoryImpl cleanUp() {
+    public TestSymbolRepositoryImpl cleanTestSymbols() {
         var clone = new ArrayList<>(symbolIds);
         clone.forEach(this::deleteSymbol);
         return this;
-    }
-
-    @Override
-    public int getSymbolCount() {
-        return symbols.size();
     }
 
     @Override

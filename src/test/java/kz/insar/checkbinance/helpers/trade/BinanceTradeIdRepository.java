@@ -8,6 +8,10 @@ public interface BinanceTradeIdRepository<T extends BinanceTradeIdRepository<T>>
     Long getBinanceTradeId(int creationIndex);
     T cleanBinanceTradeIds();
 
+    default Long createAndGetBinanceTradeId() {
+        return createBinanceTradeId().getLastTradeId();
+    }
+
     default int getIdsCount() {
         return getBinanceTradeIds().size();
     }

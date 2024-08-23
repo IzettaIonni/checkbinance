@@ -8,6 +8,7 @@ import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.helpers.CheckbinanceServiceHelper;
 import kz.insar.checkbinance.helpers.symbol.TestSymbol;
 import kz.insar.checkbinance.helpers.symbol.TestSymbolRepository;
+import kz.insar.checkbinance.helpers.trade.BinanceTradeIdRepository;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -152,8 +153,8 @@ public class BNBLegacyLastPriceResponse {
             return this;
         }
 
-        public BNBLegacyLastPriceResponseBuilder idGenerator(CheckbinanceServiceHelper idGenerator) {
-            return idGenerator(() -> idGenerator.createBinanceTradeId().getLastTradeId());
+        public BNBLegacyLastPriceResponseBuilder idGenerator(BinanceTradeIdRepository<?> idGenerator) {
+            return idGenerator(idGenerator::createAndGetBinanceTradeId);
         }
 
         public BNBLegacyLastPriceResponseBuilder withRandomIdGenerator() {

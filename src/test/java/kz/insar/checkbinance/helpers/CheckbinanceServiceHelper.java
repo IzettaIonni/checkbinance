@@ -23,8 +23,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 @RequiredArgsConstructor
-public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<CheckbinanceServiceHelper>,
-        TestSymbolBuilders<CheckbinanceServiceHelper>, BinanceTradeIdRepositoryDelegate<CheckbinanceServiceHelper> {
+public class CheckbinanceServiceHelper implements
+        TestSymbolRepositoryDelegate<CheckbinanceServiceHelper>,
+        TestSymbolBuilders<CheckbinanceServiceHelper>,
+        BinanceTradeIdRepositoryDelegate<CheckbinanceServiceHelper> {
 
     @NonNull
     private final SymbolService symbolService;
@@ -71,6 +73,11 @@ public class CheckbinanceServiceHelper implements TestSymbolRepositoryDelegate<C
     @Override
     public CheckbinanceServiceHelper getSelf() {
         return this;
+    }
+
+    public void cleanUp() {
+        cleanTestSymbols();
+        cleanBinanceTradeIds();
     }
 
     @Deprecated

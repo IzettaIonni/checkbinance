@@ -16,7 +16,9 @@ import kz.insar.checkbinance.services.SymbolService;
 import org.easymock.IMocksControl;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@TestMethodOrder(MethodOrderer.Random.class)
 public class TickerServiceImplTest {
 
     private IMocksControl control;

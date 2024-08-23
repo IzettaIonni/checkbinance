@@ -67,6 +67,11 @@ public class SymbolServiceImpl implements SymbolService {
     }
 
     @Override
+    public void deleteSymbol(SymbolId request) {
+        symbolRepository.deleteById(request.getId());
+    }
+
+    @Override
     public List<Symbol> getSymbols() {
         var allEntities = symbolRepository.findAll();
         List<Symbol> result = new ArrayList<>();

@@ -27,4 +27,8 @@ public interface TestSymbolBuilders<T extends TestSymbolRepository<T>> {
         }
         return result;
     }
+
+    default T createAndSubscribeRandomSymbol() {
+        return createAndSubscribeRandomSymbols(1);
+    }
 }

@@ -26,7 +26,7 @@ public class TestSymbolCreator<T extends TestSymbolRepository<T>> {
     }
 
     private String getRandomString(int limit) {
-        return RandomStringUtils.random(limit);
+        return RandomStringUtils.randomAlphabetic(limit);
     }
 
     private String getRandomString() {
@@ -45,7 +45,7 @@ public class TestSymbolCreator<T extends TestSymbolRepository<T>> {
 
     public TestSymbolCreator<T> withRandomName() {
         for (int i = 0; i < 10; i++) {
-            var name = getRandomString(64);
+            var name = getRandomString(32);
             if (!repository.isSymbolPresent(name)) {
                 return withName(name);
             }
@@ -53,7 +53,6 @@ public class TestSymbolCreator<T extends TestSymbolRepository<T>> {
         throw new IllegalStateException();
     }
 
-    //todo is null name possible?
     public TestSymbolCreator<T> withNullName() {
         return withName(null);
     }

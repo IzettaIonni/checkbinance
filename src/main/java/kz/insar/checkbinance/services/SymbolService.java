@@ -12,6 +12,8 @@ public interface SymbolService {
 
     Symbol updateSymbol(SymbolUpdate request);
 
+    void deleteSymbol(SymbolId request);
+
     List<Symbol> getSymbols();
 
     void addPriceSubscription(SymbolId request);

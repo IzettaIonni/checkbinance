@@ -21,8 +21,8 @@ public class BNBLastPriceResponse {
     private final List<BNBLastPrice> prices;
     private final Function<String, SymbolId> symbolIdExtractor;
 
-    public List<String> getUniqueSymbol() {
-        return new ArrayList<>(prices.stream().map(BNBLastPrice::getSymbol).collect(Collectors.toSet()));
+    public List<String> getUniqueSymbols() {
+        return prices.stream().map(BNBLastPrice::getSymbol).distinct().collect(Collectors.toList());
     }
 
     public List<SymbolPriceDTO> toSymbolPriceDTOs() {

@@ -18,13 +18,6 @@ public class TestSymbolRepositoryImpl implements TestSymbolRepository<TestSymbol
     private final List<TestSymbol> symbols = new ArrayList<>();
     private final List<SymbolId> symbolIds = new ArrayList<>();
 
-    private int normalizeCreationIndex(int creationIndex) {
-        if (creationIndex < 0) {
-            return getSymbolCount() + creationIndex;
-        }
-        else return creationIndex;
-    }
-
     @Override
     public TestSymbolRepositoryImpl createSymbol(TestSymbol testSymbol) {
         if (isSymbolPresent(testSymbol)) {
@@ -34,6 +27,15 @@ public class TestSymbolRepositoryImpl implements TestSymbolRepository<TestSymbol
         symbols.add(testSymbol);
         symbolIds.add(symbol.getId());
         testSymbol.markIssued();
+        return this;
+    }
+
+    @Override
+    public TestSymbolRepositoryImpl deleteSymbol(SymbolId id) {
+        unsubscribeSymbol(getSymbol(id));
+        issuer.deleteSymbol(id);
+        symbols.remove(getSymbol(id));
+        symbolIds.remove(id);
         return this;
     }
 
@@ -50,8 +52,15 @@ public class TestSymbolRepositoryImpl implements TestSymbolRepository<TestSymbol
     }
 
     @Override
-    public int getSymbolCount() {
-        return symbols.size();
+    public boolean isSymbolSubscribed(SymbolId id) {
+        return issuer.isSymbolSubscribed(id);
+    }
+
+    @Override
+    public TestSymbolRepositoryImpl cleanTestSymbols() {
+        var clone = new ArrayList<>(symbolIds);
+        clone.forEach(this::deleteSymbol);
+        return this;
     }
 
     @Override
@@ -80,8 +89,13 @@ public class TestSymbolRepositoryImpl implements TestSymbolRepository<TestSymbol
 
     public interface TestSymbolIssuer {
         Symbol createSymbol(TestSymbol testSymbol);
+        void deleteSymbol(SymbolId id);
+        default void deleteSymbol(TestSymbol testSymbol) {
+            deleteSymbol(testSymbol.getId());
+        }
         void subscribeSymbol(TestSymbol testSymbol);
         void unsubscribeSymbol(TestSymbol testSymbol);
+        boolean isSymbolSubscribed(SymbolId symbolId);
     }
 
     public static TestSymbolRepositoryImplBuilder builder() {

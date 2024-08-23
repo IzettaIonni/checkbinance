@@ -2,6 +2,7 @@ package kz.insar.checkbinance.helpers.symbol;
 
 import kz.insar.checkbinance.domain.Symbol;
 import kz.insar.checkbinance.domain.SymbolCreate;
+import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.services.SymbolService;
 import kz.insar.checkbinance.services.TickerService;
 import lombok.Builder;
@@ -33,6 +34,11 @@ public class TestSymbolIssuerCore implements TestSymbolRepositoryImpl.TestSymbol
     }
 
     @Override
+    public void deleteSymbol(SymbolId id) {
+        symbolService.deleteSymbol(id);
+    }
+
+    @Override
     public void subscribeSymbol(TestSymbol testSymbol) {
         tickerService.subscribeOnPrice(testSymbol.getId());
     }
@@ -40,6 +46,11 @@ public class TestSymbolIssuerCore implements TestSymbolRepositoryImpl.TestSymbol
     @Override
     public void unsubscribeSymbol(TestSymbol testSymbol) {
         tickerService.unsubscribeOnPrice(testSymbol.getId());
+    }
+
+    @Override
+    public boolean isSymbolSubscribed(SymbolId symbolId) {
+        return tickerService.listSubscriptionOnPrices().stream().map(Symbol::getId).anyMatch(symbolId::equals);
     }
 
 }

@@ -1,10 +1,13 @@
 package kz.insar.checkbinance.domain;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.Random.class)
 public class SymbolIdTest {
 
     static final Integer ID = 123;
@@ -66,11 +69,4 @@ public class SymbolIdTest {
         var expected = new SymbolId(ID);
         assertEquals(expected, actual, ".of method creates object with wrong id");
     }
-
-    //todo
-//    @Test
-//    void testFail() {
-//
-//        assertEquals(1, 2);
-//    }
 }

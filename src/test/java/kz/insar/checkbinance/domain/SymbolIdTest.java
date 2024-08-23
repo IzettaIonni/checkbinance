@@ -66,11 +66,4 @@ public class SymbolIdTest {
         var expected = new SymbolId(ID);
         assertEquals(expected, actual, ".of method creates object with wrong id");
     }
-
-    //todo
-//    @Test
-//    void testFail() {
-//
-//        assertEquals(1, 2);
-//    }
 }

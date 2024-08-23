@@ -2,6 +2,7 @@ package kz.insar.checkbinance.controllers;
 
 import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
+import kz.insar.checkbinance.api.SymbolShortDTO;
 import kz.insar.checkbinance.containers.*;
 import kz.insar.checkbinance.helpers.CheckbinanceServiceHelper;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -33,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureMockMvc
 @ExtendWith(ContainerHolder.class)
 @ActiveProfiles(value = {"test", "test1"})
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TickerControllerRESTAssuredIT {
 
     @Autowired
@@ -61,23 +61,7 @@ public class TickerControllerRESTAssuredIT {
     @AfterEach
     void tearDown() {
         binanceAPIHelper.cleanUp();
-        checkbinanceServiceHelper.cleanTestSymbols();
-        checkbinanceServiceHelper.cleanBinanceTradeIds();
-    }
-
-    @Test
-    @Order(1)
-    void testTestSymbolRepositoryCleansUp_fillAndClean() {
-        checkbinanceServiceHelper.createRandomSymbols(10).createAndSubscribeRandomSymbols(10);
-        assertFalse(checkbinanceServiceHelper.getSymbols().isEmpty());
-        System.err.println(checkbinanceServiceHelper.getSymbols());
-    }
-
-    @Test
-    @Order(2)
-    void testTestSymbolRepositoryCleansUp_check() {
-        assertTrue(checkbinanceServiceHelper.getSymbols().isEmpty());
-        System.err.println(checkbinanceServiceHelper.getSymbols());
+        checkbinanceServiceHelper.cleanUp();
     }
 
     @Test
@@ -298,7 +282,7 @@ public class TickerControllerRESTAssuredIT {
     }
 
     @Test
-    void testLegacyLastPrice_shouldReturnNullIfSubscriptionsDoesNotExist() {
+    void testLegacyLastPrice_shouldReturnEmptyIfSubscriptionsDoesNotExist() {
         given()
                 .params("sortKey", "ID", "sortDir", "ASC")
 
@@ -311,9 +295,11 @@ public class TickerControllerRESTAssuredIT {
                 .status(HttpStatus.OK)
                 .body("isEmpty()", Matchers.is(true));
     }
+
     @Test
     void testLegacyLastPrice_shouldReturnNotFoundIfBinanceAPIReturnsNotFound() {
         checkbinanceServiceHelper.createAndSubscribeRandomSymbol();
+
         binanceAPIHelper.mockRequestLegacyLastPriceErrorNotFound(
                 checkbinanceServiceHelper.getSymbolName(-1));
 
@@ -536,14 +522,12 @@ public class TickerControllerRESTAssuredIT {
     @Test
     void testExchangeAllInfo() {
         checkbinanceServiceHelper.createRandomSymbols(2);
-
         var response = BNBExchangeInfoResponse.builder()
                 .addSymbol(checkbinanceServiceHelper.getSymbol(-1))
                 .addSymbol(checkbinanceServiceHelper.getSymbol(-2)).build();
-
         binanceAPIHelper.mockRequestExchangeAllInfo(response);
-        var actual = given()
 
+        var actual = given()
         .when()
                 .get("/ticker/exchangeallinfo")
 
@@ -635,113 +619,119 @@ public class TickerControllerRESTAssuredIT {
     }
 
 
-//    @Test
-//    void testSubscribeTicker() {
-//        var symbolOne = createSymbol("CHZBNB");
-//        given()
-//                .params("name", symbolOne.getName())
-//
-//
-//        .when()
-//                .post("/ticker/subscribeticker")
-//
-//
-//        .then()
-//                .assertThat().status(HttpStatus.OK);
-//        var expected = List.of(symbolOne);
-//        var actual = tickerService.listSubscriptionOnPrices();
-//        assertEquals(expected, actual);
-//    }
-//
-//    @Test
-//    void testSubscribeTicker_InvalidId() {
-//        given()
-//                .params("id", 2147483647)
-//
-//
-//                .when()
-//                .post("/ticker/subscribeticker")
-//
-//
-//                .then()
-//                .assertThat().status(HttpStatus.NOT_FOUND);
-//    }
-//
-//    @Test
-//    void testSubscribeTicker_InvalidName() {
-//        given()
-//                .params("name", "absolutely not valid name")
-//
-//
-//                .when()
-//                .post("/ticker/subscribeticker")
-//
-//
-//                .then()
-//                .assertThat().status(HttpStatus.NOT_FOUND);
-//    }
-//
-//    @Test
-//    void testSubscribeTicker_BadRequestException() {
-//        given()
-//
-//        .when()
-//                .post("/ticker/subscribeticker")
-//
-//        .then()
-//                .assertThat().status(HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @Test
-//    void testUnsubscribeTicker() {
-//        var symbolOne = createSymbol("CHZBNB");
-//        var symbolTwo = createSymbol("BEAMUSDT");
-//        tickerService.subscribeOnPrice(symbolOne);
-//        tickerService.subscribeOnPrice(symbolTwo);
-//        given()
-//                .params("name", symbolOne.getName())
-//
-//
-//        .when()
-//                .post("/ticker/unsubscribeticker")
-//
-//
-//        .then()
-//                .assertThat().status(HttpStatus.OK);
-//        var expected = List.of(symbolTwo);
-//        var actual = tickerService.listSubscriptionOnPrices();
-//        assertEquals(expected, actual);
-//    }
-//
-//    @Test
-//    void testUnsubscribeTicker_BadRequestException() {
-//        given()
-//
-//        .when()
-//                .post("/ticker/unsubscribeticker")
-//
-//        .then()
-//                .assertThat().status(HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @Test
-//    void testSubscriptions() {
-//        var symbolOne = createSymbol("BTCBNB");
-//        var symbolTwo = createSymbol("BTCETH");
-//        tickerService.subscribeOnPrice(symbolOne);
-//        tickerService.subscribeOnPrice(symbolTwo);
-//        given()
-//
-//
-//        .when()
-//                .get("/ticker/subscriptions")
-//
-//
-//        .then()
-//                .assertThat().status(HttpStatus.OK);
-//        var expected = List.of(symbolOne, symbolTwo);
-//        var actual = tickerService.listSubscriptionOnPrices();
-//        assertEquals(expected, actual);
-//    }
+    @Test
+    void testSubscribeTicker() {
+        var symbol = checkbinanceServiceHelper.createRandomSymbol().getLastSymbol();
+
+        given()
+                .params("name", symbol.getName())
+
+        .when()
+                .post("/ticker/subscribeticker")
+
+        .then()
+                .assertThat().status(HttpStatus.OK);
+
+        assertTrue(checkbinanceServiceHelper.isSymbolSubscribed(symbol));
+    }
+
+    @Test
+    void testSubscribeTicker_InvalidId() {
+        var symbol = checkbinanceServiceHelper.createAndSubscribeRandomSymbol().getLastSymbol();
+
+        given()
+                .params("name", symbol.getName())
+
+                .when()
+                .post("/ticker/unsubscribeticker")
+
+                .then()
+                .assertThat().status(HttpStatus.OK);
+
+        assertTrue(checkbinanceServiceHelper.isSymbolUnsubscribed(symbol));
+    }
+
+    @Test
+    void testSubscribeTicker_InvalidName() {
+        given()
+                .params("name", "absolutely not valid name")
+
+
+                .when()
+                .post("/ticker/subscribeticker")
+
+
+                .then()
+                .assertThat().status(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void testUnsubscribeTicker_InvalidName() {
+        given()
+                .params("name", "absolutely not valid name")
+
+        .when()
+                .post("/ticker/unsubscribeticker")
+
+        .then()
+                .assertThat().status(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void testSubscribeTicker_shouldReturnBadRequestIfWithoutParams() {
+        given()
+
+        .when()
+                .post("/ticker/subscribeticker")
+
+        .then()
+                .assertThat().status(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void testUnsubscribeTicker_shouldReturnBadRequestIfWithoutParams() {
+        given()
+
+        .when()
+                .post("/ticker/subscribeticker")
+
+        .then()
+                .assertThat().status(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void testSubscriptions() {
+        checkbinanceServiceHelper.createAndSubscribeRandomSymbols(10);
+
+        var actual = given()
+
+        .when()
+                .get("/ticker/subscriptions")
+
+        .then()
+                .assertThat().status(HttpStatus.OK)
+                .contentType("application/json")
+                .extract().body()
+                .jsonPath().getList(".", SymbolShortDTO.class);
+
+        var expected = checkbinanceServiceHelper.getSymbols().stream().map(
+                testSymbol -> SymbolShortDTO.builder().id(testSymbol.getId().getId()).name(testSymbol.getName()).build())
+                .collect(Collectors.toList());
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testSubscriptions_shouldReturnEmptyIfNoSubscriptions() {
+        given()
+
+        .when()
+                .get("/ticker/subscriptions")
+
+        .then()
+                .assertThat().status(HttpStatus.OK)
+                .contentType("application/json")
+                .body("isEmpty()", Matchers.is(true));
+    }
 
 }

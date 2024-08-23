@@ -30,6 +30,10 @@ public interface TestSymbolRepositoryDelegate<T extends TestSymbolRepositoryDele
         return getSelf();
     }
     @Override
+    default boolean isSymbolSubscribed(SymbolId id) {
+        return getSymbolRepository().isSymbolSubscribed(id);
+    }
+    @Override
     default T cleanTestSymbols() {
         getSymbolRepository().cleanTestSymbols();
         return getSelf();

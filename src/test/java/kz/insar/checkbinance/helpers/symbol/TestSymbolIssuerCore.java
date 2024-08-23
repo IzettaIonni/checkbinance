@@ -48,4 +48,9 @@ public class TestSymbolIssuerCore implements TestSymbolRepositoryImpl.TestSymbol
         tickerService.unsubscribeOnPrice(testSymbol.getId());
     }
 
+    @Override
+    public boolean isSymbolSubscribed(SymbolId symbolId) {
+        return tickerService.listSubscriptionOnPrices().stream().map(Symbol::getId).anyMatch(symbolId::equals);
+    }
+
 }

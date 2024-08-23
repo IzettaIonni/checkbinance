@@ -52,6 +52,11 @@ public class TestSymbolRepositoryImpl implements TestSymbolRepository<TestSymbol
     }
 
     @Override
+    public boolean isSymbolSubscribed(SymbolId id) {
+        return issuer.isSymbolSubscribed(id);
+    }
+
+    @Override
     public TestSymbolRepositoryImpl cleanTestSymbols() {
         var clone = new ArrayList<>(symbolIds);
         clone.forEach(this::deleteSymbol);
@@ -90,6 +95,7 @@ public class TestSymbolRepositoryImpl implements TestSymbolRepository<TestSymbol
         }
         void subscribeSymbol(TestSymbol testSymbol);
         void unsubscribeSymbol(TestSymbol testSymbol);
+        boolean isSymbolSubscribed(SymbolId symbolId);
     }
 
     public static TestSymbolRepositoryImplBuilder builder() {

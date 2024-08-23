@@ -18,6 +18,7 @@ public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
 
     T subscribeSymbol(TestSymbol testSymbol);
     T unsubscribeSymbol(TestSymbol testSymbol);
+    boolean isSymbolSubscribed(SymbolId id);
 
     T cleanTestSymbols();
 
@@ -36,6 +37,22 @@ public interface TestSymbolRepository<T extends TestSymbolRepository<T>> {
     }
     default boolean isSymbolDuplicated(TestSymbol testSymbol) {
         return isSymbolDuplicated(testSymbol.getName());
+    }
+
+    default boolean isSymbolSubscribed(TestSymbol testSymbol) {
+        return isSymbolSubscribed(testSymbol.getId());
+    }
+    default boolean isSymbolSubscribed(int creationIndex) {
+        return isSymbolSubscribed(getSymbol(creationIndex));
+    }
+    default boolean isSymbolUnsubscribed(SymbolId id) {
+        return !isSymbolSubscribed(id);
+    }
+    default boolean isSymbolUnsubscribed(TestSymbol testSymbol) {
+        return isSymbolUnsubscribed(testSymbol.getId());
+    }
+    default boolean isSymbolUnsubscribed(int creationIndex) {
+        return isSymbolUnsubscribed(getSymbol(creationIndex));
     }
 
     default int getSymbolsCount() {

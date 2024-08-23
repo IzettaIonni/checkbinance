@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureMockMvc
 @ExtendWith(ContainerHolder.class)
 @ActiveProfiles(value = {"test", "test1"})
+@TestMethodOrder(MethodOrderer.Random.class)
 public class TickerControllerRESTAssuredIT {
 
     @Autowired

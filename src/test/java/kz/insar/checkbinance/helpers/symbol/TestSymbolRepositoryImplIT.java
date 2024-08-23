@@ -3,10 +3,7 @@ package kz.insar.checkbinance.helpers.symbol;
 import kz.insar.checkbinance.containers.BinanceAPIHelper;
 import kz.insar.checkbinance.containers.ContainerHolder;
 import kz.insar.checkbinance.helpers.CheckbinanceServiceHelper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
 @ExtendWith(ContainerHolder.class)
+@TestMethodOrder(MethodOrderer.Random.class)
 public class TestSymbolRepositoryImplIT {
 
     @Autowired

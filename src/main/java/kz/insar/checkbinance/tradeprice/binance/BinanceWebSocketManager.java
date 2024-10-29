@@ -17,6 +17,8 @@ public class BinanceWebSocketManager implements ITradePriceSubscriptionManager {
     @NonNull
     private final ITradePriceListener listener;
     @NonNull
+    private final BinanceWebSocketConverter converter;
+    @NonNull
     private final long maxStreamCount; //n на схеме
     private Map<Long, Integer> streams; // streamIndex, streamID
     private Map<Long, List<String>> symbolsOfStreams; // streamIndex, streamSymbols
@@ -27,9 +29,11 @@ public class BinanceWebSocketManager implements ITradePriceSubscriptionManager {
 
     public BinanceWebSocketManager(@NotNull WebSocketStreamClient wsStreamClient,
                                    @NotNull ITradePriceListener listener,
+                                   @NonNull BinanceWebSocketConverter converter,
                                    @NotNull Long maxStreamCount) {
         this.wsStreamClient = wsStreamClient;
         this.listener = listener;
+        this.converter = converter;
         this.maxStreamCount = maxStreamCount;
         this.streams = new HashMap<>();
         this.symbolsOfStreams = new HashMap<>();
@@ -39,7 +43,7 @@ public class BinanceWebSocketManager implements ITradePriceSubscriptionManager {
     }
 
     public BinanceWebSocketManager(ITradePriceListener listener) {
-        this(new WebSocketStreamClientImpl(), listener, 1000L);
+        this(new WebSocketStreamClientImpl(), listener, new BinanceWebSocketConverter(), 1000L);
     }
 
     @Override
@@ -52,7 +56,7 @@ public class BinanceWebSocketManager implements ITradePriceSubscriptionManager {
 
         if (streams.size() < maxStreamCount) {
             streams.put(currentStreamIndex,
-            wsStreamClient.combineStreams(addStreamType(symbol), ((event) -> listener.processTrade(converter.toITradePrice(event)))));
+            wsStreamClient.combineStreams(new ArrayList<>(List.of(addStreamType(symbol))), ((event) -> listener.processTrade(converter.toITradePrice(event)))));
             symbolsOfStreams.put(currentStreamIndex, List.of(symbol));
             implementedSymbols.add(symbol);
         }
@@ -63,7 +67,7 @@ public class BinanceWebSocketManager implements ITradePriceSubscriptionManager {
             listSymbols = listSymbols.stream().map(this::addStreamType).collect(Collectors.toList());
             symbolsOfStreams.replace(currentStreamIndex, listSymbols);
             streams.replace(currentStreamIndex,
-                    wsStreamClient.combineStreams(listSymbols, ((event) -> listener.processTrade(converter.toITradePrice(event)))));
+                    wsStreamClient.combineStreams(new ArrayList<>(listSymbols), ((event) -> listener.processTrade(converter.toITradePrice(event)))));
             implementedSymbols.add(symbol);
         }
         currentStreamIndex += 1;
@@ -77,7 +81,7 @@ public class BinanceWebSocketManager implements ITradePriceSubscriptionManager {
             if (listSymbols.contains(symbol)) {
                 listSymbols.remove(symbol);
                 streams.replace(currentStreamIndex,
-                        wsStreamClient.combineStreams(listSymbols, ((event) -> listener.processTrade(converter.toITradePrice(event)))));
+                        wsStreamClient.combineStreams(new ArrayList<>(listSymbols), ((event) -> listener.processTrade(converter.toITradePrice(event)))));
                 symbolsOfStreams.replace(i, listSymbols);
                 implementedSymbols.remove(symbol);
                 return;

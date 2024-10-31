@@ -2,44 +2,41 @@ package kz.insar.checkbinance.tradeprice.binance;
 
 import com.binance.connector.client.WebSocketStreamClient;
 import kz.insar.checkbinance.tradeprice.ITradePriceListener;
+import kz.insar.checkbinance.tradeprice.StreamNode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
 import javax.annotation.PreDestroy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-@Getter
-class StreamNode implements AutoCloseable{
+
+class BinanceStreamNode implements StreamNode, AutoCloseable{
     @NonNull
     private final WebSocketStreamClient wsStreamClient;
     @NonNull
     private final ITradePriceListener listener;
     @NonNull
     private final BinanceWebSocketConverter converter;
-    @Setter
     private int streamId;
-    private final ArrayList<String> symbols;
+    private final Set<String> symbols;
 
-    public StreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull ITradePriceListener listener,
-                      @NonNull BinanceWebSocketConverter converter, @NonNull List<String> symbols) {
+    public BinanceStreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull ITradePriceListener listener,
+                             @NonNull BinanceWebSocketConverter converter, @NonNull Collection<String> symbols) {
         this.wsStreamClient = wsStreamClient;
         this.listener = listener;
         this.converter = converter;
         this.streamId = 0;
-        this.symbols = new ArrayList<>(symbols);
+        this.symbols = new HashSet<>(symbols);
     }
 
-    public StreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull ITradePriceListener listener,
-                      @NonNull BinanceWebSocketConverter converter, @NonNull String... symbol) {
+    public BinanceStreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull ITradePriceListener listener,
+                             @NonNull BinanceWebSocketConverter converter, @NonNull String... symbol) {
         this(wsStreamClient, listener, converter, List.of(symbol));
     }
 
-    public void addSymbol(@NonNull String symbol) {
+    public void addItem(@NonNull String symbol) {
         if (symbols.contains(symbol)) return;
         var intermediateList = new ArrayList<>(symbols);
         intermediateList.add(symbol);
@@ -50,7 +47,7 @@ class StreamNode implements AutoCloseable{
         }
     }
 
-    public void removeSymbol(@NonNull String symbol) {
+    public void removeItem(@NonNull String symbol) {
         if (!symbols.contains(symbol)) return;
         var intermediateList = new ArrayList<>(symbols);
         intermediateList.remove(symbol);
@@ -73,10 +70,8 @@ class StreamNode implements AutoCloseable{
         listener.processTrade(converter.toITradePrice(event));
     }
 
-
-
-    public int getSymbolCount() {
-        return symbols.size();
+    public List<String> getItems() {
+        return new ArrayList<>(symbols);
     }
 
     @Override

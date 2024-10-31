@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public interface ITradePrice {
 
-    String getSymbol();
+    String getItem();
     BigDecimal getPrice();
     BigDecimal getQuantity();
     LocalDateTime getTime();

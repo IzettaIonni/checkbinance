@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Getter
-class StreamNode {
+class StreamNode implements AutoCloseable{
     @NonNull
     private final WebSocketStreamClient wsStreamClient;
     @NonNull
@@ -73,12 +73,15 @@ class StreamNode {
         listener.processTrade(converter.toITradePrice(event));
     }
 
-    @PreDestroy
-    public void close() {
-        wsStreamClient.closeConnection(streamId);
-    }
+
 
     public int getSymbolCount() {
         return symbols.size();
+    }
+
+    @Override
+    @PreDestroy
+    public void close() throws Exception {
+        wsStreamClient.closeConnection(streamId);
     }
 }

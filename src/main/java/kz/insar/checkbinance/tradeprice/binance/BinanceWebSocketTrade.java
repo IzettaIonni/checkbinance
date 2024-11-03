@@ -21,4 +21,8 @@ public class BinanceWebSocketTrade implements ITradePrice {
     private BigDecimal price;
     private BigDecimal quantity;
 
+    @Override
+    public String getItem() {
+        return symbol;
+    }
 }

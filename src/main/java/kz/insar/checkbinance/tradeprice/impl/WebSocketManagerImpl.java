@@ -65,7 +65,7 @@ public class WebSocketManagerImpl implements ITradePriceSubscriptionManager {
         if (!items.contains(item)) return;
 
         for (var streamNode : streams) {
-            if (streamNode.getItems().contains(item)) {
+            if (streamNode.isContainsItem(item)) {
                 streamNode.removeItem(item);
                 items.remove(item);
                 return;

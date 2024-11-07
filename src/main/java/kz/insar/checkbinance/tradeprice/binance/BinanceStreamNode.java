@@ -22,12 +22,12 @@ class BinanceStreamNode implements StreamNode, AutoCloseable{
     @NonNull
     private final BinanceWebSocketConverter converter;
     @Getter
-    private int streamId;
+    private Integer streamId;
     private final Set<String> symbols;
 
     public BinanceStreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull ITradePriceListener listener,
                              @NonNull BinanceWebSocketConverter converter, @NonNull Collection<String> symbols) {
-        this(wsStreamClient, listener, converter, 0, new HashSet<>(symbols));
+        this(wsStreamClient, listener, converter, null, new HashSet<>(symbols));
     }
 
     public BinanceStreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull ITradePriceListener listener,
@@ -39,7 +39,7 @@ class BinanceStreamNode implements StreamNode, AutoCloseable{
         if (symbols.contains(symbol)) return;
         var intermediateList = new ArrayList<>(symbols);
         intermediateList.add(symbol);
-        wsStreamClient.closeConnection(streamId);
+        if (streamId != null) wsStreamClient.closeConnection(streamId);
         streamId = wsStreamClient.combineStreams(addStreamType(intermediateList), this::processEvent);
         symbols.add(symbol);
     }
@@ -48,7 +48,7 @@ class BinanceStreamNode implements StreamNode, AutoCloseable{
         if (!symbols.contains(symbol)) return;
         var intermediateList = new ArrayList<>(symbols);
         intermediateList.remove(symbol);
-        wsStreamClient.closeConnection(streamId);
+        if (streamId != null) wsStreamClient.closeConnection(streamId);
         streamId = wsStreamClient.combineStreams(addStreamType(intermediateList), this::processEvent);
         symbols.remove(symbol);
     }
@@ -70,7 +70,6 @@ class BinanceStreamNode implements StreamNode, AutoCloseable{
     }
 
     @Override
-    @PreDestroy
     public void close() throws Exception {
         wsStreamClient.closeConnection(streamId);
     }

@@ -14,5 +14,8 @@ public interface StreamNode {
     default void addItems(List<String> items) {
         for (var item : items) addItem(item);
     }
+    default boolean isContainsItem(String item) {
+        return getItems().contains(item);
+    }
 
 }

@@ -153,9 +153,9 @@ public class WebSocketManagerImplTest {
         streamsStub.add(nodeMock2);
         streamsStub.add(nodeMock3);
         itemsStub.add(ITEM_NAME3);
-        expect(nodeMock1.getItems()).andReturn(List.of(ITEM_NAME1));
-        expect(nodeMock2.getItems()).andReturn(List.of(ITEM_NAME2));
-        expect(nodeMock3.getItems()).andReturn(List.of(ITEM_NAME3));
+        expect(nodeMock1.isContainsItem(ITEM_NAME3)).andReturn(false);
+        expect(nodeMock2.isContainsItem(ITEM_NAME3)).andReturn(false);
+        expect(nodeMock3.isContainsItem(ITEM_NAME3)).andReturn(true);
         nodeMock3.removeItem(ITEM_NAME3);
         control.replay();
 
@@ -170,7 +170,7 @@ public class WebSocketManagerImplTest {
     void testUnsubscribeItem_shouldThrowExceptionIfItemMarkedAsExistingButNotUsedInStreams() {
         streamsStub.add(nodeMock1);
         itemsStub.add(ITEM_NAME3);
-        expect(nodeMock1.getItems()).andReturn(List.of(ITEM_NAME1));
+        expect(nodeMock1.isContainsItem(ITEM_NAME3)).andReturn(false);
         control.replay();
 
         assertThrows(IllegalStateException.class, () -> service.unsubscribeItem(ITEM_NAME3));

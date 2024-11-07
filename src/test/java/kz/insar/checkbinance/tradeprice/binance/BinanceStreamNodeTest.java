@@ -2,7 +2,11 @@ package kz.insar.checkbinance.tradeprice.binance;
 
 import com.binance.connector.client.WebSocketStreamClient;
 import com.binance.connector.client.utils.websocketcallback.WebSocketMessageCallback;
+import groovyjarjarantlr4.v4.runtime.misc.Array2DHashSet;
+import kz.insar.checkbinance.tradeprice.ITradePrice;
 import kz.insar.checkbinance.tradeprice.ITradePriceListener;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.easymock.Capture;
 import org.easymock.IMocksControl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -20,14 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.Random.class)
 public class BinanceStreamNodeTest {
-    private static final String SYMBOL1 = "someSymbol1";
-    private static final String SYMBOL2 = "va-11 hall-a";
-    private static final String SYMBOL3 = "meow";
+    private static final String SYMBOL1 = RandomStringUtils.randomAlphabetic(32);
+    private static final String SYMBOL2 = RandomStringUtils.randomAlphabetic(32);
+    private static final String SYMBOL3 = RandomStringUtils.randomAlphabetic(32);
     private IMocksControl control;
     private WebSocketStreamClient streamClientMock;
     private ITradePriceListener listenerMock;
     private BinanceWebSocketConverter converterMock;
-    private Set<String> symbolsStab;
+    private List<String> symbolsStab;
     private BinanceStreamNode service;
 
     @BeforeEach
@@ -36,7 +40,7 @@ public class BinanceStreamNodeTest {
         streamClientMock = control.createMock(WebSocketStreamClient.class);
         listenerMock = control.createMock(ITradePriceListener.class);
         converterMock = control.createMock(BinanceWebSocketConverter.class);
-        symbolsStab = new HashSet<>();
+        symbolsStab = new ArrayList<>();
         service = new BinanceStreamNode(streamClientMock, listenerMock, converterMock, 0, symbolsStab);
     }
 
@@ -48,21 +52,26 @@ public class BinanceStreamNodeTest {
         service.addItem(SYMBOL1);
 
         control.verify();
-        assertEquals(Set.of(SYMBOL1), symbolsStab);
+        assertEquals(List.of(SYMBOL1), symbolsStab);
     }
 
     @Test
     void testAddItem_shouldAddSymbol() {
         symbolsStab.add(SYMBOL1);
         streamClientMock.closeConnection(0);
+        Capture<WebSocketMessageCallback> callbackCapture = newCapture();
         var processedItemList = new ArrayList<String>(List.of(SYMBOL1+"@trade", SYMBOL2+"@trade"));
-        expect(streamClientMock.combineStreams(eq(processedItemList), anyObject(WebSocketMessageCallback.class))).andReturn(1238);
+        expect(streamClientMock.combineStreams(eq(processedItemList), capture(callbackCapture))).andReturn(1238);
+        ITradePrice iTradePriceMock = control.createMock(ITradePrice.class);
+        expect(converterMock.toITradePrice("event")).andReturn(iTradePriceMock);
+        listenerMock.processTrade(iTradePriceMock);
         control.replay();
 
         service.addItem(SYMBOL2);
+        callbackCapture.getValues().get(0).onMessage("event");
 
         control.verify();
-        assertEquals(Set.of(SYMBOL1, SYMBOL2), symbolsStab);
+        assertEquals(List.of(SYMBOL1, SYMBOL2), symbolsStab);
         assertEquals(1238, service.getStreamId());
     }
 
@@ -73,7 +82,7 @@ public class BinanceStreamNodeTest {
         service.removeItem(SYMBOL1);
 
         control.verify();
-        assertEquals(new HashSet<>(), symbolsStab);
+        assertEquals(new ArrayList<>(), symbolsStab);
     }
 
     @Test
@@ -82,14 +91,19 @@ public class BinanceStreamNodeTest {
         symbolsStab.add(SYMBOL2);
         symbolsStab.add(SYMBOL3);
         streamClientMock.closeConnection(0);
-        var processedItemList = new ArrayList<String>(List.of(SYMBOL3+"@trade", SYMBOL1+"@trade"));
-        expect(streamClientMock.combineStreams(eq(processedItemList), anyObject(WebSocketMessageCallback.class))).andReturn(1238);
+        Capture<WebSocketMessageCallback> callbackCapture = newCapture();
+        var processedItemList = new ArrayList<String>(List.of(SYMBOL1+"@trade", SYMBOL3+"@trade"));
+        expect(streamClientMock.combineStreams(eq(processedItemList), capture(callbackCapture))).andReturn(1238);
+        ITradePrice iTradePriceMock = control.createMock(ITradePrice.class);
+        expect(converterMock.toITradePrice("event")).andReturn(iTradePriceMock);
+        listenerMock.processTrade(iTradePriceMock);
         control.replay();
 
         service.removeItem(SYMBOL2);
+        callbackCapture.getValues().get(0).onMessage("event");
 
         control.verify();
-        assertEquals(Set.of(SYMBOL1, SYMBOL3), symbolsStab);
+        assertEquals(List.of(SYMBOL1, SYMBOL3), symbolsStab);
         assertEquals(1238, service.getStreamId());
     }
 

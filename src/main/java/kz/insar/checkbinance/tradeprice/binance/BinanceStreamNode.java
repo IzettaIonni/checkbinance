@@ -23,11 +23,11 @@ class BinanceStreamNode implements StreamNode, AutoCloseable{
     private final BinanceWebSocketConverter converter;
     @Getter
     private Integer streamId;
-    private final Set<String> symbols;
+    private final List<String> symbols;
 
     public BinanceStreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull ITradePriceListener listener,
                              @NonNull BinanceWebSocketConverter converter, @NonNull Collection<String> symbols) {
-        this(wsStreamClient, listener, converter, null, new HashSet<>(symbols));
+        this(wsStreamClient, listener, converter, null, new ArrayList<>(symbols));
     }
 
     public BinanceStreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull ITradePriceListener listener,

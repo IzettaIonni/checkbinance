@@ -46,14 +46,6 @@ public class WebSocketManagerImplTest {
         nodeMock3 = control.createMock(StreamNode.class);
     }
 
-    @AfterEach
-    void tearDown() {
-        streamsStub.clear();
-        itemsStub.clear();
-        currentStreamIndexStub.set(0);
-        itemsPerStreamStub.set(1);
-    }
-
     @Test
     void testSubscribeItem_shouldNotAddSameItemTwice() {
         //given

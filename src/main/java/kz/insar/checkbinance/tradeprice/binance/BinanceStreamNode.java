@@ -1,12 +1,10 @@
 package kz.insar.checkbinance.tradeprice.binance;
 
 import com.binance.connector.client.WebSocketStreamClient;
+import com.binance.connector.client.utils.websocketcallback.WebSocketMessageCallback;
 import kz.insar.checkbinance.tradeprice.ITradePriceListener;
 import kz.insar.checkbinance.tradeprice.StreamNode;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 
 import javax.annotation.PreDestroy;
 import java.util.*;
@@ -18,29 +16,28 @@ class BinanceStreamNode implements StreamNode, AutoCloseable{
     @NonNull
     private final WebSocketStreamClient wsStreamClient;
     @NonNull
-    private final ITradePriceListener listener;
-    @NonNull
-    private final BinanceWebSocketConverter converter;
+    private final WebSocketMessageCallback callback;
+    private final List<String> symbols;
     @Getter
     private Integer streamId;
-    private final List<String> symbols;
 
-    public BinanceStreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull ITradePriceListener listener,
-                             @NonNull BinanceWebSocketConverter converter, @NonNull Collection<String> symbols) {
-        this(wsStreamClient, listener, converter, null, new ArrayList<>(symbols));
+    public BinanceStreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull WebSocketMessageCallback callback) {
+        this(wsStreamClient, callback, new ArrayList<>(), null);
     }
 
     public BinanceStreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull ITradePriceListener listener,
                              @NonNull BinanceWebSocketConverter converter, @NonNull String... symbol) {
-        this(wsStreamClient, listener, converter, Set.of(symbol));
+        this(wsStreamClient, new Callback(listener, converter), List.of(symbol), null);
     }
+
+
 
     public void addItem(@NonNull String symbol) {
         if (symbols.contains(symbol)) return;
         var intermediateList = new ArrayList<>(symbols);
         intermediateList.add(symbol);
         if (streamId != null) wsStreamClient.closeConnection(streamId);
-        streamId = wsStreamClient.combineStreams(addStreamType(intermediateList), this::processEvent);
+        streamId = wsStreamClient.combineStreams(addStreamType(intermediateList), callback);
         symbols.add(symbol);
     }
 
@@ -49,7 +46,7 @@ class BinanceStreamNode implements StreamNode, AutoCloseable{
         var intermediateList = new ArrayList<>(symbols);
         intermediateList.remove(symbol);
         if (streamId != null) wsStreamClient.closeConnection(streamId);
-        streamId = wsStreamClient.combineStreams(addStreamType(intermediateList), this::processEvent);
+        if (!(symbols.size() == 1)) streamId = wsStreamClient.combineStreams(addStreamType(intermediateList), callback);
         symbols.remove(symbol);
     }
 
@@ -61,10 +58,6 @@ class BinanceStreamNode implements StreamNode, AutoCloseable{
         return symbols.stream().map(this::addStreamType).collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private void processEvent(String event) {
-        listener.processTrade(converter.toITradePrice(event));
-    }
-
     public List<String> getItems() {
         return new ArrayList<>(symbols);
     }
@@ -72,5 +65,23 @@ class BinanceStreamNode implements StreamNode, AutoCloseable{
     @Override
     public void close() throws Exception {
         wsStreamClient.closeConnection(streamId);
+    }
+
+    void setStreamId(Integer id) {
+        streamId = id;
+    }
+
+    @AllArgsConstructor
+    @EqualsAndHashCode
+    public static class Callback implements WebSocketMessageCallback {
+        @NonNull
+        private final ITradePriceListener listener;
+        @NonNull
+        private final BinanceWebSocketConverter converter;
+
+        @Override
+        public void onMessage(String data) {
+            listener.processTrade(converter.toITradePrice(data));
+        }
     }
 }

@@ -5,4 +5,6 @@ public interface ITradePriceSubscriptionManager{
     void subscribeItem(String item);
     void unsubscribeItem(String item);
 
+    void close();
+
 }

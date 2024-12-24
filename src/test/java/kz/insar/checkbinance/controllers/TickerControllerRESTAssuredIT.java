@@ -33,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @AutoConfigureMockMvc
 @ExtendWith(ContainerHolder.class)
-@ActiveProfiles(value = {"test", "test1"})
 @TestMethodOrder(MethodOrderer.Random.class)
 public class TickerControllerRESTAssuredIT {
 

@@ -75,4 +75,10 @@ public class WebSocketManagerImpl implements ITradePriceSubscriptionManager {
         throw new IllegalStateException("No stream with such symbol is existed but symbol is marked as subscribed");
     }
 
+    public void close() {
+        for (var node : streams) {
+            node.close();
+        }
+    }
+
 }

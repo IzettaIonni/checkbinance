@@ -5,7 +5,8 @@ CREATE TYPE symbol_status_type AS ENUM
     'END_OF_DAY',
     'HALT',
     'AUCTION_MATCH',
-    'BREAK');
+    'BREAK',
+    'UNKNOWN');
 
 CREATE TABLE symbols (
     symbol_id SERIAL PRIMARY KEY,

@@ -6,8 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.time.LocalTime;
-
 @Configuration
 @EnableScheduling
 public class ScheduledUpdate {
@@ -15,9 +13,9 @@ public class ScheduledUpdate {
     @Autowired
     TickerService tickerService;
 //todo uncomment
-//
-//    @Scheduled(fixedDelay = 300000)
-//    private void shceduledSymbolUpdate() {
-//        tickerService.updateSymbols();
-//    }
+
+    @Scheduled(fixedDelay = 300000)
+    public void scheduledSymbolUpdate() {
+        tickerService.updateSymbols();
+    }
 }

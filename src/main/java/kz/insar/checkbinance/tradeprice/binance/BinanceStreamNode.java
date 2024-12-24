@@ -6,7 +6,6 @@ import kz.insar.checkbinance.tradeprice.ITradePriceListener;
 import kz.insar.checkbinance.tradeprice.StreamNode;
 import lombok.*;
 
-import javax.annotation.PreDestroy;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,10 +26,8 @@ class BinanceStreamNode implements StreamNode, AutoCloseable{
 
     public BinanceStreamNode(@NonNull WebSocketStreamClient wsStreamClient, @NonNull ITradePriceListener listener,
                              @NonNull BinanceWebSocketConverter converter, @NonNull String... symbol) {
-        this(wsStreamClient, new Callback(listener, converter), List.of(symbol), null);
+        this(wsStreamClient, new Callback(listener, converter), new ArrayList<>(Arrays.asList(symbol)), null);
     }
-
-
 
     public void addItem(@NonNull String symbol) {
         if (symbols.contains(symbol)) return;
@@ -63,7 +60,7 @@ class BinanceStreamNode implements StreamNode, AutoCloseable{
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         wsStreamClient.closeConnection(streamId);
     }
 

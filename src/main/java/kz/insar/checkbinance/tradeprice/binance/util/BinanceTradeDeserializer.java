@@ -31,6 +31,7 @@ public class BinanceTradeDeserializer extends StdDeserializer<BinanceWebSocketTr
         String price;
         String quantity;
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
+//todo {"stream":"btcusdt@trade","data":{"e":"trade","E":1732636519372,"s":"BTCUSDT","t":4156456888,"p":"93028.00000000","q":"0.00023000","T":1732636519372,"m":true,"M":true}}
 
         // Extract and map fields
         time = node.get("E").asText();

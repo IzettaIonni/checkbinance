@@ -2,9 +2,8 @@ package kz.insar.checkbinance.tradeprice.binance;
 
 import com.binance.connector.client.WebSocketStreamClient;
 import com.binance.connector.client.utils.websocketcallback.WebSocketMessageCallback;
-import kz.insar.checkbinance.tradeprice.ITradePrice;
+import kz.insar.checkbinance.services.qus.tradeprice.binance.BinanceStreamNode;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.easymock.Capture;
 import org.easymock.IMocksControl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;

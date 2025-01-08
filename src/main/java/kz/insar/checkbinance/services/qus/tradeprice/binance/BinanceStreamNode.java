@@ -1,9 +1,9 @@
-package kz.insar.checkbinance.tradeprice.binance;
+package kz.insar.checkbinance.services.qus.tradeprice.binance;
 
 import com.binance.connector.client.WebSocketStreamClient;
 import com.binance.connector.client.utils.websocketcallback.WebSocketMessageCallback;
-import kz.insar.checkbinance.tradeprice.ITradePriceListener;
-import kz.insar.checkbinance.tradeprice.StreamNode;
+import kz.insar.checkbinance.services.qus.tradeprice.ITradePriceListener;
+import kz.insar.checkbinance.services.qus.tradeprice.StreamNode;
 import lombok.*;
 
 import java.util.*;

@@ -1,6 +1,7 @@
 package kz.insar.checkbinance.tradeprice.binance;
 
-import org.junit.jupiter.api.BeforeAll;
+import kz.insar.checkbinance.services.qus.tradeprice.binance.BinanceWebSocketConverter;
+import kz.insar.checkbinance.services.qus.tradeprice.binance.BinanceWebSocketTrade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

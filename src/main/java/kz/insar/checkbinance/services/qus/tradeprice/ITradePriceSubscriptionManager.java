@@ -1,4 +1,4 @@
-package kz.insar.checkbinance.tradeprice;
+package kz.insar.checkbinance.services.qus.tradeprice;
 
 public interface ITradePriceSubscriptionManager{
 

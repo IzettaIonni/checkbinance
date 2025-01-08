@@ -1,4 +1,4 @@
-package kz.insar.checkbinance.tradeprice.binance.util;
+package kz.insar.checkbinance.services.qus.tradeprice.binance.util;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

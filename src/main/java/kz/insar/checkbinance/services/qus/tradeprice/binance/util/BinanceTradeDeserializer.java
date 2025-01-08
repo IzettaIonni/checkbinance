@@ -1,18 +1,17 @@
-package kz.insar.checkbinance.tradeprice.binance.util;
+package kz.insar.checkbinance.services.qus.tradeprice.binance.util;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import kz.insar.checkbinance.tradeprice.binance.BinanceWebSocketTrade;
+import kz.insar.checkbinance.services.qus.tradeprice.binance.BinanceWebSocketTrade;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.TimeZone;
 
 public class BinanceTradeDeserializer extends StdDeserializer<BinanceWebSocketTrade> {
 

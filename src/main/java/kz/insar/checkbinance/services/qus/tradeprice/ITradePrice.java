@@ -1,4 +1,4 @@
-package kz.insar.checkbinance.tradeprice;
+package kz.insar.checkbinance.services.qus.tradeprice;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

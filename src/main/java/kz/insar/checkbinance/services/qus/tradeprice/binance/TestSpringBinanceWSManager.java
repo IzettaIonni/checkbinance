@@ -1,12 +1,8 @@
-package kz.insar.checkbinance.tradeprice.binance;
+package kz.insar.checkbinance.services.qus.tradeprice.binance;
 
 import com.binance.connector.client.WebSocketStreamClient;
 import com.binance.connector.client.impl.WebSocketStreamClientImpl;
-import kz.insar.checkbinance.tradeprice.ITradePriceListener;
-import kz.insar.checkbinance.tradeprice.ITradePriceSubscriptionManager;
 import lombok.NonNull;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

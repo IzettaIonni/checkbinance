@@ -1,4 +1,4 @@
-package kz.insar.checkbinance.tradeprice.binance.util;
+package kz.insar.checkbinance.services.qus.tradeprice.binance.util;
 
 //todo ingonre all unknown properties
 

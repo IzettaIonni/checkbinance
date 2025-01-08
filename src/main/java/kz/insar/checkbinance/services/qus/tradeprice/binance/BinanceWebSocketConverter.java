@@ -1,9 +1,8 @@
-package kz.insar.checkbinance.tradeprice.binance;
+package kz.insar.checkbinance.services.qus.tradeprice.binance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kz.insar.checkbinance.tradeprice.ITradePrice;
-import kz.insar.checkbinance.tradeprice.binance.util.EnvelopeDTO;
-import kz.insar.checkbinance.tradeprice.binance.util.StreamDataDTO;
+import kz.insar.checkbinance.services.qus.tradeprice.ITradePrice;
+import kz.insar.checkbinance.services.qus.tradeprice.binance.util.EnvelopeDTO;
 import lombok.SneakyThrows;
 
 import java.time.Instant;

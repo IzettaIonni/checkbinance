@@ -1,4 +1,4 @@
-package kz.insar.checkbinance.tradeprice.binance;
+package kz.insar.checkbinance.services.qus.tradeprice.binance;
 
 import kz.insar.checkbinance.services.qus.tradeprice.binance.BinanceWebSocketConverter;
 import kz.insar.checkbinance.services.qus.tradeprice.binance.BinanceWebSocketTrade;

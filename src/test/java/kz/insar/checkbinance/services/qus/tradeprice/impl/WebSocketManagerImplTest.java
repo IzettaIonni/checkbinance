@@ -1,4 +1,4 @@
-package kz.insar.checkbinance.tradeprice.impl;
+package kz.insar.checkbinance.services.qus.tradeprice.impl;
 
 import kz.insar.checkbinance.services.qus.tradeprice.StreamNode;
 import kz.insar.checkbinance.services.qus.tradeprice.StreamNodeFactory;

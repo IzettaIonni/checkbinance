@@ -1,6 +1,8 @@
 package kz.insar.checkbinance.repositories.entities;
 
+import kz.insar.checkbinance.domain.Symbol;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringExclude;
 
 import javax.persistence.*;
 
@@ -18,8 +20,9 @@ public class SymbolSubscriptionPriceEntity {
     @Column(name = "symbol_subscription_price_id")
     private Integer symbolSubscriptionPriceId;
 
-    @Column(name = "symbol_id")
-    private Integer symbol;
+    @JoinColumn(name = "symbol_id")
+    @OneToOne
+    private SymbolEntity symbol;
 
     @Column(name = "subscription_status")
     private Boolean subscriptionStatus;

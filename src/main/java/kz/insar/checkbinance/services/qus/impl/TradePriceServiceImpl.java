@@ -1,9 +1,7 @@
 package kz.insar.checkbinance.services.qus.impl;
 
 import com.binance.connector.client.impl.WebSocketStreamClientImpl;
-import kz.insar.checkbinance.domain.SymbolId;
-import kz.insar.checkbinance.repositories.SymbolRepository;
-import kz.insar.checkbinance.repositories.entities.SymbolName;
+import kz.insar.checkbinance.repositories.SymbolSubscriptionPriceRepository;
 import kz.insar.checkbinance.services.qus.TradePriceService;
 import kz.insar.checkbinance.services.qus.tradeprice.ITradePriceListener;
 import kz.insar.checkbinance.services.qus.tradeprice.ITradePriceSubscriptionManager;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
@@ -26,16 +23,16 @@ public class TradePriceServiceImpl implements TradePriceService {
 
     ITradePriceListener listener;
     ITradePriceSubscriptionManager manager;
-    SymbolRepository repository;
+    SymbolSubscriptionPriceRepository subscriptionRepository;
 
     @Autowired
-    public TradePriceServiceImpl(SymbolRepository repository) {
+    public TradePriceServiceImpl(SymbolSubscriptionPriceRepository subscriptionRepository) {
         this.listener = new PrintListener();
         this.manager = new WebSocketManagerImpl(
                 new BinanceStreamNodeFactory(
                         new WebSocketStreamClientImpl(), this.listener, new BinanceWebSocketConverter()),
                 5);
-        this.repository = repository;
+        this.subscriptionRepository = subscriptionRepository;
     }
 
 //    @PostConstruct
@@ -51,10 +48,13 @@ public class TradePriceServiceImpl implements TradePriceService {
 //        }
 //    }
     @PostConstruct
-    @Scheduled(fixedDelay = 300000)
     public void start() {
-        subscriptionRepisitory.getAllSymbolNames.stream().forEach((e) -> manager.subscribeItem(e));
+        reconciliation();
+    }
 
+    @Scheduled(fixedDelay = 300000)
+    public void reconciliation() {
+        subscriptionRepository.getAllSymbolNames().forEach((e) -> manager.subscribeItem(e));
     }
 
     @PreDestroy

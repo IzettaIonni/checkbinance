@@ -1,0 +1,26 @@
+package kz.insar.checkbinance.services.qus.tradeprice.binance;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import kz.insar.checkbinance.services.qus.tradeprice.ITradePrice;
+import kz.insar.checkbinance.services.qus.tradeprice.binance.util.BinanceTradeDeserializer;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Getter
+@AllArgsConstructor
+@JsonDeserialize(using = BinanceTradeDeserializer.class)
+@EqualsAndHashCode
+public class BinanceWebSocketTrade implements ITradePrice {
+
+    private LocalDateTime time;
+    private String symbol;
+    private BigDecimal price;
+    private BigDecimal quantity;
+
+    @Override
+    public String getItem() {
+        return symbol;
+    }
+}

@@ -4,10 +4,7 @@ import kz.insar.checkbinance.api.ExchangeInfoBySymbolsDTO;
 import kz.insar.checkbinance.api.LastPriceDTO;
 import kz.insar.checkbinance.api.SymbolParamsDTO;
 import kz.insar.checkbinance.api.SymbolShortDTO;
-import kz.insar.checkbinance.client.ExchangeInfoResponseDTO;
-import kz.insar.checkbinance.client.RecentTradeDTO;
-import kz.insar.checkbinance.client.SymbolDTO;
-import kz.insar.checkbinance.client.SymbolPriceDTO;
+import kz.insar.checkbinance.client.*;
 import kz.insar.checkbinance.common.CurrentTimeSupplier;
 import kz.insar.checkbinance.common.EpochMilisToTimeConverter;
 import kz.insar.checkbinance.domain.Symbol;
@@ -25,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ApiConverter {
+    //todo разобраться со слоями (клиент бинаса торчит в наш апи конвертер, символДТО из клиента, символ статус из клиента)
 
     private final Supplier<LocalDateTime> currentTime;
 
@@ -81,13 +79,34 @@ public class ApiConverter {
     public SymbolParamsDTO toApi(SymbolDTO symbol) {
         SymbolParamsDTO symbolParamsDTO = new SymbolParamsDTO();
         symbolParamsDTO.setSymbol(symbol.getSymbol());
-        symbolParamsDTO.setStatus(symbol.getStatus());
+        symbolParamsDTO.setStatus(toSymbolStatus(symbol.getStatus()));
         symbolParamsDTO.setBaseAsset(symbol.getBaseAsset());
         symbolParamsDTO.setBaseAssetPrecision(symbol.getBaseAssetPrecision());
         symbolParamsDTO.setQuoteAsset(symbol.getQuoteAsset());
         symbolParamsDTO.setQuotePrecision(symbol.getQuotePrecision());
         symbolParamsDTO.setQuoteAssetPrecision(symbol.getQuoteAssetPrecision());
         return symbolParamsDTO;
+    }
+
+    private SymbolStatus toSymbolStatus(String status) {
+        if (status == null) return SymbolStatus.UNKNOWN;
+        switch (status) {
+            case "PRE_TRADING":
+                return SymbolStatus.PRE_TRADING;
+            case "TRADING":
+                return SymbolStatus.TRADING;
+            case "POST_TRADING":
+                return SymbolStatus.POST_TRADING;
+            case "END_OF_DAY":
+                return SymbolStatus.END_OF_DAY;
+            case "HALT":
+                return SymbolStatus.HALT;
+            case "AUCTION_MATCH":
+                return SymbolStatus.AUCTION_MATCH;
+            case "BREAK":
+                return SymbolStatus.BREAK;
+            default: return SymbolStatus.UNKNOWN;
+        }
     }
 
     public ExchangeInfoBySymbolsDTO toApi(ExchangeInfoResponseDTO exchangeInfoResponse) {
@@ -105,7 +124,7 @@ public class ApiConverter {
     public SymbolUpdate toDomainUpdate(Symbol symbol, SymbolDTO updateParams) {
         return SymbolUpdate.builder()
                 .id(symbol.getId())
-                .status(updateParams.getStatus())
+                .status(toSymbolStatus(updateParams.getStatus()))
                 .baseAsset(updateParams.getBaseAsset())
                 .baseAssetPrecision(updateParams.getBaseAssetPrecision())
                 .quoteAsset(updateParams.getQuoteAsset())
@@ -117,7 +136,7 @@ public class ApiConverter {
     public SymbolCreate toDomainCreate(SymbolDTO createParams) {
         return SymbolCreate.builder()
                 .name(createParams.getSymbol())
-                .status(createParams.getStatus())
+                .status(toSymbolStatus(createParams.getStatus()))
                 .baseAsset(createParams.getBaseAsset())
                 .baseAssetPrecision(createParams.getBaseAssetPrecision())
                 .quoteAsset(createParams.getQuoteAsset())

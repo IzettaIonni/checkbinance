@@ -10,7 +10,7 @@ import lombok.Data;
 //@Builder(toBuilder = true)
 public class SymbolDTO {
     private String symbol;
-    private SymbolStatus status;
+    private String status;
     private String baseAsset;
     private Integer baseAssetPrecision;
     private String quoteAsset;

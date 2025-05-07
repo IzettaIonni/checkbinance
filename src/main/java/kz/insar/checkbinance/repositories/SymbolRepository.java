@@ -2,9 +2,11 @@ package kz.insar.checkbinance.repositories;
 
 import kz.insar.checkbinance.domain.SymbolId;
 import kz.insar.checkbinance.repositories.entities.SymbolEntity;
+import kz.insar.checkbinance.repositories.entities.SymbolName;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface SymbolRepository extends JpaRepository<SymbolEntity, Integer> {
@@ -17,4 +19,5 @@ public interface SymbolRepository extends JpaRepository<SymbolEntity, Integer> {
 
     //@Query(~OQL)
     Optional<SymbolEntity> findBySymbolName(String symbolName);
+    List<SymbolName> findAllNamesBy();
 }

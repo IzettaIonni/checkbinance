@@ -82,11 +82,12 @@ public class SymbolServiceImpl implements SymbolService {
     }
 
     @Override
+    @Transactional
     public void addPriceSubscription(SymbolId id) {
         var entity = subscriptionRepository.findBySymbol(id.getId()).orElse(null);
         if (entity == null) {
             entity = SymbolSubscriptionPriceEntity.builder()
-                    .symbol(id.getId())
+                    .symbol(symbolRepository.findById(id.getId()).orElseThrow())
                     .subscriptionStatus(true)
                     .build();
             subscriptionRepository.save(entity);
@@ -109,11 +110,8 @@ public class SymbolServiceImpl implements SymbolService {
 
     @Override
     public List<Symbol> getListOfPriceSubscriptions() {
-        var symbolIds = subscriptionRepository.findAll().stream()
+        return subscriptionRepository.findAll().stream()
                 .map(SymbolSubscriptionPriceEntity::getSymbol)
-                .collect(Collectors.toList());
-        return symbolRepository.findAllById(symbolIds).stream()
-                .map(converter::toDomain)
-                .collect(Collectors.toList());
+                .map(converter::toDomain).collect(Collectors.toList());
     }
 }
